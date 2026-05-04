@@ -1,0 +1,156 @@
+# Auditoria Amazon — {{product_name}}
+
+**ASIN**: {{asin}}
+**URL**: https://www.amazon.com.br/dp/{{asin}}
+**Auditado em**: {{date}}
+**Score Geral**: {{overall_score}}/100
+
+---
+
+## 📊 Score por Dimensão
+
+| Dimensão | Score | Status |
+|---|---|---|
+| Título | {{title_score}}/10 | {{title_status}} |
+| Bullets | {{bullets_score}}/10 | {{bullets_status}} |
+| Descrição | {{description_score}}/10 | {{description_status}} |
+| Backend Keywords | {{backend_score}}/10 | {{backend_status}} |
+| Imagens | {{images_score}}/10 | {{images_status}} |
+| A+ Content | {{aplus_score}}/10 | {{aplus_status}} |
+| Categoria/Browse Node | {{category_score}}/10 | {{category_status}} |
+| Reviews | {{reviews_score}}/10 | {{reviews_status}} |
+| Preço | {{price_score}}/10 | {{price_status}} |
+| Variações | {{variations_score}}/10 | {{variations_status}} |
+| **TOTAL** | **{{overall_score}}/100** | {{overall_status}} |
+
+---
+
+## 🚨 Problemas Críticos (P0 — corrigir imediatamente)
+
+{{p0_issues_table}}
+
+> P0 = problemas que **bloqueiam vendas ativamente** ou **violam políticas Amazon**. Risco de suspensão ou perda significativa de conversão.
+
+---
+
+## ⚠️ Melhorias Recomendadas (P1 — corrigir em até 7 dias)
+
+{{p1_issues_table}}
+
+> P1 = problemas que **prejudicam performance** mas não bloqueiam. Cada P1 resolvido = 5-15% de melhoria em alguma métrica.
+
+---
+
+## 💡 Otimizações Adicionais (P2 — quando tiver tempo)
+
+{{p2_issues_table}}
+
+> P2 = oportunidades de polimento. Marginal mas vale fazer em revisão mensal.
+
+---
+
+## ✅ Pontos Positivos (manter)
+
+{{positive_points_list}}
+
+---
+
+## 📋 Plano de Ação Priorizado
+
+### Esta semana (fazer hoje/amanhã)
+{{action_plan_this_week}}
+
+### Próximas 2 semanas
+{{action_plan_next_two_weeks}}
+
+### Mês seguinte (revisão mensal)
+{{action_plan_next_month}}
+
+---
+
+## 📈 Impacto Estimado das Correções
+
+| Mudança | Métrica afetada | Estimativa de impacto |
+|---|---|---|
+{{impact_estimates_rows}}
+
+> ⚠️ **Estimativas baseadas em benchmarks Amazon BR Casa**. Resultado real depende de execução, concorrência e algoritmo Amazon. Tratar como ordem de magnitude, não como número exato.
+
+---
+
+## 🔍 Análise Detalhada por Seção
+
+### Título Atual
+```
+{{current_title}}
+```
+**Análise**: {{title_analysis}}
+
+**Versão sugerida**:
+```
+{{suggested_title}}
+```
+**Mudanças**: {{title_changes}}
+
+---
+
+### Bullets Atuais
+{{current_bullets_list}}
+
+**Análise**: {{bullets_analysis}}
+
+**Versão sugerida**:
+{{suggested_bullets_list}}
+
+---
+
+### Descrição Atual
+{{current_description}}
+
+**Análise**: {{description_analysis}}
+
+**Versão sugerida**:
+{{suggested_description}}
+
+---
+
+### Backend Keywords (estimado, não acessível diretamente)
+**Análise**: {{backend_analysis}}
+**Sugestão**: {{suggested_backend}}
+
+---
+
+### Análise de Imagens
+- **Quantidade atual**: {{image_count}}/7-9
+- **Hero (#1)**: {{hero_analysis}}
+- **Lifestyle**: {{lifestyle_analysis}}
+- **Infográficos**: {{infographic_analysis}}
+- **Dimensões**: {{dimensions_analysis}}
+
+**Recomendações específicas**: {{image_recommendations}}
+
+---
+
+### Reviews
+- **Nota atual**: {{rating}}/5 ⭐
+- **Quantidade**: {{review_count}}
+- **Tendência últimos 30 dias**: {{review_trend}}
+- **Padrões em reviews negativos**: {{negative_review_patterns}}
+
+**Ações sugeridas**: {{review_actions}}
+
+---
+
+## 📝 Notas do Marco
+
+{{marco_notes}}
+
+---
+
+## 🔄 Próxima Auditoria Sugerida
+
+Agendar nova `*audit-listing {{asin}}` em **{{next_audit_recommendation}}** dias.
+
+---
+
+_Auditoria gerada por @amalfi-amazon (Marco) em {{date}}._

@@ -1,0 +1,243 @@
+# Listing Amalfi Amazon — {{product_name}}
+
+**SKU ID**: {{sku_id}}
+**ASIN**: {{asin_or_tbd}}
+**Categoria**: {{amazon_category}}
+**Browse Node**: {{browse_node_id}}
+**Gerado**: {{date}}
+**Versão**: v{{version}}
+
+---
+
+## 📌 Título ({{title_chars}}/200 chars)
+
+```
+{{generated_title}}
+```
+
+**Keywords primárias incluídas**: {{primary_keywords_list}}
+**Posicionamento mobile (60 chars iniciais)**: `{{title_first_60}}`
+
+---
+
+## 📋 Bullet Points
+
+1. **{{bullet_1_headline}}**: {{bullet_1_body}}
+   _({{bullet_1_chars}} chars)_
+
+2. **{{bullet_2_headline}}**: {{bullet_2_body}}
+   _({{bullet_2_chars}} chars)_
+
+3. **{{bullet_3_headline}}**: {{bullet_3_body}}
+   _({{bullet_3_chars}} chars)_
+
+4. **{{bullet_4_headline}}**: {{bullet_4_body}}
+   _({{bullet_4_chars}} chars)_
+
+5. **{{bullet_5_headline}}**: {{bullet_5_body}}
+   _({{bullet_5_chars}} chars)_
+
+---
+
+## 📝 Descrição ({{description_chars}}/2000 chars)
+
+{{description_html}}
+
+---
+
+## 🔍 Backend Keywords ({{backend_bytes}}/250 bytes)
+
+```
+{{backend_keywords}}
+```
+
+**Estratégia**: {{backend_strategy_note}}
+
+---
+
+## 🖼️ Briefing Visual (7 Imagens)
+
+### Imagem #1 — Hero (FOTO REAL OBRIGATÓRIA — não pode ser 100% IA)
+
+**Status**: ⚠️ Requer foto real do produto.
+
+**Instruções**:
+{{hero_instructions}}
+
+**Tratamento sugerido**:
+- Remover fundo da foto crua (Canva Background Remover ou remove.bg)
+- Aplicar fundo branco puro `#FFFFFF`
+- Centralizar produto ocupando 85% do frame
+- Exportar 2.000×2.000 px PNG ou JPG
+- Sem texto, sem logos, sem watermarks
+
+**Ferramentas sugeridas**: Canva grátis OU Photopea (Photoshop online grátis)
+
+---
+
+### Imagem #2 — Lifestyle 1 (HIGGSFIELD)
+
+**Aspect ratio**: 1:1 (2.000×2.000)
+**Reference image strength**: 0.7
+
+**Prompt Higgsfield**:
+```
+{{higgsfield_prompt_lifestyle_1}}
+```
+
+**Negative prompt**:
+```
+{{negative_prompt_universal}}
+```
+
+**Variações sugeridas**: 3 (escolher melhor)
+
+---
+
+### Imagem #3 — Infográfico de Features (CANVA)
+
+**Layout**: {{infographic_layout}}
+
+**Texto exato**:
+{{infographic_text_blocks}}
+
+**Ícones sugeridos** (buscar no Canva):
+{{icons_list}}
+
+**Paleta**:
+- Primária: {{primary_color}}
+- Secundária: {{secondary_color}}
+- Texto: {{text_color}}
+
+**Fontes**:
+- Headlines: Montserrat Bold {{headline_font_size}}pt
+- Descrição: Open Sans Regular {{body_font_size}}pt
+
+---
+
+### Imagem #4 — {{image_4_title}} ({{image_4_tool}})
+
+{{image_4_briefing}}
+
+---
+
+### Imagem #5 — Dimensões (CANVA)
+
+**Layout**: setas com medidas + box inferior com ficha completa
+
+**Medidas a destacar**:
+- Altura: {{height}} cm
+- Largura: {{width}} cm
+- Profundidade: {{depth}} cm
+- Peso: {{weight}} kg
+
+**Especificações de design**:
+- Background: branco puro
+- Setas: linhas finas cinza médio `#666666`
+- Fonte medidas: Montserrat Regular 32pt
+- Box inferior: fundo `#F5F5F5`, fonte 24pt
+
+---
+
+### Imagem #6 — Lifestyle 2 (HIGGSFIELD)
+
+**Aspect ratio**: 1:1
+**Reference image strength**: 0.7
+
+**Prompt Higgsfield**:
+```
+{{higgsfield_prompt_lifestyle_2}}
+```
+
+**Negative prompt**:
+```
+{{negative_prompt_universal}}
+```
+
+---
+
+### Imagem #7 — {{image_7_title}} ({{image_7_tool}})
+
+{{image_7_briefing}}
+
+---
+
+## 🎨 A+ Content (Módulos 1-7)
+
+> ⚠️ **NOTA**: A+ Content requer **Brand Registry**. Owner Amalfi NÃO tem hoje (modelo revenda).
+> Conteúdo abaixo fica salvo pro caso de adoção futura. **Não usar agora**.
+
+### Módulo 1 — Banner Principal
+**Texto**: {{a_plus_module_1_text}}
+**Briefing visual**: {{a_plus_module_1_visual}}
+
+### Módulo 2 — Imagem + Texto Justaposto
+**Texto**: {{a_plus_module_2_text}}
+**Briefing visual**: {{a_plus_module_2_visual}}
+
+### Módulo 3 — Comparativo (4 colunas)
+{{a_plus_module_3_content}}
+
+### Módulo 4 — Imagem Técnica + Bullets
+**Bullets**: {{a_plus_module_4_bullets}}
+**Briefing visual**: {{a_plus_module_4_visual}}
+
+### Módulo 5 — Logo + Storytelling
+**Texto**: {{a_plus_module_5_text}}
+
+### Módulo 6 — Galeria Múltiplas Imagens
+{{a_plus_module_6_content}}
+
+### Módulo 7 — FAQ Visual
+{{a_plus_module_7_content}}
+
+---
+
+## 💰 Sugestão de Precificação
+
+- **Faixa de preço sugerida**: R$ {{price_min}} - R$ {{price_max}}
+- **Preço alvo recomendado**: R$ {{price_target}}
+- **Rationale**: {{pricing_rationale}}
+- **Margem alvo após FBA fees**: ≥ 30%
+
+---
+
+## 📊 Variações Sugeridas (parent/child)
+
+{{variations_list}}
+
+---
+
+## 🎯 Categoria & Browse Node
+
+- **Categoria recomendada**: {{recommended_category}}
+- **Browse Node ID**: {{browse_node_id}}
+- **Justificativa**: {{category_rationale}}
+
+⚠️ **Confirme com Seller Central** antes de aplicar.
+
+---
+
+## ✅ Próximos Passos (checklist do owner)
+
+- [ ] **Foto Hero**: tirar/usar foto crua, processar (remove fundo + branco puro)
+- [ ] **Imagens 2/4/6**: gerar no Higgsfield com prompts deste documento
+- [ ] **Imagens 3/5/7**: montar no Canva com briefings deste documento
+- [ ] **Listing principal**: colar título, bullets, descrição, backend keywords no Seller Central
+- [ ] **Categoria**: validar Browse Node e aplicar
+- [ ] **Variações**: criar parent/child SKUs se aplicável
+- [ ] **Preço**: definir conforme sugestão
+- [ ] **Após go-live**: agendar `*audit-listing {ASIN}` em 7 dias pra validar
+- [ ] **Após 30 dias**: rodar `*analyze-ads` com primeiro Search Term Report
+
+---
+
+## 📝 Notas do Marco
+
+{{marco_notes}}
+
+---
+
+_Gerado por @amalfi-amazon (Marco) em {{date}}._
+_Spec: docs/agents/amalfi-amazon-spec.md_
+_Versão deste documento: v{{version}}_

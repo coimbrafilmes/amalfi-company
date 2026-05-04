@@ -1,0 +1,175 @@
+# Análise Sponsored Products — Amalfi Company
+
+**Período analisado**: {{period_start}} a {{period_end}}
+**Tipo de relatório**: {{report_type}}
+**ASINs cobertos**: {{asin_count}}
+**Gerado em**: {{date}}
+
+---
+
+## 📊 Resumo Executivo
+
+| Métrica | Valor | Status |
+|---|---|---|
+| **Spend total** | R$ {{total_spend}} | {{spend_status}} |
+| **Sales atribuídas** | R$ {{attributed_sales}} | {{sales_status}} |
+| **ACoS médio** | {{avg_acos}}% | {{acos_status}} |
+| **TACoS estimado** | {{tacos}}% | {{tacos_status}} |
+| **CTR médio** | {{avg_ctr}}% | {{ctr_status}} |
+| **CR médio** | {{avg_cr}}% | {{cr_status}} |
+| **Wasted spend** (cliques sem conversão) | R$ {{wasted_spend}} ({{wasted_pct}}%) | {{wasted_status}} |
+
+### Diagnóstico geral
+{{overall_diagnosis}}
+
+### Estimativa de impacto das ações sugeridas
+- **Economia mensal estimada**: R$ {{estimated_monthly_savings}}
+- **ROAS adicional estimado**: +{{estimated_roas_lift}}%
+
+---
+
+## 🚨 Ações Imediatas (aplicar HOJE)
+
+### 🛑 Pausar Keywords ({{pause_count}} keywords)
+
+| Keyword | Match Type | Cliques | Conversões | ACoS | Spend Total | Razão |
+|---|---|---|---|---|---|---|
+{{pause_table_rows}}
+
+**Economia estimada**: R$ {{pause_savings}}/mês
+
+---
+
+### ➕ Adicionar Negativas ({{negative_count}} search terms)
+
+| Search Term | Match Type Sugerida | Cliques | Spend Atual | Razão |
+|---|---|---|---|---|
+{{negative_table_rows}}
+
+**Economia estimada**: R$ {{negative_savings}}/mês
+
+---
+
+### 📈 Subir Bid em Vencedoras ({{bid_up_count}} keywords)
+
+| Keyword | Match Type | Bid Atual | Bid Sugerido | CR | ACoS | Rationale |
+|---|---|---|---|---|---|---|
+{{bid_up_table_rows}}
+
+**Vendas adicionais estimadas**: R$ {{bid_up_revenue_lift}}/mês
+
+---
+
+### 📉 Baixar Bid em Pesadas ({{bid_down_count}} keywords)
+
+| Keyword | Match Type | Bid Atual | Bid Sugerido | ACoS | Razão |
+|---|---|---|---|---|---|
+{{bid_down_table_rows}}
+
+**Economia estimada**: R$ {{bid_down_savings}}/mês
+
+---
+
+### 🌾 Harvesting (Search Terms → Exact Keywords) ({{harvest_count}} terms)
+
+| Search Term | Conversões | Spend | ASIN | Ação Sugerida |
+|---|---|---|---|---|
+{{harvest_table_rows}}
+
+> **Como aplicar**: pra cada search term acima:
+> 1. Criar nova keyword **Exact Match** numa campanha **Manual Exact** dedicada (criar se não existir)
+> 2. Adicionar a mesma search term como **Negative Exact** na campanha de origem (Auto/Broad/Phrase)
+> 3. Bid inicial sugerido: 1.2× o que ela já tava recebendo
+
+**Vendas adicionais estimadas**: R$ {{harvest_revenue_lift}}/mês (após 14 dias de aprendizado Amazon)
+
+---
+
+## 📊 Análise por Campanha
+
+{{campaign_analysis_section}}
+
+---
+
+## 📊 Análise por SKU (top 5)
+
+{{sku_analysis_section}}
+
+---
+
+## 🎯 Distribuição de Spend (onde tá indo o dinheiro)
+
+| Categoria | Spend | % Total | Sales | ACoS |
+|---|---|---|---|---|
+| Top performers (CR ≥ 8%) | R$ {{top_spend}} | {{top_pct}}% | R$ {{top_sales}} | {{top_acos}}% |
+| Médios (CR 3-8%) | R$ {{mid_spend}} | {{mid_pct}}% | R$ {{mid_sales}} | {{mid_acos}}% |
+| Bottom (CR <3%) | R$ {{bot_spend}} | {{bot_pct}}% | R$ {{bot_sales}} | {{bot_acos}}% |
+| Wasted (0 conversões) | R$ {{wasted_spend}} | {{wasted_pct}}% | R$ 0 | ∞ |
+
+---
+
+## 🔍 Insights Quentes ({{insights_count}})
+
+{{insights_list}}
+
+---
+
+## 📋 Plano de Aplicação no Seller Central
+
+**Tempo estimado pra aplicar tudo**: ~{{application_minutes}} minutos
+
+### Passo 1: Adicionar negativas ({{negative_count}} negativas)
+```
+Caminho: Campaign Manager → cada campanha → Negative Keywords (sub-aba) → Add
+Tempo: ~10 min
+```
+
+### Passo 2: Pausar keywords ruins ({{pause_count}} keywords)
+```
+Caminho: Campaign Manager → Keywords (filtrar por campanha) → marcar e pausar
+Tempo: ~10 min
+```
+
+### Passo 3: Ajustar bids ({{bid_up_count + bid_down_count}} keywords)
+```
+Caminho: Campaign Manager → Keywords → editar bid in-line
+Tempo: ~15 min
+```
+
+### Passo 4: Criar harvesting ({{harvest_count}} novas exact keywords)
+```
+Caminho: Campaign Manager → criar nova campanha Manual Exact (se não existir) → Add Keywords
+Tempo: ~20 min
+```
+
+---
+
+## 🎓 Lição da Semana (padrão aprendido)
+
+{{weekly_learning}}
+
+---
+
+## 📈 Comparação com Análise Anterior
+
+> Disponível a partir da 2ª análise. Compara com `{{previous_analysis_date}}`.
+
+{{comparison_section}}
+
+---
+
+## 🔄 Próxima Análise Sugerida
+
+Agendar nova `*analyze-ads` em **7 dias** (cadência semanal recomendada pra revisão).
+
+---
+
+## 📝 Notas do Marco
+
+{{marco_notes}}
+
+---
+
+_Análise gerada por @amalfi-amazon (Marco) em {{date}}._
+_CSV processado: {{csv_path}}_
+_Total de linhas analisadas: {{total_rows}}_
