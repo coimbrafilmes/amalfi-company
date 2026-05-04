@@ -1,0 +1,25 @@
+# AIOX Project Configuration
+version: "2.1.0"
+
+project:
+  name: "amalfi-company"
+  type: "greenfield"
+  created: "2026-05-04"
+  github_org: "coimbrafilmes"
+
+environment:
+  bootstrapped: true
+  bootstrap_date: "2026-05-04T13:03:00"
+  os: "darwin-arm64"
+  os_version: "macOS 26.2"
+
+workflow:
+  current: "greenfield-fullstack"
+  phase: "0-bootstrap-complete"
+
+permissions:
+  mode: "ask"  # explore (read-only) | ask (confirm changes) | auto (full autonomy)
+
+settings:
+  auto_update_status: true
+  quality_gates_enabled: true
