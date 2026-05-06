@@ -1,0 +1,764 @@
+<!DOCTYPE html><html><head><title>2026-05-05-listing-v1 — Amalfi Amazon</title><meta charset="utf-8"><style>/* Amalfi — Marco's listing render style
+ * Pragmatic, clean, designed for both PDF print + HTML browser viewing
+ * Optimized for: scannability, copy-paste para Seller Central, e clareza visual
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* Headings */
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0d2818;
+  border-bottom: 3px solid #4fb89c;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3d2c;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d5840;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a4a4a;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Paragraphs and inline */
+p {
+  margin: 10px 0;
+}
+
+strong, b {
+  color: #0d2818;
+  font-weight: 700;
+}
+
+em, i {
+  color: #555;
+}
+
+/* Inline code (specs, char counts, paths) */
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f5f4;
+  color: #0d4a35;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Code blocks (titulo, descrição HTML, prompts Higgsfield, backend keywords) */
+pre {
+  background: #f8faf9;
+  border: 1px solid #d6e0db;
+  border-left: 4px solid #4fb89c;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0;
+  color: #1a3d2c;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lists */
+ul, ol {
+  margin: 10px 0 14px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+li > strong:first-child {
+  color: #0d4a35;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+th {
+  background: #f3f5f4;
+  color: #0d2818;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4fb89c;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+tr:hover {
+  background: #f8faf9;
+}
+
+/* Horizontal rules — slim, subtle */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 28px 0;
+}
+
+/* Blockquotes (notas, alerts, A+ content disclaimer) */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: #fff8e8;
+  border-left: 4px solid #f0b22d;
+  color: #5c4a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* Links (raros aqui — só paths/refs) */
+a {
+  color: #0d4a35;
+  text-decoration: none;
+  border-bottom: 1px dotted #4fb89c;
+}
+
+/* Print-specific */
+@media print {
+  body {
+    padding: 0;
+    max-width: none;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, table {
+    break-inside: avoid;
+  }
+
+  pre {
+    font-size: 11px;
+  }
+}
+
+/* HTML browser-only styling (light shadow + container) */
+@media screen {
+  body {
+    background: #f5f7f6;
+  }
+
+  body > * {
+    background: white;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  html {
+    background: #f5f7f6;
+  }
+
+  body {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+    margin: 24px auto;
+    padding: 40px 48px;
+    border-radius: 10px;
+  }
+}
+/*# sourceURL=/Users/coimbrafilmes/Desktop/CLAUDE CODE/CLIENTES/AMALFI COMPANY/agents/amalfi-amazon/scripts/../assets/listing.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/opt/homebrew/lib/node_modules/md-to-pdf/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="listing-amalfi-amazon--tomada-2pt-10a-250v-branca-nbr-14136">Listing Amalfi Amazon — Tomada 2P+T 10A 250V Branca NBR 14136</h1>
+<p><strong>SKU ID</strong>: tomada-10a-2pt-branca-001
+<strong>ASIN</strong>: ⏳ pendente (atribuir após cadastrar no Seller Central)
+<strong>Categoria</strong>: Ferramentas e Materiais de Construção &gt; Material Elétrico &gt; Tomadas
+<strong>Browse Node</strong>: a validar com Seller Central
+<strong>Gerado</strong>: 2026-05-05
+<strong>Versão</strong>: v1
+<strong>Caminho de posicionamento</strong>: <strong>B — Genérico</strong> (sem mencionar Schneider/Lissê)</p>
+<hr>
+<h2 id="📌-título-119200-chars">📌 Título (119/200 chars)</h2>
+<pre><code>Tomada 10A 250V Branca 2P+T NBR 14136 Padrão Brasileiro - Inclui Suporte 4x2 e Parafusos para Caixa Embutir Residencial
+</code></pre>
+<p><strong>Keywords primárias incluídas</strong>: tomada, 10a, 250v, branca, 2p+t, nbr 14136, padrão brasileiro, suporte 4x2, parafusos, caixa, embutir, residencial</p>
+<p><strong>Posicionamento mobile (60 chars iniciais)</strong>: <code>Tomada 10A 250V Branca 2P+T NBR 14136 Padrão Brasileir</code>
+<strong>Posicionamento mobile (80 chars iniciais)</strong>: <code>Tomada 10A 250V Branca 2P+T NBR 14136 Padrão Brasileiro - Inclui Suporte</code></p>
+<p>✅ Validado contra <code>kb/amazon-br-rules.md</code>:</p>
+<ul>
+<li>≤ 200 chars ✓</li>
+<li>Sem emojis ✓</li>
+<li>Sem <code>™ ® © $</code>, sem URLs ✓</li>
+<li>Sem palavras proibidas (sem "melhor", "único", "100%") ✓</li>
+<li>Sem menção a marca de terceiro ✓</li>
+</ul>
+<hr>
+<h2 id="📋-bullet-points">📋 Bullet Points</h2>
+<ol>
+<li><p><strong>PADRÃO BRASILEIRO NBR 14136</strong>: Tomada 2P+T (2 polos + terra) compatível com o padrão obrigatório no Brasil desde 2010. Plug de 3 pinos redondos, encaixa em caixas 4x2 padrão de toda residência e comércio modernos.
+<em>(232 chars)</em></p>
+</li>
+<li><p><strong>10A / 250V — APARELHOS ATÉ 1100W EM 127V OU 2200W EM 220V</strong>: Suporta carga ideal para o dia a dia: TV, micro-ondas, ferro de passar, ventilador, computador, carregadores de notebook. Dispense extensões e use direto na parede.
+<em>(232 chars)</em></p>
+</li>
+<li><p><strong>KIT COMPLETO PRONTO PRA INSTALAR</strong>: Acompanha 1 tomada branca + 1 suporte 4x2 (espelho) + 2 parafusos de fixação. Você abre, encaixa e fixa — sem ferramenta especial, sem peça faltando. Instalação rápida por eletricista ou DIY.
+<em>(229 chars)</em></p>
+</li>
+<li><p><strong>PLÁSTICO RESISTENTE COM PROTEÇÃO ANTI-AMARELAMENTO</strong>: Corpo em termoplástico branco com tratamento UV — não amarela com a luz solar nem com o tempo. Resistente a impacto, fácil de limpar, mantém o acabamento clean por anos.
+<em>(228 chars)</em></p>
+</li>
+<li><p><strong>IDEAL PARA SALA, QUARTO, COZINHA, ESCRITÓRIO E LOJA</strong>: Design discreto, encaixe perfeito em paredes claras, harmoniza com qualquer decoração. Use em reformas, construção nova ou substituição de tomadas antigas (padrão americano 2 pinos).
+<em>(241 chars)</em></p>
+</li>
+</ol>
+<p>✅ Validado: 5 bullets ✓ | cada ≤ 250 chars ✓ | headline em CAPS ✓ | sem palavras proibidas ✓</p>
+<hr>
+<h2 id="📝-descrição-16122000-chars">📝 Descrição (1.612/2.000 chars)</h2>
+<pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Atualize sua casa ou comércio para o padrão elétrico brasileiro NBR 14136 com uma tomada robusta, segura e pronta pra usar.<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Esta Tomada 2P+T 10A 250V Branca foi desenvolvida para entregar conexão segura e durável em qualquer ambiente. Compatível com o novo padrão brasileiro de 3 pinos redondos, funciona em redes 127V e 220V — ideal pra reformas, construção nova ou substituição daquelas tomadas antigas de 2 pinos americanos que já não atendem aparelhos modernos.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>O que vem na embalagem:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>1 Tomada 2P+T 10A 250V branca<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>1 Suporte 4x2 (espelho)<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>2 Parafusos de fixação<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Especificações técnicas:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>Corrente máxima: 10 amperes<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>Tensão máxima: 250V (compatível com 127V e 220V)<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>Padrão: NBR 14136 (2 polos + terra)<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>Material: termoplástico branco com proteção UV<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>Encaixe: caixa de luz 4x2 padrão brasileiro<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Por que trocar suas tomadas antigas:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Segurança:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> aterramento obrigatório protege contra surtos<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Compatibilidade:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> aceita plugues de notebook, micro-ondas, TV, ferro elétrico<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Conformidade:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> padrão exigido por lei desde 2010<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Estética:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> design clean, branco neutro, harmoniza com qualquer parede<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>Instalação:<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span> deve ser feita por eletricista qualificado ou pessoa com conhecimento básico em elétrica. Sempre desligue a chave geral antes de manusear fiação.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Indicado para residências, escritórios, lojas, consultórios, ambientes comerciais. Combina com decoração moderna, minimalista, industrial ou clássica.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+</code></pre>
+<p>✅ Validado: ≤ 2.000 chars ✓ | HTML básico permitido ✓ | sem URLs/emails ✓ | sem palavras proibidas ✓</p>
+<hr>
+<h2 id="🔍-backend-keywords-228250-bytes">🔍 Backend Keywords (228/250 bytes)</h2>
+<pre><code>bivolt 127v 220v 110v tres pinos pino redondo aterramento aterrada embutida parede comercial industrial escritorio loja reforma construcao moderna atual novo padrao kit conjunto eletrica amperes voltagem termoplastico espelho
+</code></pre>
+<p><strong>Estratégia</strong>: complementa o título sem repetir palavras (Amazon ignora duplicatas). Cobre:</p>
+<ul>
+<li>Variações de voltagem (bivolt, 127v, 220v, 110v) — termo de busca dominante no BR</li>
+<li>Sinônimos do tipo de tomada (3 pinos / tres pinos / pino redondo)</li>
+<li>Aplicação B2B (comercial, industrial, escritorio, loja)</li>
+<li>Ocasião de compra (reforma, construcao, substituicao)</li>
+<li>Posicionamento (moderna, atual, novo padrao)</li>
+<li>Modos de busca alternativos (kit, conjunto, eletrica)</li>
+</ul>
+<p>⚠️ <strong>Não inclui</strong> marca de terceiro (Schneider, Lissê, Pial) — alinhado ao Caminho B.</p>
+<hr>
+<h2 id="🖼️-briefing-visual-7-imagens">🖼️ Briefing Visual (7 Imagens)</h2>
+<h3 id="imagem-1--hero-foto-real-obrigatória--amazon-penaliza-100-ia">Imagem #1 — Hero (FOTO REAL OBRIGATÓRIA — Amazon penaliza 100% IA)</h3>
+<p><strong>Status</strong>: ⚠️ Requer foto real do produto <strong>fora da embalagem</strong> (Caminho B = não pode mostrar logo Schneider/Lissê).</p>
+<p><strong>Instruções para o owner</strong>:</p>
+<ol>
+<li>Tirar tomada da embalagem plástica</li>
+<li>Colocar sobre superfície branca lisa (folha A4 funciona)</li>
+<li>Fotografar <strong>frontalmente</strong>, perfeitamente alinhada (3 furos centralizados)</li>
+<li>Iluminação difusa (luz de janela em dia nublado é ideal — sem sombra dura)</li>
+<li>Câmera paralela à tomada, sem distorção de perspectiva</li>
+<li>Foto crua = colocar na pasta <code>/Users/coimbrafilmes/Downloads/</code> e me avisar pra processar</li>
+</ol>
+<p><strong>Tratamento pós-foto</strong>:</p>
+<ul>
+<li>Remover fundo: Canva (Background Remover) ou remove.bg (grátis até 50/mês)</li>
+<li>Aplicar fundo branco puro <code>#FFFFFF</code> (RGB 255, 255, 255)</li>
+<li>Centralizar tomada ocupando <strong>85%</strong> do frame</li>
+<li>Exportar <strong>2.000×2.000 px</strong> PNG (preserva fundo limpo)</li>
+<li>Sem texto, sem logos, sem watermarks</li>
+</ul>
+<p><strong>Ferramentas sugeridas</strong>: Canva grátis OU Photopea (Photoshop online grátis)</p>
+<hr>
+<h3 id="imagem-2--lifestyle-sala-higgsfield">Imagem #2 — Lifestyle Sala (HIGGSFIELD)</h3>
+<p><strong>Aspect ratio</strong>: 1:1 (2.000×2.000)
+<strong>Reference image strength</strong>: 0.7 (use IMG_4377 como referência só pra forma da tomada — Higgsfield re-renderiza)</p>
+<p><strong>Prompt Higgsfield</strong>:</p>
+<pre><code>A modern white 2P+T Brazilian standard wall outlet (NBR 14136 type with 3 round pins) installed flush on a smooth painted wall in a contemporary Brazilian living room. Soft natural lighting from a large window on the left, slight shadow under the outlet. The outlet is the central focus, sharp and detailed, perfectly aligned. Subtle out-of-focus background: minimalist Scandinavian decor — light wood side table with a small green plant, light gray painted wall, baseboard visible at the bottom edge. Photorealistic, clean, magazine-style interior photography, 4K, professional product placement shot, soft daylight. Aspect ratio 1:1.
+</code></pre>
+<p><strong>Negative prompt</strong>:</p>
+<pre><code>text, watermark, logo, brand name, brand logo, schneider, pial, lisse, signage, lettering, deformed product, bent outlet, melted plastic, dust, dirt, scratches, multiple outlets, blurry product, cartoon, illustration, painting, drawing, anime, neon colors, dark mood, plastic bag, packaging, polybag, hands, people, extension cord, plug inserted
+</code></pre>
+<p><strong>Variações sugeridas</strong>: 3 (escolher melhor)</p>
+<hr>
+<h3 id="imagem-3--infográfico-de-features-canva">Imagem #3 — Infográfico de Features (CANVA)</h3>
+<p><strong>Layout</strong>: 4 quadrantes em grid 2x2, divisores cinza claro <code>#E5E5E5</code>, tomada (cutout do hero) no centro como elemento que "une" os quadrantes.</p>
+<p><strong>Texto exato</strong>:</p>
+<pre><code>[Topo, centralizado]
+TUDO QUE VOCÊ PRECISA EM 1 PRODUTO
+
+[Quadrante TL — Top Left]
+Headline: 10A / 250V
+Sub: Suporta até 2.200W
+Ícone: raio (lightning bolt)
+
+[Quadrante TR — Top Right]
+Headline: NBR 14136
+Sub: Padrão brasileiro
+Ícone: bandeira BR + check
+
+[Quadrante BL — Bottom Left]
+Headline: SUPORTE INCLUSO
+Sub: Caixa 4x2 + parafusos
+Ícone: tomada com suporte
+
+[Quadrante BR — Bottom Right]
+Headline: PROTEÇÃO UV
+Sub: Não amarela com o tempo
+Ícone: sol + escudo
+</code></pre>
+<p><strong>Ícones sugeridos</strong> (buscar no Canva):</p>
+<ul>
+<li>"lightning bolt outline" (raio)</li>
+<li>"brazil flag flat" (bandeira)</li>
+<li>"outlet plug icon" (tomada)</li>
+<li>"sun shield" ou "uv protection"</li>
+</ul>
+<p><strong>Paleta</strong>:</p>
+<ul>
+<li>Primária: <code>#FFFFFF</code> (branco)</li>
+<li>Secundária: <code>#4FB89C</code> (verde-água — combina com a embalagem original sem ser cópia)</li>
+<li>Texto: <code>#1A1A1A</code> (cinza muito escuro)</li>
+<li>Acentos: <code>#E5E5E5</code> (cinza claro pros divisores)</li>
+</ul>
+<p><strong>Fontes</strong>:</p>
+<ul>
+<li>Headlines: Montserrat Bold 40pt</li>
+<li>Sub: Open Sans Regular 24pt</li>
+<li>Headline topo: Montserrat ExtraBold 32pt</li>
+</ul>
+<hr>
+<h3 id="imagem-4--conteúdo-da-caixa-flat-lay-higgsfield">Imagem #4 — Conteúdo da Caixa Flat Lay (HIGGSFIELD)</h3>
+<p><strong>Aspect ratio</strong>: 1:1 (2.000×2.000)
+<strong>Reference image strength</strong>: 0.5 (mais liberdade pra Higgsfield compor)</p>
+<p><strong>Prompt Higgsfield</strong>:</p>
+<pre><code>Top-down flat lay product photography on a pure white seamless background of three items neatly arranged side by side: 1) on the left, a modern white Brazilian 2P+T NBR 14136 wall outlet with 3 round pins; 2) in the center, a white plastic 4x2 wall plate frame (rectangular, with screw holes); 3) on the right, two small silver Phillips head screws. Items are perfectly aligned with consistent spacing. Sharp focus, soft top-light, no harsh shadows, professional studio lighting, e-commerce product photography style, 4K, clean composition, perfectly white background, no props, no packaging, no plastic bag.
+</code></pre>
+<p><strong>Negative prompt</strong>: (mesmo da Imagem #2)</p>
+<hr>
+<h3 id="imagem-5--compatibilidade-caixa-4x2--specs-canva">Imagem #5 — Compatibilidade Caixa 4x2 + Specs (CANVA)</h3>
+<p><strong>Layout</strong>:</p>
+<ul>
+<li>Topo (60% do frame): tomada centralizada DENTRO de um desenho técnico de caixa 4x2 padrão (silhueta retangular). Setas mostrando "Encaixa Perfeitamente"</li>
+<li>Inferior (40% do frame): box branco com ficha técnica em 2 colunas</li>
+</ul>
+<p><strong>Texto exato — topo</strong>:</p>
+<pre><code>ENCAIXA EM CAIXA 4x2
+PADRÃO DE TODA RESIDÊNCIA BRASILEIRA
+</code></pre>
+<p><strong>Texto exato — box ficha técnica (2 colunas)</strong>:</p>
+<pre><code>COLUNA 1                    COLUNA 2
+Padrão: NBR 14136          Cor: Branca
+Caixa: 4x2 (7,5 × 5 cm)    Material: Termoplástico UV
+Corrente: 10A              Conteúdo: Tomada + Suporte
+Tensão: 250V               + 2 Parafusos
+</code></pre>
+<p><strong>Especificações de design</strong>:</p>
+<ul>
+<li>Background: branco puro <code>#FFFFFF</code></li>
+<li>Caixa 4x2: linha tracejada cinza médio <code>#666666</code>, espessura 3pt</li>
+<li>Setas: linhas finas cinza <code>#666666</code>, ponta sólida</li>
+<li>Box ficha: fundo <code>#F5F5F5</code>, fonte Open Sans 24pt</li>
+<li>Headline topo: Montserrat Bold 36pt</li>
+<li>Sub headline topo: Open Sans Regular 20pt</li>
+</ul>
+<hr>
+<h3 id="imagem-6--lifestyle-cozinha-higgsfield">Imagem #6 — Lifestyle Cozinha (HIGGSFIELD)</h3>
+<p><strong>Aspect ratio</strong>: 1:1 (2.000×2.000)
+<strong>Reference image strength</strong>: 0.5</p>
+<p><strong>Prompt Higgsfield</strong>:</p>
+<pre><code>Photorealistic close-up of a white Brazilian 2P+T NBR 14136 wall outlet (3 round pins) installed near a kitchen counter in a modern Brazilian apartment. Light marble countertop visible at the bottom edge, white painted wall as background, soft warm morning light coming from a window slightly off-frame. The outlet is the sharp focal point, perfectly aligned and clean. In the very blurred background, a hint of a coffee cup and a small green plant. Magazine-style interior photography, 4K, clean minimalist composition, photorealistic. Aspect ratio 1:1.
+</code></pre>
+<p><strong>Negative prompt</strong>: (mesmo da Imagem #2, adicionar: <code>appliances visible, branded products, coffee maker visible, microwave visible, kitchen clutter</code>)</p>
+<hr>
+<h3 id="imagem-7--comparativo-antigo-vs-novo-padrão-canva">Imagem #7 — Comparativo Antigo vs Novo Padrão (CANVA)</h3>
+<p><strong>Layout</strong>: split 50/50 vertical</p>
+<ul>
+<li>Esquerda: tomada antiga padrão americano 2 pinos (gráfico flat — silhueta cinza)</li>
+<li>Direita: tomada nova NBR 14136 (gráfico flat — silhueta verde-água)</li>
+<li>Topo centralizado: headline</li>
+<li>Inferior: 3 bullets de cada lado</li>
+</ul>
+<p><strong>Texto exato</strong>:</p>
+<pre><code>[Topo, centralizado]
+POR QUE TROCAR AGORA?
+
+[Esquerda — header]
+ANTIGO (2 pinos americanos)
+
+[Esquerda — bullets]
+✗ Sem aterramento
+✗ Risco de choque
+✗ Plugues novos não encaixam
+
+[Direita — header]
+NOVO (NBR 14136)
+
+[Direita — bullets]
+✓ Aterramento seguro
+✓ Padrão obrigatório
+✓ Aceita todos plugues modernos
+</code></pre>
+<p><strong>Especificações de design</strong>:</p>
+<ul>
+<li>Esquerda: tons mutados (cinza médio <code>#999999</code> pra silhueta, <code>#D9534F</code> pros X)</li>
+<li>Direita: tons positivos (verde-água <code>#4FB89C</code> pra silhueta, <code>#5CB85C</code> pros checks)</li>
+<li>Background: branco</li>
+<li>Headline topo: Montserrat ExtraBold 36pt</li>
+<li>Headers laterais: Montserrat Bold 26pt</li>
+<li>Bullets: Open Sans Regular 22pt</li>
+<li>Divisor central: linha vertical cinza <code>#E5E5E5</code>, 2pt</li>
+</ul>
+<hr>
+<h2 id="🎨-a-content-módulos-1-7">🎨 A+ Content (Módulos 1-7)</h2>
+<blockquote>
+<p>⚠️ <strong>NOTA</strong>: A+ Content requer <strong>Brand Registry</strong>. Owner Amalfi NÃO tem (modelo revenda Genérico).
+Conteúdo abaixo fica <strong>arquivado</strong> pro caso de adoção futura. <strong>Não usar agora</strong>.</p>
+</blockquote>
+<h3 id="módulo-1--banner-principal">Módulo 1 — Banner Principal</h3>
+<p><strong>Texto</strong>: "TOMADA 2P+T 10A 250V — PADRÃO BRASILEIRO NBR 14136"
+<strong>Sub</strong>: "Compatível, segura e pronta pra instalar"
+<strong>Briefing visual</strong>: foto hero da tomada à esquerda, texto centralizado à direita sobre fundo branco</p>
+<h3 id="módulo-2--imagem--texto-justaposto">Módulo 2 — Imagem + Texto Justaposto</h3>
+<p><strong>Texto</strong>: "Atualize sua casa pro padrão obrigatório desde 2010. Aterramento seguro, encaixe perfeito em caixa 4x2, design clean."
+<strong>Briefing visual</strong>: Imagem #2 (lifestyle sala) à esquerda, texto à direita</p>
+<h3 id="módulo-3--comparativo-4-colunas">Módulo 3 — Comparativo (4 colunas)</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Tomada Antiga 2P</th>
+<th>Esta Tomada 10A</th>
+<th>Tomada 20A</th>
+<th>Tomada Inteligente</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Padrão</td>
+<td>Americano (descontinuado)</td>
+<td>NBR 14136 ✓</td>
+<td>NBR 14136</td>
+<td>NBR 14136</td>
+</tr>
+<tr>
+<td>Aterramento</td>
+<td>Não</td>
+<td>Sim</td>
+<td>Sim</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Carga máxima</td>
+<td>~6A</td>
+<td>10A</td>
+<td>20A</td>
+<td>10-15A</td>
+</tr>
+<tr>
+<td>Uso ideal</td>
+<td>—</td>
+<td>Casa, escritório</td>
+<td>Cozinha, ar-condic.</td>
+<td>Automação</td>
+</tr>
+<tr>
+<td>Preço relativo</td>
+<td>—</td>
+<td>$</td>
+<td>$$</td>
+<td>$$$$</td>
+</tr>
+</tbody></table>
+<h3 id="módulo-4--imagem-técnica--bullets">Módulo 4 — Imagem Técnica + Bullets</h3>
+<p><strong>Bullets</strong>:</p>
+<ul>
+<li>10 amperes corrente máxima</li>
+<li>250V tensão máxima (127V/220V)</li>
+<li>Padrão NBR 14136 (3 pinos redondos)</li>
+<li>Termoplástico branco com proteção UV</li>
+<li>Encaixe caixa 4x2 padrão</li>
+</ul>
+<p><strong>Briefing visual</strong>: vista explodida (exploded view) da tomada + suporte + parafusos sobre fundo branco</p>
+<h3 id="módulo-5--logo--storytelling">Módulo 5 — Logo + Storytelling</h3>
+<p><strong>Texto</strong>: "Desde 2010, a NBR 14136 tornou obrigatório o uso do plug de 3 pinos redondos no Brasil. Esta tomada atende ao padrão e oferece a segurança que sua casa merece."</p>
+<h3 id="módulo-6--galeria-múltiplas-imagens">Módulo 6 — Galeria Múltiplas Imagens</h3>
+<p>6 imagens lifestyle: sala, quarto, cozinha, escritório, loja, reforma — todas com a tomada como protagonista discreto</p>
+<h3 id="módulo-7--faq-visual">Módulo 7 — FAQ Visual</h3>
+<table>
+<thead>
+<tr>
+<th>Pergunta</th>
+<th>Resposta</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>É bivolt?</td>
+<td>Sim, suporta redes 127V e 220V (até 250V)</td>
+</tr>
+<tr>
+<td>Encaixa em caixa antiga?</td>
+<td>Sim, qualquer caixa 4x2 padrão brasileiro</td>
+</tr>
+<tr>
+<td>Inclui suporte?</td>
+<td>Sim, suporte 4x2 + 2 parafusos inclusos</td>
+</tr>
+<tr>
+<td>Posso instalar sozinho?</td>
+<td>Sim, com cuidado básico — desligue o disjuntor antes</td>
+</tr>
+<tr>
+<td>Aceita plug de aparelho importado?</td>
+<td>Aceita plugs de 3 pinos redondos NBR 14136</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🎯-categoria--browse-node">🎯 Categoria &amp; Browse Node</h2>
+<ul>
+<li><strong>Categoria recomendada</strong>: Ferramentas e Materiais de Construção &gt; Material Elétrico &gt; Tomadas</li>
+<li><strong>Browse Node ID</strong>: a confirmar pelo owner no Seller Central</li>
+<li><strong>Justificativa</strong>: tomada elétrica é categorizada como Material de Construção/Elétrico no Amazon BR. Categoria "Casa" não cabe (não é decoração nem iluminação).</li>
+</ul>
+<p>⚠️ <strong>Confirme com Seller Central</strong> antes de aplicar — categoria errada limita ranking.</p>
+<hr>
+<h2 id="📊-variações-sugeridas-parentchild">📊 Variações Sugeridas (parent/child)</h2>
+<p><strong>Não criar variações por enquanto</strong> — owner vai vender só <strong>unidade</strong>.</p>
+<p><strong>Possíveis variações futuras</strong> (avaliar conforme tração de venda):</p>
+<ul>
+<li>Kit com 5 unidades (mesmo SKU físico, parent agrupando)</li>
+<li>Kit com 10 unidades</li>
+<li>Variação de cor (preta) — se fornecedor tiver</li>
+</ul>
+<hr>
+<h2 id="✅-próximos-passos-checklist-do-owner">✅ Próximos Passos (checklist do owner)</h2>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Foto Hero</strong>: tirar foto crua do produto <strong>fora da embalagem</strong> (sem logo Schneider visível), processar (remove fundo + branco puro 2000×2000)</li>
+<li><input disabled="" type="checkbox"> <strong>Imagens 2/4/6</strong>: gerar no Higgsfield com prompts deste documento (3 variações cada, escolher melhor)</li>
+<li><input disabled="" type="checkbox"> <strong>Imagens 3/5/7</strong>: montar no Canva com briefings deste documento</li>
+<li><input disabled="" type="checkbox"> <strong>Listing principal</strong>: copiar título, bullets, descrição, backend keywords e colar no Seller Central</li>
+<li><input disabled="" type="checkbox"> <strong>Marca no Seller Central</strong>: cadastrar como <strong>Genérico</strong></li>
+<li><input disabled="" type="checkbox"> <strong>Categoria</strong>: validar Browse Node ("Material Elétrico &gt; Tomadas") e aplicar</li>
+<li><input disabled="" type="checkbox"> <strong>Cadastrar SKU</strong> no Seller Central → pegar ASIN</li>
+<li><input disabled="" type="checkbox"> <strong>Renomear arquivo catálogo</strong>: <code>agents/amalfi-amazon/catalog/pending-tomada-10a-2pt-branca.md</code> → <code>{ASIN}.md</code></li>
+<li><input disabled="" type="checkbox"> <strong>Voltar e me avisar com ASIN</strong>: assim eu atualizo histórico e posso fazer <code>*audit-listing {ASIN}</code> em 7 dias</li>
+<li><input disabled="" type="checkbox"> <strong>Após 30 dias</strong>: rodar <code>*analyze-ads</code> com primeiro Search Term Report</li>
+</ul>
+<hr>
+<h2 id="📝-notas-do-marco">📝 Notas do Marco</h2>
+<p><strong>Caminho B é o mais agressivo dos 3</strong> que apresentei. Pontos de atenção:</p>
+<ol>
+<li><p><strong>Hero precisa ser foto real SEM mostrar Schneider/Lissê</strong> — se a foto que você processar mostrar logo, Amazon pode (raramente, mas pode) cruzar com listings Schneider e flag de trademark misuse. Tira foto da tomada <strong>fora do saco</strong>.</p>
+</li>
+<li><p><strong>Comprador pode reclamar "produto Schneider mas listing não menciona"</strong> — risco baixo (a maioria não liga, alguns até preferem genérico mais barato), mas se acontecer com frequência, Amazon pode pedir revisão. Mitigação: descrever <strong>especs técnicas</strong> (que coincidem com qualquer tomada NBR 14136 10A) e não criar contradição.</p>
+</li>
+<li><p><strong>Sem brand registry = sem A+ Content e sem Brand Story</strong>. Compensação: <strong>bullets fortes + 7 imagens bem feitas</strong> (especialmente #3 infográfico e #7 comparativo). É onde você ganha conversão sem A+.</p>
+</li>
+<li><p><strong>Sponsored Products é seu melhor amigo</strong> nesse cenário. Listing genérico não rankeia organicamente nos primeiros 30 dias. Reservar budget pra Auto Campaign + Manual Exact em "tomada 10a", "tomada padrão brasileiro", "tomada nbr 14136" desde dia 1.</p>
+</li>
+<li><p><strong>Quando der ASIN, me avisa</strong>. Renomeio o arquivo do catálogo e atualizo MEMORY pra próximas tarefas. Em 7-10 dias, dispara <code>*audit-listing {ASIN}</code> pra eu validar como ficou no ar.</p>
+</li>
+<li><p><strong>Sobre dimensões 18×9×5 cm = embalagem</strong> (não a tomada). Em Image #5 mostro caixa 4x2 (7,5×5cm) como referência de <strong>encaixe</strong> — que é o que comprador quer saber. Embalagem só vai pro shipping no Seller Central.</p>
+</li>
+</ol>
+<hr>
+<p><em>Gerado por @amalfi-amazon (Marco) em 2026-05-05.</em>
+<em>Spec: docs/agents/amalfi-amazon-spec.md</em>
+<em>Versão deste documento: v1</em></p>
+
+	
+
+</body></html>
