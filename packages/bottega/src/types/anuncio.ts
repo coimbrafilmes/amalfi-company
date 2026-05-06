@@ -84,7 +84,8 @@ export type EstagioConversao =
 export interface BriefingImagem {
   numero: number;
   isCover: boolean;
-  estagio: EstagioConversao;
+  /** Hint do tipo de cena. Gemini às vezes retorna fora do enum — string livre. */
+  estagio: EstagioConversao | string;
   titulo: string;            // 4-6 palavras pt-BR
   prompt: string;            // prompt completo pra Gemini Image
   negativePrompt?: string;
@@ -104,7 +105,8 @@ export type EstagioAPlus =
 
 export interface BriefingAPlus {
   numero: number;             // 1-6
-  estagio: EstagioAPlus;
+  /** Hint do tipo de cena. Gemini às vezes retorna fora do enum — string livre. */
+  estagio: EstagioAPlus | string;
   titulo: string;             // 4-6 palavras pt-BR
   prompt: string;
   negativePrompt?: string;

@@ -67,10 +67,12 @@ export const descricaoSchema = z.object({
 });
 
 // === Briefings: Anúncio (1024x1024) ===
+// estagio aceita string livre — Gemini ocasionalmente inventa estágios novos.
+// Validação estrita ficaria no client se necessário.
 export const briefingSchema = z.object({
   numero: z.number().int().min(1).max(20),
   isCover: z.boolean(),
-  estagio: z.enum(['capa', 'gancho', 'dor', 'mecanismo', 'prova', 'objecao', 'decisao', 'lifestyle', 'detalhe']),
+  estagio: z.string().min(1).max(50),
   titulo: shortText,
   prompt: z.string().min(20).max(4_000),
   negativePrompt: z.string().max(1_500).optional(),
@@ -84,16 +86,10 @@ export const briefingSchema = z.object({
 export const briefingsSchema = z.array(briefingSchema).min(1).max(15);
 
 // === Briefings: A+ Content (970x600) ===
+// estagio é string livre; ordem é dada por `numero` (1-6 sequencial).
 export const briefingAPlusSchema = z.object({
   numero: z.number().int().min(1).max(6),
-  estagio: z.enum([
-    'aplus-header',
-    'aplus-beneficio-1',
-    'aplus-beneficio-2',
-    'aplus-comparacao',
-    'aplus-lifestyle-amplo',
-    'aplus-detalhe-tecnico',
-  ]),
+  estagio: z.string().min(1).max(50),
   titulo: shortText,
   prompt: z.string().min(20).max(4_000),
   negativePrompt: z.string().max(1_500).optional(),
