@@ -78,11 +78,26 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
 }
 
 function extractJson(text: string, kind: string): unknown {
-  let cleaned = text
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```\s*$/, '')
-    .trim();
+  let cleaned = text.trim();
   if (!cleaned) throw new Error(`[${kind}] resposta vazia do Gemini`);
+
+  // Remove prefácio conversacional ("Com certeza! Aqui está...") + markdown fence.
+  // Pega do primeiro { ou [ em diante.
+  const startObj = cleaned.indexOf('{');
+  const startArr = cleaned.indexOf('[');
+  let start = -1;
+  if (startObj === -1) start = startArr;
+  else if (startArr === -1) start = startObj;
+  else start = Math.min(startObj, startArr);
+  if (start > 0) cleaned = cleaned.slice(start);
+
+  // Remove markdown trailing (``` no fim) e qualquer texto após o último } ou ]
+  const lastObj = cleaned.lastIndexOf('}');
+  const lastArr = cleaned.lastIndexOf(']');
+  const end = Math.max(lastObj, lastArr);
+  if (end >= 0 && end < cleaned.length - 1) cleaned = cleaned.slice(0, end + 1);
+
+  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
   // Tentativa 1: parse direto
   try {
@@ -175,13 +190,15 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
 
   // === 1. Análise (com Search) ===
   await opts.onStep('Lendo o mercado…');
-  const analise = await geminiText(promptAnalise(form), (r) => analiseSchema.parse(r), 'analise', true);
+  // Search desligado — introduz texto conversacional + JSON malformado.
+  // Prompts já usam o conhecimento ambient do Gemini sobre Brasil/Amazon.
+  const analise = await geminiText(promptAnalise(form), (r) => analiseSchema.parse(r), 'analise', false);
   const analiseContext = JSON.stringify(analise);
 
   // === 2. Keywords + Títulos + Descrição (paralelo) ===
   await opts.onStep('Curando palavras e títulos…');
   const [keywords, titulos, descricao] = await Promise.all([
-    geminiText(promptKeywords(form, analiseContext), (r) => keywordsSchema.parse(r), 'keywords', true),
+    geminiText(promptKeywords(form, analiseContext), (r) => keywordsSchema.parse(r), 'keywords', false),
     geminiText(promptTitulos(form, analiseContext), (r) => titulosSchema.parse(r), 'titulos'),
     geminiText(promptDescricao(form, analiseContext), (r) => descricaoSchema.parse(r), 'descricao'),
   ]);
