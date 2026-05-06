@@ -1,43 +1,91 @@
 # Bottega · by Amalfi & Co.
 
-Atelier digital de criação de anúncios Amazon BR — texto + imagem, gerados por Gemini 2.5 Flash + Imagen 4, vestidos na identidade Amalfi & Co.
+Atelier digital de criação de anúncios Amazon BR — texto + imagem, gerados por Gemini 2.5 Flash + Imagen 4 via **Netlify Functions** (key server-side, nunca exposta no client), vestidos na identidade Amalfi & Co.
 
 > *Pequenos objetos para uma vida costeira — escolhidos com cuidado, levados com calma.*
 
-Clone funcional do GUMPINHO (`gerador-de-anucio10de10.netlify.app`), reconstruído sob a identidade visual do Amalfi & Co. (Costa Amalfitana · Tinta + Mar + Terracota · DM Serif + Cormorant Italic + Inter).
+Clone funcional do GUMPINHO (`gerador-de-anucio10de10.netlify.app`), reconstruído sob a identidade visual Amalfi & Co. (Costa Amalfitana · Tinta + Mar + Terracota · DM Serif + Cormorant Italic + Inter).
+
+---
+
+## Arquitetura — segurança first
+
+```
+Browser (React/Vite)
+  ↓ fetch
+Netlify Function (Node)  ← API key vive aqui (process.env.GEMINI_API_KEY)
+  ↓ @google/genai
+Gemini Flash / Imagen 4
+```
+
+A key Gemini fica **só no servidor**, configurada no painel Netlify. O bundle JS público não tem nem 1 byte da key. O client só sabe falar com `/.netlify/functions/*`.
+
+3 Functions:
+- `gemini-text` — análise, keywords, títulos, descrição, briefings (qualquer chamada de texto)
+- `gemini-image` — Imagen 4
+- `smoke-test` — health check (`GET → ok|erro`)
 
 ---
 
 ## Quickstart
 
+### 1. Dev local em **modo mock** (zero $)
+
 ```bash
 cd packages/bottega
 npm install
-npm run dev
+npm run dev          # http://localhost:5173
 ```
 
-Abra `http://localhost:5173`.
+Mock = dados pré-cozidos realistas (tomada NBR 14136). Nenhuma chamada externa.
 
-### Modo de geração
+### 2. Dev local com **Functions reais**
 
-Por padrão o app roda em **mock** — todas as gerações usam dados pré-cozidos (realistas, baseados na tomada NBR 14136 do Marco). Zero custo, zero rede, ideal pra dev e demo.
+Pra testar a integração Gemini ao vivo localmente, instale o Netlify CLI e use `netlify dev`:
 
-Pra ligar o **Gemini real**, edite `.env`:
+```bash
+npm install -g netlify-cli
+cd packages/bottega
+netlify dev          # roda Vite + Functions juntos em http://localhost:8888
+```
 
+Em `.env`, troque:
 ```diff
 - VITE_USE_MOCK=true
 + VITE_USE_MOCK=false
 ```
 
-Depois reinicie o dev server. A `VITE_GEMINI_API_KEY` já está provisionada no `.env` local.
+A `GEMINI_API_KEY` do `.env` é lida pelas Functions (não vai pro bundle).
 
-### Smoke test (validar a key sem gastar tokens)
+### 3. Smoke test direto à API (não passa pelas Functions)
 
 ```bash
 node scripts/smoke-test.mjs
 ```
 
-Faz uma chamada mínima ao Gemini 2.5 Flash com o prompt `"Responda apenas com a palavra 'ok'."`. Custa ~0 tokens (free tier). Sai com código `0` se a key for válida.
+Validação simples ~$0 da `GEMINI_API_KEY`. Útil pra confirmar que a key tá viva antes de deployar.
+
+---
+
+## Deploy Netlify (entrega ao `@devops`)
+
+1. Conectar o repositório ao Netlify.
+2. Site settings → Build:
+   - Base directory: `packages/bottega`
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+3. Site settings → Environment variables:
+   - `GEMINI_API_KEY` = (a key)
+   - `GEMINI_TEXT_MODEL` = `gemini-2.5-flash` (opcional)
+   - `GEMINI_IMAGE_MODEL` = `imagen-4.0-generate-001` (opcional)
+4. Site settings → Build configuration: confirma que vai ler `netlify.toml`.
+5. Deploy → testa `/configuracoes` → botão "Verificar agora" → deve sair "✓ ok".
+
+`netlify.toml` na raiz do pacote já cuida de:
+- SPA redirect (`/* → /index.html`)
+- Functions dir (`netlify/functions`)
+- Headers de segurança (CSP, X-Frame-Options, etc.)
+- Cache de assets
 
 ---
 
@@ -45,71 +93,97 @@ Faz uma chamada mínima ao Gemini 2.5 Flash com o prompt `"Responda apenas com a
 
 | Script | O que faz |
 |--------|-----------|
-| `npm run dev` | Vite dev server (porta 5173) |
-| `npm run build` | `tsc -b && vite build` (saída `dist/`) |
-| `npm run preview` | Serve `dist/` localmente |
+| `npm run dev` | Vite dev (mock) |
+| `npm run build` | `tsc -b && vite build` (out: `dist/`) |
+| `npm run preview` | Preview do build |
 | `npm run lint` | ESLint |
-| `node scripts/smoke-test.mjs` | Valida `VITE_GEMINI_API_KEY` |
+| `node scripts/smoke-test.mjs` | Valida `GEMINI_API_KEY` direto na API |
+
+Pra dev real (com Functions): `netlify dev` (CLI Netlify).
 
 ---
 
 ## Estrutura
 
 ```
-src/
-├── components/        # Atomic Design (Brad Frost)
-│   ├── atoms/        # 12 — Button, Input, Slider, Badge, etc.
-│   ├── molecules/    # 10 — Field, Dropzone, Lockup, CardAnuncio, etc.
-│   └── organisms/    # 8 — Brandbar, HeroEditorial, FormCriacao, ResultsTabs, GlobalFooter
-├── pages/            # 4 — Atelier, Criacao, Catalogo, Configuracoes
-├── lib/
-│   ├── gemini/       # client + prompts + schemas + orchestrator
-│   ├── mocks/        # dados mockados (tomada SKU)
-│   └── utils/        # cn, env, slug
-├── store/            # Zustand (anunciosStore persistido + criacaoStore)
-├── styles/           # globals.css + tokens.css (Amalfi)
-└── types/            # domain types (CriacaoForm, Anuncio, etc.)
+packages/bottega/
+├── netlify/
+│   └── functions/      ← server-side proxy (Node)
+│       ├── gemini-text.ts
+│       ├── gemini-image.ts
+│       └── smoke-test.ts
+├── netlify.toml        ← build + redirects + headers
+├── public/
+│   └── _redirects      ← fallback SPA redirect
+└── src/
+    ├── components/     # Atomic Design
+    │   ├── atoms/      (12)
+    │   ├── molecules/  (10)
+    │   └── organisms/  (8)
+    ├── pages/          (4)
+    ├── lib/
+    │   ├── gemini/     # client orchestrator (chama Functions via fetch)
+    │   ├── mocks/
+    │   └── utils/
+    ├── store/          # Zustand
+    ├── styles/
+    └── types/
 ```
-
-Tokens de design em **3 formatos**:
-- `src/styles/tokens.css` (CSS custom properties)
-- `tailwind.config.js` (Tailwind tokens)
-- `docs/brand/tokens/tokens.json` (W3C DTCG bundle)
 
 ---
 
 ## Stack
 
-- **React 19** + **TypeScript** + **Vite v8**
-- **Tailwind CSS v3** (escolhido sobre v4 por estabilidade ESM)
-- **Zustand** (com `persist` middleware — chave `bottega.anuncios`)
-- **React Router v6**
-- **Radix UI** (Slider, Tabs, ToggleGroup) — primitives sem estilo, tokens nossos
-- **`@google/genai`** SDK pra Gemini Flash + Imagen 4
-- **Zod** schemas pra runtime validation das respostas do Gemini
-- **clsx** pra composição de classes
+- **React 19** + **TypeScript 6** + **Vite 8**
+- **Tailwind CSS 3** com tokens Amalfi
+- **Zustand** (persist em localStorage, key `bottega.anuncios`, version 2 com migration)
+- **React Router 7**
+- **Radix UI** (Slider, Tabs, ToggleGroup, Dialog, Tooltip)
+- **Zod 4** — runtime validation com bounds explícitos
+- **@netlify/functions** — TypeScript handlers
+- **@google/genai** — só no lado servidor, nunca no client
+- **clsx**
 
 ---
 
 ## Pipeline de geração (`gerarTudoReal`)
 
-1. **Análise de mercado** (Gemini Flash) — persona, dores, motivações, janela de decisão
-2. **Em paralelo** (3 chamadas concorrentes):
-   - Keywords agrupadas (50 termos, 5 grupos)
+1. **Análise de mercado** (Gemini Flash + Google Search) — persona, dores, motivações, janela
+2. **Em paralelo** (3 chamadas):
+   - Keywords (50 termos / 5 grupos / Google Search)
    - Títulos (5 produto + 5 dor)
-   - Descrição completa (description, HTML, 5 bullets Amazon, FAQ)
-3. **Briefings de imagem** (Gemini Flash) — 7-12 cenas com prompt + overlay + paletaCor
-4. **Imagens** (Imagen 4) — uma chamada por briefing
+   - Descrição (description, HTML A+, 5 bullets Amazon, FAQ)
+3. **Briefings de imagem** (Gemini Flash) — N cenas
+4. **Imagens** (Imagen 4) — 1 chamada por briefing, paralelo, graceful (falhas individuais não derrubam o fluxo)
 
-Tudo passa por **Zod schemas** (`lib/gemini/schemas.ts`) antes de virar tipo `CriacaoResults`. Erros retornam graciosamente com fallback pro último mock.
+Todo retorno passa por **Zod com `.min()` + `.max()`** antes de virar tipo TS.
+
+---
+
+## Bug fixes aplicados (vs. versão overnight)
+
+| Severidade | Fix |
+|-----------|-----|
+| CRITICAL | API key migrada do client pra Netlify Functions |
+| CRITICAL | Dropzone valida tipo + tamanho (10 MB) |
+| CRITICAL | `criacaoStore.generate` com guard de race condition |
+| CRITICAL | `extractJson` com try-catch + cause + preview |
+| CRITICAL | Schemas Zod com `.max()` em todos arrays |
+| HIGH | FormCriacao valida nome (3+) e detalhes técnicos (20+) |
+| HIGH | Timeout (90s texto / 120s imagem) com AbortController |
+| HIGH | Imagens falhadas marcadas `falhou:true` com badge na tile |
+| HIGH | `anunciosStore` com `migrate` versioning (v1→v2) |
+| HIGH | `vite.config.ts` com `outDir + target` configurados |
+| HIGH | `_redirects` SPA pra evitar 404 em `/novo` em produção |
+| MEDIUM | ESLint `argsIgnorePattern: '^_'` global, sem `disable-next-line` |
+| MEDIUM | CardAnuncio dead code removido (`isLight` span) |
+| MEDIUM | CriacaoPage usa `useRef` pra deduplicar saves no anunciosStore |
 
 ---
 
 ## VOZ Amalfi (embutida nos prompts)
 
-Regras embedadas em todos os prompt builders:
-
-- **NÃO usar:** "PROMOÇÃO IMPERDÍVEL", "premium soft touch", "incrível", caps lock, exclamações
+- **NÃO usar:** "PROMOÇÃO IMPERDÍVEL", "premium soft touch", caps lock, exclamações
 - **USAR:** linguagem editorial calma, italic Cormorant pra ênfase, pt-BR coloquial culto
 - **Tom:** "A vida boa cabe em pequenos gestos."
 - **Referência:** `docs/brand/01-direction-amalfi-editorial.md`
@@ -120,38 +194,20 @@ Regras embedadas em todos os prompt builders:
 
 | Rota | Componente | O que mostra |
 |------|-----------|--------------|
-| `/atelier` | `AtelierPage` | Hero editorial + stats + grid de cards do catálogo |
-| `/novo` | `CriacaoPage` | Form à esquerda (Areia) + Results à direita (Tinta) |
-| `/catalogo` | `CatalogoPage` | Lista completa de anúncios persistidos |
-| `/configuracoes` | `ConfiguracoesPage` | Status `USE_MOCK` + key check + botão smoke test |
-
----
-
-## State
-
-- **`anunciosStore`** (Zustand + persist) — array de `Anuncio`, salvo em `localStorage` com chave `bottega.anuncios`, version 1
-- **`criacaoStore`** — estado da geração ativa (form, results, loading, error). Toggle mock vs real via `VITE_USE_MOCK`. Rotaciona `loadingMessage` a cada 1.2s.
+| `/atelier` | AtelierPage | Hero + stats + grid de cards |
+| `/novo` | CriacaoPage | Form (Areia) + Results (Tinta) |
+| `/catalogo` | CatalogoPage | Lista completa |
+| `/configuracoes` | ConfiguracoesPage | Status modo + smoke test via Function |
 
 ---
 
 ## Limitações conhecidas
 
-- **Imagen 4 não foi testado live** — código pronto, key tem permissão, mas custo por imagem é alto (~$0.04). Recomendação: rodar mock primeiro, ligar imagens depois quando o owner aprovar uma capa.
-- **Smoke test não roda dentro do Claude Code** — o sandbox bloqueia chamadas externas. Rode manualmente no terminal.
-- **Sem testes unitários** — escopo overnight focou em rendering correto + build limpo. Tests ficam pra próxima iteração.
-- **HEIC upload não converte** — Dropzone aceita PNG/JPG/HEIC mas só base64-encoda; o Gemini Vision aceita HEIC nativamente, então a foto crua passa direto.
+- **Imagen 4 ainda não foi testado live** — Function pronta, lógica pronta, mas custo (~$0.04/imagem × 9 cenas = ~$0.36 por anúncio) tornou prudente esperar primeiro mock OK + smoke test OK antes de queimar tokens. `@devops` pode validar pós-deploy.
+- **Sem testes unitários** — escopo atual focou em rendering correto + build limpo + paridade funcional. Vitest fica pra próxima sprint.
+- **HEIC não converte client-side** — Dropzone aceita HEIC e envia base64. Gemini Vision aceita HEIC nativamente, então funciona mesmo sem conversão. Se em algum momento precisar exibir preview HEIC no Safari/Chrome desktop, precisamos converter.
+- **Sem cost tracking** — futuro: log do custo estimado por geração na UI.
 
 ---
 
-## Próximos passos sugeridos
-
-1. Owner liga `VITE_USE_MOCK=false` e gera o primeiro anúncio real (tomada).
-2. Validar VOZ_AMALFI saindo correta nos títulos e descrição.
-3. Aprovar uma capa, ligar Imagen 4 pras 9 cenas.
-4. Subir o anúncio gerado pro Seller Central, anotar ASIN no `Anuncio.asin`.
-5. Iterar sobre keywords/títulos baseado em métricas reais do anúncio.
-
----
-
-*Built overnight — 2026-05-05 → 2026-05-06.*
-*Design: Uma. Code: Orion. Brand: Amalfi & Co. (Sarah Mendes).*
+*Atualizado: 2026-05-06 · Dex (full-stack) refatorou da overnight build do Orion.*

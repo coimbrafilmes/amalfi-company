@@ -1,18 +1,45 @@
 # Bottega — Architecture
 
-> Espelha a spec em `docs/architecture/bottega-spec.md` com o que foi de fato implementado.
+> Espelha a spec em `docs/architecture/bottega-spec.md` com o estado real após refactor do `@dev` (Dex) sobre a overnight build do Orion.
 
 ## Princípios
 
-1. **Atomic Design.** Atoms → Molecules → Organisms → Pages. Sem componentes "soltos".
-2. **Tokens first.** Nenhuma cor/font/spacing hardcoded. Tudo vem de `tokens.css` e `tailwind.config.js`.
-3. **Mock-first, real-on-toggle.** Default seguro (mock); 1 linha no `.env` flipa pra Gemini real.
-4. **Zod no boundary.** Toda resposta do Gemini passa por schema Zod antes de virar tipo TS.
-5. **Persist mínimo.** Só `Anuncio[]` é persistido. Estado da geração ativa é volátil.
+1. **Atomic Design.** Atoms → Molecules → Organisms → Pages.
+2. **Tokens first.** Sem cor/font/spacing hardcoded.
+3. **Server-side proxy.** Key Gemini fica em Netlify Functions, nunca no client.
+4. **Mock-first toggle.** `VITE_USE_MOCK=true` por default; Functions chamadas só quando `false`.
+5. **Zod no boundary.** Toda resposta Gemini com `.min()` + `.max()` explícitos.
+6. **Persist com migration.** Schema versionado, `migrate(state, version)` cuida de upgrades.
+7. **Graceful degradation.** Imagem que falha não derruba o fluxo; é marcada `falhou:true`.
 
 ---
 
-## Layers
+## Topologia
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Browser (React + Vite bundle)                      │
+│  Sem @google/genai, sem GEMINI_API_KEY              │
+├─────────────────────────────────────────────────────┤
+│           ↓ fetch /.netlify/functions/*             │
+├─────────────────────────────────────────────────────┤
+│  Netlify Functions (Node 20, esbuild)               │
+│  process.env.GEMINI_API_KEY (Netlify secrets)       │
+│  - gemini-text  (POST)                              │
+│  - gemini-image (POST)                              │
+│  - smoke-test   (GET)                               │
+├─────────────────────────────────────────────────────┤
+│           ↓ @google/genai SDK                       │
+├─────────────────────────────────────────────────────┤
+│  Google AI Platform                                 │
+│  - Gemini 2.5 Flash (texto + Google Search)         │
+│  - Imagen 4.0       (imagens)                       │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Layers (frontend)
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -37,121 +64,85 @@
 ## Components inventory
 
 ### Atoms (12)
-
-| Componente | Responsabilidade |
-|-----------|------------------|
-| `Eyebrow` | Caption uppercase tracked, Inter 500 11px |
-| `Display` | DM Serif título grande |
-| `Editorial` | Cormorant italic para ênfase |
-| `BodyText` | Inter 400 corpo de texto |
-| `Button` | 5 variants (primary, secondary, ghost, link, terra) × 3 sizes (sm, md, lg) |
-| `Input` | forwardRef, border-tinta-15 → focus mar |
-| `Textarea` | forwardRef, mesmo estilo do Input |
-| `Slider` | Radix Slider com track tinta-15 e thumb terracota |
-| `ToggleGroup` | Radix ToggleGroup (estilo das imagens: lifestyle/info/misto) |
-| `Badge` | tones: terra, mar, neutral |
-| `Avatar` | círculo Tinta com inicial Osso |
-| `Dot` | bullet colorido inline (mar/terracota) |
+Eyebrow · Display · Editorial · BodyText · Button (5×3) · Input · Textarea · Slider · ToggleGroup · Badge · Avatar · Dot.
 
 ### Molecules (10)
-
-| Componente | Composição |
-|-----------|-----------|
-| `Stat` | Display number + Eyebrow label (12 / 487 / 94 no Atelier) |
-| `Lockup` | "Bottega *by* Amalfi & Co." em 3 variants (brandbar/footer/inline) |
-| `MonogramaA` | Círculo terracota + DM Serif "A" + Cormorant "·co.·" |
-| `Field` | Label (Eyebrow) + Input/Textarea + helper (italic Cormorant) |
-| `Dropzone` | drag-and-drop com FileReader → base64 |
-| `KeywordChip` | pill terracota-outlined, click pra copiar |
-| `TabItem` | Radix Tabs.Trigger com underline terracota no active |
-| `CardAnuncio` | media bg paleta + body Osso + meta com Dot |
-| `BriefingTile` | numerado, com paletaCor de fundo, prompt em Cormorant italic |
-| `TituloListItem` | número + texto + char-count + foco badge |
+Stat · Lockup · MonogramaA · Field · **Dropzone (com validação tipo+tamanho)** · KeywordChip · TabItem · CardAnuncio · **BriefingTile (com flag failed)** · TituloListItem.
 
 ### Organisms (8)
-
-| Componente | Função |
-|-----------|--------|
-| `Brandbar` | sticky top, Lockup + nav React Router (active = underline terracota) |
-| `HeroEditorial` | bg Tinta + Osso text + blur radial `aquarela-mar` + CTA terracota |
-| `StatsRow` | 3 Stats em row, bg Areia |
-| `CatalogoSection` | grid de CardAnuncio (mistura persisted + samples) |
-| `FormCriacao` | form completo (6 campos) com validation + submit |
-| `ResultsTabs` | Radix Tabs com 5 panels: análise/keywords/títulos/descrição/briefings |
-| `ResultsBlock` | wrapper editorial pros painéis |
-| `GlobalFooter` | Lockup footer + 3 nav cols + MonogramaA terra |
+Brandbar · HeroEditorial · StatsRow · CatalogoSection · **FormCriacao (validação nome+detalhes)** · ResultsTabs · ResultsBlock · GlobalFooter.
 
 ### Pages (4)
-
-| Page | Layout |
-|------|--------|
-| `AtelierPage` | Brandbar + Hero + StatsRow + CatalogoSection + Footer |
-| `CriacaoPage` | Brandbar + split (Form 50% Areia / Results 50% Tinta) + Footer |
-| `CatalogoPage` | Brandbar + lista filtrável + Footer |
-| `ConfiguracoesPage` | Brandbar + status panel (USE_MOCK + HAS_VALID_KEY + smoke button) |
+**AtelierPage** · **CriacaoPage (useRef pra dedup save)** · **CatalogoPage** · **ConfiguracoesPage (usa Function smoke-test)**.
 
 ---
 
-## Lib · Gemini
-
-### `client.ts`
-- `getGeminiClient()` — singleton cached, lê `VITE_GEMINI_API_KEY`
-- `smokeTestGemini()` — chamada mínima de validação (~$0)
-
-### `prompts.ts`
-5 builders + 1 helper, todos com VOZ_AMALFI embutida:
-- `promptAnalise(form)` → análise de mercado
-- `promptKeywords(form, analise)` → 50 termos agrupados
-- `promptTitulos(form, analise, keywords)` → 5 produto + 5 dor
-- `promptDescricao(form, analise, keywords, titulos)` → desc + bullets + FAQ
-- `promptBriefings(form, analise)` → N cenas (numeroImagens do form)
-- `buildImagenPrompt(briefing)` → prompt final pra Imagen 4
-
-### `schemas.ts`
-Zod schemas espelhando os tipos em `types/anuncio.ts`. Cada schema valida o JSON parseado da resposta do Gemini.
+## Lib · Gemini (client side)
 
 ### `orchestrator.ts`
-`gerarTudoReal(form)`:
-1. `await` análise
-2. `Promise.all([keywords, titulos, descricao])` — paralelo
-3. `await` briefings
-4. `Promise.all(briefings.map(gerarImagem))` — paralelo
-5. Retorna `CriacaoResults` com `modoGeracao: 'real'`
+Não importa mais `@google/genai`. Em vez disso:
+- `callTextFn(prompt, useSearch)` → POST `/.netlify/functions/gemini-text` com AbortController/timeout
+- `callImageFn(prompt, negative)` → POST `/.netlify/functions/gemini-image`, retorna null em erro (graceful)
+- `extractJson(text, kind)` → try-catch com `cause` + preview do payload bruto
+- `geminiJson(kind, prompt, validator, useSearch)` → wrapper que combina text fn + extract + Zod validate
 
-`extractJson()` lida com Gemini ocasionalmente envelopar JSON em markdown ```json blocks.
+`gerarTudoReal(form)`:
+1. `gerarAnalise` (com Search)
+2. `Promise.all([keywords, titulos, descricao])` — paralelo
+3. `gerarBriefings`
+4. `gerarImagens` (paralelo, falhas isoladas)
+
+`smokeTestGeminiViaFn()` → GET `/.netlify/functions/smoke-test`.
+
+### `prompts.ts`
+5 builders + `buildImagenPrompt`. VOZ_AMALFI embutida (proibe "PROMOÇÃO IMPERDÍVEL", "premium soft touch", caps, exclamações).
+
+### `schemas.ts`
+Zod com bounds explícitos pra resistir a Gemini alucinando arrays gigantes.
+
+---
+
+## Lib · Mocks
+
+`gerarMockTudo()` retorna `CriacaoResults` realista (tomada NBR 14136). Usado quando `USE_MOCK=true`. `LOADING_MESSAGES` rotacionados a cada 1.2s no spinner.
 
 ---
 
 ## State management
 
 ### `anunciosStore`
-```ts
-interface AnunciosState {
-  anuncios: Anuncio[];
-  add(a: Anuncio): void;
-  update(id: string, patch: Partial<Anuncio>): void;
-  remove(id: string): void;
-}
-```
-- Middleware: `persist`
-- Storage key: `bottega.anuncios`
-- Version: 1
+- Persist com `version: 2`, `migrate` callback
+- v1 → v2: adiciona `falhou` em todas as imagens persistidas (`falhou: !img.base64`)
+- Storage: `localStorage` chave `bottega.anuncios`
 
 ### `criacaoStore`
-```ts
-interface CriacaoState {
-  form: CriacaoForm | null;
-  results: CriacaoResults | null;
-  loading: boolean;
-  loadingMessage: string;
-  error: string | null;
-  generate(form: CriacaoForm): Promise<void>;
-  reset(): void;
-}
-```
-- `generate()` checa `USE_MOCK` e `HAS_VALID_KEY`, escolhe mock vs real
-- Rotaciona `loadingMessage` (array em `mocks/index.ts`) a cada 1.2s
-- Não persiste — só vive durante a sessão
+- `formInicial()` agora é factory (sem state compartilhado entre resets)
+- `generate()` checa `status === 'gerando'` no início — race condition fixed
+- `clearInterval` em `finally` (não duplica)
+
+---
+
+## Netlify Functions (server side)
+
+Todas em TypeScript, transpilação esbuild via `[functions] node_bundler = "esbuild"` no `netlify.toml`.
+
+### `gemini-text.ts`
+- POST `{ prompt, useSearch?, model? }`
+- Valida prompt obrigatório, max 50k chars
+- `Promise.race` com timeout 90s
+- Retorna `{ text, latencyMs }` ou `{ error, latencyMs }` HTTP 502
+- Sem cache (`Cache-Control: no-store`)
+
+### `gemini-image.ts`
+- POST `{ prompt, negativePrompt?, aspectRatio? }`
+- Valida prompt max 4k chars
+- Timeout 120s
+- Retorna `{ base64, modelUsado, latencyMs }`
+- Aspect ratio default `1:1`
+
+### `smoke-test.ts`
+- GET → `{ ok, latencyMs, sample, error? }`
+- Sempre HTTP 200 (UI consome o `ok`)
 
 ---
 
@@ -161,29 +152,21 @@ interface CriacaoState {
 
 | Token | Hex | Papel |
 |-------|-----|------|
-| `--color-osso` | `#F8F4EE` | bg principal (60%) |
-| `--color-areia` | `#E8DFD2` | bg secundário (25%) |
-| `--color-tinta` | `#1F2A3A` | text + bg dark (15%) |
-| `--color-mar` | `#2D5D7B` | accent links/focus |
-| `--color-terracota` | `#C47855` | CTA + acento |
-| `--color-ceu` | `#A8C0CF` | sub-tom |
-| `--color-ocre` | `#D4A876` | sub-tom |
+| osso | `#F8F4EE` | bg principal (60%) |
+| areia | `#E8DFD2` | bg secundário (25%) |
+| tinta | `#1F2A3A` | text + bg dark (15%) |
+| mar | `#2D5D7B` | accent links/focus |
+| terracota | `#C47855` | CTA |
+| ceu | `#A8C0CF` | sub |
+| ocre | `#D4A876` | sub |
 
-Plus alphas: `tinta-08`, `tinta-15`, `tinta-65`.
+### Tipografia
 
-### Typography
-
-| Token | Família | Uso |
-|-------|---------|-----|
-| `--font-display` | DM Serif Display | títulos grandes |
-| `--font-editorial` | Cormorant Garamond Italic | ênfase, voz |
-| `--font-ui` | Inter | UI, eyebrows, body |
-
-Escala: display-xl (96px) → display-l (72) → display-m (48) → display-s (32) → editorial-xl/l/m → h1/h2/h3 → lede → body-lg/body → eyebrow → button → caption → meta.
-
-### Spacings
-
-`section: 80px`, `section-lg: 120px`, `section-xl: 160px`. Resto via Tailwind default.
+| Token | Família |
+|-------|---------|
+| display | DM Serif Display |
+| editorial | Cormorant Garamond Italic |
+| ui | Inter |
 
 ---
 
@@ -191,20 +174,44 @@ Escala: display-xl (96px) → display-l (72) → display-m (48) → display-s (3
 
 ```
 npm run build
-├─ tsc -b              # type check (strict)
-└─ vite build          # bundle (Rollup)
-   └─ output: dist/    # 1 HTML + 1 JS chunk + 1 CSS chunk
+├─ tsc -b              # ~150ms
+└─ vite build          # ~570ms
+   └─ output: dist/
+      ├─ index.html             1 kB
+      ├─ assets/index.css      24 kB (gzip 6kB)
+      ├─ assets/orchestrator…  76 kB (gzip 22kB) ← lazy chunk só quando USE_MOCK=false
+      └─ assets/index.js      313 kB (gzip 100kB) ← React + Router + Radix + Zustand
 ```
 
-Tempos atuais (M1 Mac): tsc ~150ms, vite ~550ms, total ~700ms · 176 modules.
+Bundle client **não contém** `GoogleGenAI` nem a key (validado via grep).
 
 ---
 
-## Não implementado (escopo futuro)
+## Deploy Netlify
 
-- **Tests.** Vitest + RTL configurados na infra, mas sem suite. Próxima iteração.
-- **i18n.** Hardcoded pt-BR — sem framework de tradução.
-- **Auth.** Single-user local. Sem login/multi-tenant.
-- **Server-side.** 100% client. Key Gemini exposta no bundle (aceitável pra single-user; em produção teria proxy).
-- **PDF export.** Spec original mencionava PDF do anúncio finalizado. Adiar.
-- **ASIN integration.** Campo `Anuncio.asin` existe mas não há integração com Seller Central API.
+`netlify.toml`:
+- `base = "packages/bottega"` (monorepo)
+- `publish = "dist"`
+- `command = "npm run build"`
+- `functions = "netlify/functions"`
+- `node_bundler = "esbuild"`
+- `external_node_modules = ["@google/genai"]`
+- SPA redirect `/* → /index.html`
+- Headers: X-Frame-Options DENY, Referrer-Policy strict-origin
+
+Env vars no painel Netlify:
+- `GEMINI_API_KEY` (obrigatória)
+- `GEMINI_TEXT_MODEL` (opcional, default `gemini-2.5-flash`)
+- `GEMINI_IMAGE_MODEL` (opcional, default `imagen-4.0-generate-001`)
+
+---
+
+## Não implementado (backlog explícito)
+
+- **Tests.** Vitest + RTL configurados, sem suite escrita.
+- **Cost tracking** por geração na UI.
+- **Foto crua usada como referência visual no Imagen** (gap funcional vs. ideal: hoje a foto serve só pra preview no form, não influencia geração de imagens).
+- **Export PDF** do anúncio finalizado (botão existe na UI mas não faz nada).
+- **Edit/regenerar** painéis individuais (regenerar só keywords, p.ex.).
+- **ASIN integration** com Seller Central API (campo existe no tipo, sem fluxo).
+- **i18n** — hardcoded pt-BR.
