@@ -78,16 +78,58 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
 }
 
 function extractJson(text: string, kind: string): unknown {
-  const cleaned = text
+  let cleaned = text
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```\s*$/, '')
     .trim();
   if (!cleaned) throw new Error(`[${kind}] resposta vazia do Gemini`);
+
+  // Tentativa 1: parse direto
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Tentativa 2: sanitiza control chars dentro de strings.
+    // Gemini com Search grounding às vezes retorna newlines literais não-escapados
+    // dentro de string values, o que viola JSON spec. Re-escapamos.
+    let inString = false;
+    let escaped = false;
+    let out = '';
+    for (let i = 0; i < cleaned.length; i++) {
+      const c = cleaned[i];
+      const code = cleaned.charCodeAt(i);
+      if (escaped) {
+        out += c;
+        escaped = false;
+        continue;
+      }
+      if (c === '\\') {
+        out += c;
+        escaped = true;
+        continue;
+      }
+      if (c === '"') {
+        out += c;
+        inString = !inString;
+        continue;
+      }
+      if (inString && code < 0x20) {
+        // Control char dentro de string — escape pra preservar JSON válido
+        if (c === '\n') out += '\\n';
+        else if (c === '\r') out += '\\r';
+        else if (c === '\t') out += '\\t';
+        else out += '\\u' + code.toString(16).padStart(4, '0');
+        continue;
+      }
+      out += c;
+    }
+    cleaned = out;
+  }
+
   try {
     return JSON.parse(cleaned);
   } catch (parseErr) {
     const preview = cleaned.slice(0, 200);
-    throw new Error(`[${kind}] JSON inválido — prévia: ${preview}…`, { cause: parseErr });
+    throw new Error(`[${kind}] JSON inválido após sanitização — prévia: ${preview}…`, { cause: parseErr });
   }
 }
 
