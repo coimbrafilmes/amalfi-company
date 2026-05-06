@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset complementar e base Amalfi */
+
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  background: var(--color-osso);
+  color: var(--color-tinta);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* Selection — mantém na paleta */
+::selection { background: var(--color-terracota); color: var(--color-osso); }
+
+/* Scrollbar — discreta editorial */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(31, 42, 58, 0.15); }
+::-webkit-scrollbar-thumb:hover { background: rgba(31, 42, 58, 0.3); }
+
+/* Focus visible Amalfi */
+*:focus-visible {
+  outline: 2px solid var(--color-mar);
+  outline-offset: 2px;
+}
+
+/* Helpers semânticos (atalhos de classe que repetem muito) */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Animação fade-in pra entradas */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.4s ease-out forwards; }
+
+/* Gradient mancha aquarela (pra hero) */
+.aquarela-mar {
+  background: radial-gradient(circle at center, rgba(45,93,123,0.45) 0%, rgba(45,93,123,0) 65%);
+  filter: blur(40px);
+}
+.aquarela-terracota {
+  background: radial-gradient(circle at center, rgba(196,120,85,0.35) 0%, rgba(196,120,85,0) 65%);
+  filter: blur(40px);
+}
