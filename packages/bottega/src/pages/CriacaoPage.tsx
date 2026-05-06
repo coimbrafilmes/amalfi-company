@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brandbar } from '../components/organisms/Brandbar';
 import { FormCriacao } from '../components/organisms/FormCriacao';
@@ -11,14 +11,16 @@ export function CriacaoPage() {
   const navigate = useNavigate();
   const { form, results, status, loadingMessage, errorMsg, setField, generate, reset } = useCriacaoStore();
   const addAnuncio = useAnunciosStore((s) => s.add);
+  const lastSavedRef = useRef<string | null>(null);
 
-  // quando geração concluir, salvar no store de anúncios
+  // Salva no anunciosStore exatamente uma vez por geração concluída.
+  // Track via results.geradoEm pra evitar duplicação em re-renders.
   useEffect(() => {
-    if (status === 'concluido' && results) {
-      addAnuncio(form, results);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, results]);
+    if (status !== 'concluido' || !results) return;
+    if (lastSavedRef.current === results.geradoEm) return;
+    addAnuncio(form, results);
+    lastSavedRef.current = results.geradoEm;
+  }, [status, results, form, addAnuncio]);
 
   return (
     <div className="min-h-screen bg-osso">

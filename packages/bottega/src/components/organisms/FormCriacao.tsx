@@ -17,6 +17,9 @@ interface FormCriacaoProps {
 
 /** FormCriacao — coluna esquerda da tela de criação. Bg Areia. */
 export function FormCriacao({ form, setField, onSubmit, isSubmitting }: FormCriacaoProps) {
+  // Validação mínima: nome + detalhes técnicos. Sem ambos, prompts geram análise vazia.
+  const isValid = form.nomeProduto.trim().length >= 3 && form.detalhesTecnicos.trim().length >= 20;
+
   return (
     <div className="bg-areia px-12 py-section-lg pb-20 border-r border-tinta-15">
       <div className="flex items-center gap-3 mb-6">
@@ -92,15 +95,21 @@ export function FormCriacao({ form, setField, onSubmit, isSubmitting }: FormCria
       </Field>
 
       <div className="mt-10 pt-8 border-t border-tinta-15 flex flex-col gap-3">
-        <Button variant="primary" fullWidth onClick={onSubmit} disabled={isSubmitting || !form.nomeProduto}>
+        <Button variant="primary" fullWidth onClick={onSubmit} disabled={isSubmitting || !isValid}>
           {isSubmitting ? 'Gerando…' : 'Criar anúncio'}
         </Button>
         <Button variant="ghost" size="sm" fullWidth>
           Salvar rascunho
         </Button>
-        <span className="font-editorial italic text-[13px] text-center text-tinta-65 mt-2">
-          Cada criação leva, em média, três minutos.
-        </span>
+        {!isValid && !isSubmitting ? (
+          <span className="font-editorial italic text-[13px] text-center text-tinta-65 mt-2">
+            Para começar, preencha o nome do produto e os detalhes técnicos (ao menos 20 caracteres).
+          </span>
+        ) : (
+          <span className="font-editorial italic text-[13px] text-center text-tinta-65 mt-2">
+            Cada criação leva, em média, três minutos.
+          </span>
+        )}
       </div>
     </div>
   );

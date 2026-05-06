@@ -6,6 +6,7 @@ interface BriefingTileProps {
   tag: string;
   paleta?: 'areia' | 'mar' | 'ceu' | 'terracota' | 'ocre' | 'osso-outline';
   imageBase64?: string;
+  failed?: boolean;
   className?: string;
 }
 
@@ -14,7 +15,7 @@ interface BriefingTileProps {
  * Princípio brandbook: cores secundárias da paleta, texto editorial sobre fundo.
  * Se imageBase64, renderiza imagem (geração real); senão, placeholder editorial.
  */
-export function BriefingTile({ numero, titulo, tag, paleta = 'mar', imageBase64, className }: BriefingTileProps) {
+export function BriefingTile({ numero, titulo, tag, paleta = 'mar', imageBase64, failed, className }: BriefingTileProps) {
   const paletaClass = {
     areia: 'bg-areia text-tinta',
     mar: 'bg-mar text-osso',
@@ -36,6 +37,11 @@ export function BriefingTile({ numero, titulo, tag, paleta = 'mar', imageBase64,
       <span className="absolute bottom-4 left-4 z-10 font-ui text-[9px] font-medium uppercase tracking-widest opacity-70">
         {tag}
       </span>
+      {failed && (
+        <span className="absolute top-3 right-3 z-10 bg-terracota text-osso px-2 py-0.5 font-ui text-[9px] font-medium uppercase tracking-widest">
+          falhou
+        </span>
+      )}
     </div>
   );
 }

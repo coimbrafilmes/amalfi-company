@@ -20,8 +20,9 @@ function paletaPraTile(idx: number, paletaCor?: BriefingImagem['paletaCor']) {
     | 'areia' | 'mar' | 'ceu' | 'terracota' | 'ocre' | 'osso-outline';
 }
 
-function imageBase64For(imagens: ImagemGerada[] | undefined, n: number) {
-  return imagens?.find((i) => i.briefingNumero === n)?.base64;
+function imageInfoFor(imagens: ImagemGerada[] | undefined, n: number) {
+  const img = imagens?.find((i) => i.briefingNumero === n);
+  return { base64: img?.base64, failed: img?.falhou ?? false };
 }
 
 /** ResultsTabs — coluna direita Tinta com 5 tabs. */
@@ -227,23 +228,33 @@ export function ResultsTabs({ results, isLoading, loadingMessage }: ResultsTabsP
           </p>
 
           <div className="grid grid-cols-3 gap-4">
-            {results.briefings.map((b, idx) => (
-              <BriefingTile
-                key={b.numero}
-                numero={b.numero}
-                titulo={b.titulo}
-                tag={b.estagio}
-                paleta={paletaPraTile(idx, b.paletaCor)}
-                imageBase64={imageBase64For(results.imagens, b.numero)}
-              />
-            ))}
+            {results.briefings.map((b, idx) => {
+              const info = imageInfoFor(results.imagens, b.numero);
+              return (
+                <BriefingTile
+                  key={b.numero}
+                  numero={b.numero}
+                  titulo={b.titulo}
+                  tag={b.estagio}
+                  paleta={paletaPraTile(idx, b.paletaCor)}
+                  imageBase64={info.base64}
+                  failed={info.failed}
+                />
+              );
+            })}
           </div>
 
-          {results.imagens && (
-            <p className="mt-10 font-editorial italic text-base opacity-75">
-              {results.imagens.length} imagens renderizadas em modo {results.modoGeracao}.
-            </p>
-          )}
+          {results.imagens && (() => {
+            const ok = results.imagens.filter((i) => !i.falhou && i.base64).length;
+            const total = results.imagens.length;
+            const failed = total - ok;
+            return (
+              <p className="mt-10 font-editorial italic text-base opacity-75">
+                {ok} de {total} imagens renderizadas em modo {results.modoGeracao}
+                {failed > 0 ? ` — ${failed} falharam, considere regenerar.` : '.'}
+              </p>
+            );
+          })()}
         </Tabs.Content>
       </Tabs.Root>
 

@@ -43,8 +43,6 @@ export function CardAnuncio({
     osso: 'bg-osso text-tinta-65 border border-tinta-15',
   }[paletaCapa];
 
-  const isLight = paletaCapa === 'areia' || paletaCapa === 'ceu' || paletaCapa === 'osso' || paletaCapa === 'ocre';
-
   return (
     <article
       onClick={onClick}
@@ -82,8 +80,6 @@ export function CardAnuncio({
           </span>
           <span>{versao}</span>
         </div>
-        {/* isLight é visual hint pra QA — sem efeito */}
-        <span className="hidden">{isLight ? 'light' : 'dark'}</span>
       </div>
     </article>
   );
