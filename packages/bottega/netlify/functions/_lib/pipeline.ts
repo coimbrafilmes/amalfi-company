@@ -34,9 +34,9 @@ import type {
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
 const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? 'imagen-4.0-generate-001';
 
-// Retry config — Gemini retorna 503 quando sobrecarregado. Fast retries no servidor.
-const MAX_ATTEMPTS = 3;
-const BACKOFF_MS = [1_500, 4_000];
+// Retry config — Gemini retorna 503 quando sobrecarregado. Background pode aguardar mais.
+const MAX_ATTEMPTS = 5;
+const BACKOFF_MS = [2_000, 5_000, 10_000, 20_000];
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
