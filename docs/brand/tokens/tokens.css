@@ -1,0 +1,206 @@
+/* =====================================================================
+   AMALFI & CO. — Design Tokens (CSS Custom Properties)
+   ---------------------------------------------------------------------
+   Fonte de verdade: docs/brand/Amalfi Co. — Manual de Marca.pdf (v1.0 · Maio 2026)
+   Extraído por @ux-design-expert (Uma) em 2026-05-06.
+   Aplicar em :root no CSS global. NÃO modificar valores sem revisar brandbook.
+   ===================================================================== */
+
+:root {
+  /* ------ COR · Primárias (proporção 60-25-15) ------ */
+  --color-tinta:     #1F2A3A;  /* primary 60% — Pantone 5395 C */
+  --color-mar:       #2D5D7B;  /* secondary 25% — Pantone 7700 C */
+  --color-terracota: #C47855;  /* accent 15% — Pantone 7578 C */
+
+  /* ------ COR · Secundárias (paleta de apoio) ------ */
+  --color-aqua:  #6E9BB3;
+  --color-ceu:   #CFDFE6;
+  --color-ocre:  #D4A05A;
+  --color-areia: #E6D6BF;
+  --color-osso:  #F4EDE0;  /* background base light mode */
+
+  /* ------ COR · Aliases semânticos (preferir esses na app) ------ */
+  --color-bg-base:     var(--color-osso);
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-soft:     var(--color-areia);
+  --color-bg-inverse:  var(--color-tinta);
+
+  --color-text-primary:    var(--color-tinta);
+  --color-text-secondary:  rgba(31, 42, 58, 0.65);
+  --color-text-tertiary:   rgba(31, 42, 58, 0.45);
+  --color-text-inverse:    var(--color-osso);
+  --color-text-inverse-secondary: rgba(244, 237, 224, 0.65);
+
+  --color-border-soft:    rgba(31, 42, 58, 0.08);
+  --color-border-default: rgba(31, 42, 58, 0.15);
+  --color-border-strong:  var(--color-tinta);
+  --color-border-inverse: rgba(244, 237, 224, 0.15);
+
+  --color-action-primary:        var(--color-tinta);
+  --color-action-primary-hover:  var(--color-mar);
+  --color-action-accent:         var(--color-terracota);
+  --color-action-accent-hover:   #B6643F;
+
+  --color-link:       var(--color-mar);
+  --color-link-hover: var(--color-tinta);
+
+  /* ------ COR · Combinações aprovadas (95% dos casos) ------ */
+  /* Use uma como dominante, outra como acento */
+  /* SERENIDADE  · Tinta + Osso       → editorial padrão */
+  /* PRESENÇA    · Mar + Areia        → coleções, campanhas costeiras */
+  /* CALOR       · Terracota + Osso   → promoções, embalagens premium */
+  /* LUZ         · Osso + Ocre        → coleções verão, papelaria */
+
+  /* ------ TIPOGRAFIA · Famílias ------ */
+  --font-display:   'DM Serif Display', 'Times New Roman', Georgia, serif;
+  --font-editorial: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-ui:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* ------ TIPOGRAFIA · Tamanhos (em px, escala fluida) ------ */
+  --font-size-display-xl: 96px;
+  --font-size-display-l:  64px;
+  --font-size-display-m:  48px;
+  --font-size-display-s:  32px;
+
+  --font-size-editorial-xl: 32px;
+  --font-size-editorial-l:  22px;  /* lede oficial */
+  --font-size-editorial-m:  18px;
+
+  --font-size-h1: 64px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
+
+  --font-size-body-lg: 16px;
+  --font-size-body:    14px;
+  --font-size-eyebrow: 11px;
+  --font-size-button:  11px;
+  --font-size-caption: 11px;
+  --font-size-meta:    10px;
+
+  /* ------ TIPOGRAFIA · Pesos ------ */
+  --font-weight-display:   400;  /* DM Serif Display Regular */
+  --font-weight-editorial: 400;  /* Cormorant Italic Regular */
+  --font-weight-light:     300;  /* Inter Light — body principal */
+  --font-weight-regular:   400;
+  --font-weight-medium:    500;  /* eyebrows, botões */
+  --font-weight-semibold:  600;
+
+  /* ------ TIPOGRAFIA · Line height ------ */
+  --line-height-display: 1.05;
+  --line-height-tight:   1.15;
+  --line-height-snug:    1.4;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.7;  /* body principal */
+
+  /* ------ TIPOGRAFIA · Letter spacing ------ */
+  --letter-spacing-display: -0.015em;
+  --letter-spacing-h1:      -0.01em;
+  --letter-spacing-h2:      -0.005em;
+  --letter-spacing-body:    0;
+  --letter-spacing-eyebrow: 0.18em;  /* tracking generoso CAPS */
+  --letter-spacing-button:  0.18em;
+  --letter-spacing-meta:    0.16em;
+
+  /* ------ ESPAÇO · Escala (mín. 32px de respiro entre seções) ------ */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;   /* mínimo entre seções (princípio do brandbook) */
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 144px;
+
+  /* ------ LAYOUT · Containers ------ */
+  --max-width-prose:    640px;
+  --max-width-content:  1280px;
+  --max-width-wide:     1440px;
+
+  /* ------ LAYOUT · Borda & raios ------ */
+  --border-width-hair:    1px;
+  --border-width-default: 1.5px;
+  --border-radius-none:   0px;     /* PADRÃO — Amalfi não usa cantos arredondados */
+  --border-radius-sm:     2px;     /* exceções raras */
+  --border-radius-circle: 50%;     /* monograma A·co. circular */
+
+  /* ------ MOTION · Transições ------ */
+  --transition-fast:   150ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   320ms ease;
+
+  /* ------ Z-INDEX ------ */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-sticky:  50;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
+}
+
+/* =====================================================================
+   DARK MODE OVERRIDES (opcional — quando body[data-theme="dark"] ou similar)
+   Tela "Novo Anúncio" coluna direita JÁ usa Tinta como bg — não precisa toggle global.
+   Mas se quiser dark mode total, descomenta:
+   ===================================================================== */
+
+/*
+[data-theme="dark"] {
+  --color-bg-base:        var(--color-tinta);
+  --color-bg-elevated:    #283446;
+  --color-bg-soft:        rgba(244, 237, 224, 0.04);
+  --color-text-primary:   var(--color-osso);
+  --color-text-secondary: rgba(244, 237, 224, 0.65);
+  --color-border-soft:    rgba(244, 237, 224, 0.08);
+  --color-border-default: rgba(244, 237, 224, 0.15);
+}
+*/
+
+/* =====================================================================
+   UTILITY CLASSES (use só pra acelerar prototipagem; dev pode trocar por
+   Tailwind/CSS Modules/styled-components na implementação final)
+   ===================================================================== */
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-eyebrow);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.display { font-family: var(--font-display); font-weight: var(--font-weight-display); line-height: var(--line-height-display); letter-spacing: var(--letter-spacing-display); }
+.editorial { font-family: var(--font-editorial); font-style: italic; font-weight: var(--font-weight-editorial); line-height: var(--line-height-snug); }
+.ui { font-family: var(--font-ui); }
+
+.btn-primary {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-button);
+  text-transform: uppercase;
+  padding: 16px 28px;
+  border: var(--border-width-default) solid var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-primary:hover { background: var(--color-action-primary-hover); border-color: var(--color-action-primary-hover); }
+
+.btn-ghost {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-button);
+  text-transform: uppercase;
+  padding: 16px 28px;
+  border: var(--border-width-default) solid var(--color-text-primary);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-ghost:hover { background: var(--color-text-primary); color: var(--color-text-inverse); }

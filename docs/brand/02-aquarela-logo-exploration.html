@@ -1,0 +1,901 @@
+<!DOCTYPE html><html><head><title>02-aquarela-logo-exploration — Amalfi Amazon</title><meta charset="utf-8"><style>/* Amalfi — Marco's listing render style
+ * Pragmatic, clean, designed for both PDF print + HTML browser viewing
+ * Optimized for: scannability, copy-paste para Seller Central, e clareza visual
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* Headings */
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0d2818;
+  border-bottom: 3px solid #4fb89c;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3d2c;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d5840;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a4a4a;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Paragraphs and inline */
+p {
+  margin: 10px 0;
+}
+
+strong, b {
+  color: #0d2818;
+  font-weight: 700;
+}
+
+em, i {
+  color: #555;
+}
+
+/* Inline code (specs, char counts, paths) */
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f5f4;
+  color: #0d4a35;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Code blocks (titulo, descrição HTML, prompts Higgsfield, backend keywords) */
+pre {
+  background: #f8faf9;
+  border: 1px solid #d6e0db;
+  border-left: 4px solid #4fb89c;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0;
+  color: #1a3d2c;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lists */
+ul, ol {
+  margin: 10px 0 14px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+li > strong:first-child {
+  color: #0d4a35;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+th {
+  background: #f3f5f4;
+  color: #0d2818;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4fb89c;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+tr:hover {
+  background: #f8faf9;
+}
+
+/* Horizontal rules — slim, subtle */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 28px 0;
+}
+
+/* Blockquotes (notas, alerts, A+ content disclaimer) */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: #fff8e8;
+  border-left: 4px solid #f0b22d;
+  color: #5c4a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* Links (raros aqui — só paths/refs) */
+a {
+  color: #0d4a35;
+  text-decoration: none;
+  border-bottom: 1px dotted #4fb89c;
+}
+
+/* Print-specific */
+@media print {
+  body {
+    padding: 0;
+    max-width: none;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, table {
+    break-inside: avoid;
+  }
+
+  pre {
+    font-size: 11px;
+  }
+}
+
+/* HTML browser-only styling (light shadow + container) */
+@media screen {
+  body {
+    background: #f5f7f6;
+  }
+
+  body > * {
+    background: white;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  html {
+    background: #f5f7f6;
+  }
+
+  body {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+    margin: 24px auto;
+    padding: 40px 48px;
+    border-radius: 10px;
+  }
+}
+/*# sourceURL=/Users/coimbrafilmes/Desktop/CLAUDE CODE/CLIENTES/AMALFI COMPANY/agents/amalfi-amazon/scripts/../assets/listing.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/opt/homebrew/lib/node_modules/md-to-pdf/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="logo-exploration--aquarela-luminosa-costa-amalfitana-v2">Logo Exploration — Aquarela Luminosa Costa Amalfitana (v2)</h1>
+<blockquote>
+<p><strong>Pedido</strong>: AMALFI em tipografia sofisticada + ilustração da Costa Amalfitana em aquarela + tons terrosos.
+<strong>Versão</strong>: v2 (alinhada com referência visual fornecida pelo owner em 2026-05-05) — substitui v1
+<strong>Decisão estratégica</strong>: sistema <strong>dual</strong> (hero emocional aquarela + functional sólido monocromático).</p>
+</blockquote>
+<hr>
+<h2 id="✨-a-referência-travou-a-direção">✨ A referência travou a direção</h2>
+<p>A imagem de referência que você enviou (Costa Amalfitana aquarela quadrada, vista aérea de Positano) ensinou 4 coisas que eu não tinha capturado em v1:</p>
+<ol>
+<li><strong>Casas brancas dominam</strong> — não são terracotta. As casas mediterrâneas pintadas de cal são predominantemente <strong>brancas/cremê</strong>. A terracotta aparece <strong>só nos telhados</strong> (acento, não primária).</li>
+<li><strong>Cúpula verde-teal é assinatura</strong> — a igreja Santa Maria Assunta de Positano tem cúpula em ladrilho verde-azulado <strong>icônico</strong>. Vai virar elemento característico da nossa aquarela.</li>
+<li><strong>Mar é turquesa, não azul-bruma cinza</strong> — vibrante, com matiz verde-azulado, não "navy desbotado".</li>
+<li><strong>Aéreo e luminoso</strong> — pinceladas soltas, papel branco aparecendo, NÃO sépia pesado. Sensação "manhã de sol, brisa do mar".</li>
+</ol>
+<p>Paleta v2 é mais <strong>leve, ensolarada, otimista</strong>. v1 tava terra-batida-vintage demais.</p>
+<hr>
+<h2 id="🎨-paleta-aquarela-luminosa-v2">🎨 Paleta Aquarela Luminosa v2</h2>
+<h3 id="cores-predominantes-luz">Cores predominantes (luz)</h3>
+<table>
+<tbody><tr>
+<td style="background:#FCFAF5; color:#5C3D1F; padding:24px; min-width:130px; border-radius:6px; border:1px solid #E5DCC5;">
+<b>Caliça</b><br>
+<code style="background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:3px;">#FCFAF5</code><br>
+<small>Casas brancas</small>
+</td>
+<td style="background:#F5EFE0; color:#5C3D1F; padding:24px; min-width:130px; border-radius:6px; border:1px solid #E5DCC5;">
+<b>Pergaminho</b><br>
+<code style="background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:3px;">#F5EFE0</code><br>
+<small>Papel/fundo</small>
+</td>
+<td style="background:#7BA8A0; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Cúpula</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#7BA8A0</code><br>
+<small>Verde Santa Maria ⭐</small>
+</td>
+<td style="background:#6BAEC4; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Tirreno</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#6BAEC4</code><br>
+<small>Mar turquesa</small>
+</td>
+</tr>
+</tbody></table>
+
+<h3 id="acentos-terrosos-telhassombras">Acentos terrosos (telhas/sombras)</h3>
+<table>
+<tbody><tr>
+<td style="background:#E89870; color:#5C3D1F; padding:24px; min-width:130px; border-radius:6px;">
+<b>Telha Clara</b><br>
+<code style="background:rgba(0,0,0,0.1); padding:2px 6px; border-radius:3px;">#E89870</code><br>
+<small>Telhado luz</small>
+</td>
+<td style="background:#C5694A; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Telha Profunda</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#C5694A</code><br>
+<small>Telhado sombra</small>
+</td>
+<td style="background:#A8B99B; color:#3D4D2E; padding:24px; min-width:130px; border-radius:6px;">
+<b>Sálvia</b><br>
+<code style="background:rgba(0,0,0,0.1); padding:2px 6px; border-radius:3px;">#A8B99B</code><br>
+<small>Vegetação penhasco</small>
+</td>
+<td style="background:#7B5E3D; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Sépia</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#7B5E3D</code><br>
+<small>Detalhes/janelas</small>
+</td>
+</tr>
+</tbody></table>
+
+<h3 id="apoio-tons-mar-profundo--sol">Apoio (tons mar profundo + sol)</h3>
+<table>
+<tbody><tr>
+<td style="background:#3D7A95; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Tirreno Profundo</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#3D7A95</code><br>
+<small>Mar sombra</small>
+</td>
+<td style="background:#1B3A5C; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Tirreno Noite</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#1B3A5C</code><br>
+<small>Tipografia (texto)</small>
+</td>
+<td style="background:#F4D8B8; color:#5C3D1F; padding:24px; min-width:130px; border-radius:6px;">
+<b>Sol Manhã</b><br>
+<code style="background:rgba(0,0,0,0.1); padding:2px 6px; border-radius:3px;">#F4D8B8</code><br>
+<small>Wash céu</small>
+</td>
+<td style="background:#B8AC95; color:#FCFAF5; padding:24px; min-width:130px; border-radius:6px;">
+<b>Pedra</b><br>
+<code style="background:rgba(255,255,255,0.18); color:#FCFAF5; padding:2px 6px; border-radius:3px;">#B8AC95</code><br>
+<small>Penhasco rocha</small>
+</td>
+</tr>
+</tbody></table>
+
+<h3 id="princípios-da-paleta-v2">Princípios da paleta v2</h3>
+<ul>
+<li><strong>Branco/cremê é a estrela</strong> — casas dominam visualmente</li>
+<li><strong>Cúpula verde-teal <code>#7BA8A0</code></strong> é o <strong>detalhe que vira marca</strong> (igual o nó vermelho-verde da Gucci)</li>
+<li><strong>Mar turquesa</strong> (não navy nem cinza) — vibração ensolarada</li>
+<li><strong>Terracotta só em telhas</strong> — acento, nunca dominante</li>
+<li><strong>Tipografia em Tirreno Noite <code>#1B3A5C</code></strong> (texto sobre cremê = legibilidade WCAG AA garantida)</li>
+</ul>
+<hr>
+<h2 id="🖼️-3-concepts-de-logo-atualizados-v2">🖼️ 3 Concepts de Logo (atualizados v2)</h2>
+<blockquote>
+<p>⚠️ Os SVGs continuam sendo <strong>aproximações vetoriais</strong> com filtros de turbulência simulando aquarela. Pra produção final, gere a imagem real no <strong>Higgsfield</strong> com os briefings atualizados no fim do doc — eu integro depois.</p>
+</blockquote>
+<hr>
+<h3 id="🎨-concept-1--horizonte-refinado-v2">🎨 Concept 1 — <strong>HORIZONTE</strong> (refinado v2)</h3>
+<p>Wordmark Cormorant Italic + faixa aquarela horizontal abaixo. Versão luminosa: casas brancas, cúpula verde, mar turquesa.</p>
+<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="background:#F5EFE0; max-width:700px; width:100%; border-radius:8px;">
+  <defs>
+    <filter id="aq1v2-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="3.5"></feDisplacementMap>
+    </filter>
+    <filter id="aq1v2-soft">
+      <feGaussianBlur stdDeviation="1.8"></feGaussianBlur>
+    </filter>
+    <linearGradient id="aq1v2-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F4D8B8" stop-opacity="0"></stop>
+      <stop offset="100%" stop-color="#F4D8B8" stop-opacity="0.55"></stop>
+    </linearGradient>
+    <linearGradient id="aq1v2-sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6BAEC4" stop-opacity="0.55"></stop>
+      <stop offset="100%" stop-color="#3D7A95" stop-opacity="0.75"></stop>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&amp;family=Inter:wght@500&amp;display=swap');
+      .aq1v2-word { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; fill: #1B3A5C; }
+      .aq1v2-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #7B5E3D; letter-spacing: 0.42em; }
+      .aq1v2-rule { stroke: #C5694A; stroke-width: 0.8; opacity: 0.6; }
+    </style>
+  </defs>
+
+  <!-- Wordmark -->
+</svg><p>  <text x="350" y="135" text-anchor="middle" font-size="120" class="aq1v2-word">Amalfi</text></p>
+  <!-- Faixa aquarela -->
+  <g transform="translate(0, 195)" filter="url(#aq1v2-rough)">
+    <!-- Sky soft -->
+    <rect x="120" y="0" width="460" height="36" fill="url(#aq1v2-sky)" opacity="0.6">
+
+<pre><code>&lt;!-- Penhasco silhueta sálvia --&gt;
+&lt;path d="M 120 50 Q 165 35 200 42 L 200 80 L 120 80 Z" fill="#A8B99B" opacity="0.45"/&gt;
+&lt;path d="M 540 48 Q 580 38 600 45 L 600 80 L 540 80 Z" fill="#A8B99B" opacity="0.45"/&gt;
+
+&lt;!-- Casas brancas (cluster esquerda) --&gt;
+&lt;rect x="170" y="40" width="14" height="34" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="187" y="36" width="11" height="38" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="201" y="42" width="13" height="32" fill="#FCFAF5" opacity="0.92"/&gt;
+&lt;rect x="217" y="38" width="10" height="36" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="230" y="44" width="12" height="30" fill="#FCFAF5" opacity="0.92"/&gt;
+&lt;!-- Telhas --&gt;
+&lt;path d="M 168 40 L 177 32 L 186 40 Z" fill="#E89870" opacity="0.85"/&gt;
+&lt;path d="M 185 36 L 192.5 28 L 200 36 Z" fill="#C5694A" opacity="0.85"/&gt;
+&lt;path d="M 199 42 L 207.5 33 L 216 42 Z" fill="#E89870" opacity="0.85"/&gt;
+&lt;path d="M 215 38 L 222 31 L 229 38 Z" fill="#C5694A" opacity="0.85"/&gt;
+&lt;path d="M 228 44 L 234 37 L 244 44 Z" fill="#E89870" opacity="0.85"/&gt;
+
+&lt;!-- Cúpula icônica Santa Maria (centro) --&gt;
+&lt;path d="M 350 36 Q 358 18 366 36 Z" fill="#7BA8A0" opacity="0.9"/&gt;
+&lt;rect x="354" y="36" width="8" height="3" fill="#7B5E3D" opacity="0.7"/&gt;
+&lt;!-- Torre sino --&gt;
+&lt;rect x="345" y="42" width="6" height="32" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="365" y="42" width="6" height="32" fill="#FCFAF5" opacity="0.95"/&gt;
+
+&lt;!-- Casas brancas (cluster direita) --&gt;
+&lt;rect x="400" y="44" width="12" height="30" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="415" y="40" width="13" height="34" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="431" y="36" width="11" height="38" fill="#FCFAF5" opacity="0.92"/&gt;
+&lt;rect x="445" y="42" width="14" height="32" fill="#FCFAF5" opacity="0.95"/&gt;
+&lt;rect x="462" y="38" width="11" height="36" fill="#FCFAF5" opacity="0.92"/&gt;
+&lt;!-- Telhas --&gt;
+&lt;path d="M 398 44 L 406 36 L 414 44 Z" fill="#E89870" opacity="0.85"/&gt;
+&lt;path d="M 413 40 L 421.5 32 L 430 40 Z" fill="#C5694A" opacity="0.85"/&gt;
+&lt;path d="M 429 36 L 436.5 28 L 444 36 Z" fill="#E89870" opacity="0.85"/&gt;
+&lt;path d="M 443 42 L 452 33 L 461 42 Z" fill="#C5694A" opacity="0.85"/&gt;
+&lt;path d="M 460 38 L 467 31 L 475 38 Z" fill="#E89870" opacity="0.85"/&gt;
+
+&lt;!-- Sea turquesa --&gt;
+&lt;rect x="120" y="80" width="460" height="40" fill="url(#aq1v2-sea)" filter="url(#aq1v2-soft)"/&gt;
+&lt;!-- Sea highlights --&gt;
+&lt;path d="M 150 95 Q 200 92 250 96 T 360 95 T 470 96 T 560 95" stroke="#FCFAF5" stroke-width="0.9" fill="none" opacity="0.7"/&gt;
+&lt;path d="M 180 108 Q 240 105 300 109 T 460 108" stroke="#FCFAF5" stroke-width="0.6" fill="none" opacity="0.5"/&gt;
+</code></pre>
+  </rect></g>
+
+  <!-- Tagline -->
+  <line x1="290" y1="335" x2="410" y2="335" class="aq1v2-rule">
+  <text x="350" y="355" text-anchor="middle" font-size="13" class="aq1v2-tag">COMPANY</text>
+
+
+<p><strong>Vibe</strong>: editorial limpo, wordmark é a estrela, aquarela é assinatura emotiva. <strong>Funciona em cartão de visita 9×5cm</strong> sem perder leitura.</p>
+<hr>
+<h3 id="🎨-concept-2--positano-refinado-v2--alinhado-à-referência">🎨 Concept 2 — <strong>POSITANO</strong> (refinado v2 — alinhado à referência)</h3>
+<p>Cena ampla estilo a referência que você mandou. Casas brancas em cascata pelo penhasco, cúpula verde-teal proeminente, mar turquesa, wordmark Cormorant Italic em Tirreno Noite sobre o céu cremê (não branco — pra contrastar com casas).</p>
+<svg viewBox="0 0 700 540" xmlns="http://www.w3.org/2000/svg" style="background:#F5EFE0; max-width:700px; width:100%; border-radius:8px;">
+  <defs>
+    <filter id="aq2v2-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="9"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="4.5"></feDisplacementMap>
+    </filter>
+    <filter id="aq2v2-soft">
+      <feGaussianBlur stdDeviation="2.2"></feGaussianBlur>
+    </filter>
+    <linearGradient id="aq2v2-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F4D8B8" stop-opacity="0.4"></stop>
+      <stop offset="60%" stop-color="#F5EFE0" stop-opacity="0.3"></stop>
+      <stop offset="100%" stop-color="#F5EFE0" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id="aq2v2-sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6BAEC4" stop-opacity="0.6"></stop>
+      <stop offset="100%" stop-color="#3D7A95" stop-opacity="0.85"></stop>
+    </linearGradient>
+    <linearGradient id="aq2v2-cliff" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8B99B" stop-opacity="0.45"></stop>
+      <stop offset="100%" stop-color="#B8AC95" stop-opacity="0.6"></stop>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&amp;family=Inter:wght@500&amp;display=swap');
+      .aq2v2-word { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; fill: #1B3A5C; }
+      .aq2v2-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #7B5E3D; letter-spacing: 0.5em; }
+    </style>
+  </defs>
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="700" height="200" fill="url(#aq2v2-sky)" filter="url(#aq2v2-soft)"></rect>
+
+  <!-- Penhasco vegetação (esquerda + direita) -->
+  <g filter="url(#aq2v2-rough)">
+    <path d="M 0 280 L 0 380 L 250 380 L 280 320 L 220 280 Z" fill="url(#aq2v2-cliff)"></path>
+    <path d="M 700 290 L 700 380 L 480 380 L 460 330 L 510 290 Z" fill="url(#aq2v2-cliff)"></path>
+  </g>
+
+  <!-- Casas brancas em cascata (esquerda) -->
+  <g filter="url(#aq2v2-rough)">
+    <rect x="40" y="220" width="22" height="60" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="65" y="240" width="20" height="58" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="88" y="225" width="24" height="65" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="115" y="250" width="22" height="55" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="140" y="235" width="26" height="68" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="170" y="265" width="20" height="50" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="193" y="245" width="24" height="62" fill="#FCFAF5" opacity="0.95"></rect>
+    <!-- Roofs -->
+    <path d="M 38 220 L 51 207 L 64 220 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 63 240 L 75 228 L 87 240 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 86 225 L 100 211 L 114 225 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 113 250 L 126 238 L 139 250 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 138 235 L 153 220 L 168 235 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 168 265 L 180 254 L 192 265 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 191 245 L 205 232 L 219 245 Z" fill="#E89870" opacity="0.9"></path>
+    <!-- Janelas detalhes -->
+    <rect x="48" y="235" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="54" y="235" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="72" y="255" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="78" y="255" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="96" y="245" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="102" y="245" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+  </g>
+
+  <!-- Igreja Santa Maria — CENTRO, com cúpula verde icônica -->
+  <g filter="url(#aq2v2-rough)">
+    <!-- Corpo da igreja -->
+    <rect x="298" y="240" width="52" height="65" fill="#FCFAF5" opacity="0.97"></rect>
+    <!-- Cúpula -->
+    <path d="M 300 240 Q 324 200 348 240 Z" fill="#7BA8A0" opacity="0.95"></path>
+    <path d="M 305 240 Q 324 210 343 240" stroke="#5C8B82" stroke-width="0.6" fill="none" opacity="0.7"></path>
+    <!-- Lanterna -->
+    <rect x="320" y="195" width="8" height="10" fill="#FCFAF5" opacity="0.95"></rect>
+    <path d="M 318 195 L 324 188 L 330 195 Z" fill="#7BA8A0" opacity="0.95"></path>
+    <!-- Cruz -->
+    <line x1="324" y1="188" x2="324" y2="180" stroke="#7B5E3D" stroke-width="1"></line>
+    <line x1="320" y1="183" x2="328" y2="183" stroke="#7B5E3D" stroke-width="1"></line>
+    <!-- Janelas -->
+    <rect x="312" y="270" width="5" height="14" fill="#7B5E3D" opacity="0.55"></rect>
+    <rect x="322" y="270" width="5" height="14" fill="#7B5E3D" opacity="0.55"></rect>
+    <rect x="332" y="270" width="5" height="14" fill="#7B5E3D" opacity="0.55"></rect>
+  </g>
+
+  <!-- Casas brancas (direita) -->
+  <g filter="url(#aq2v2-rough)">
+    <rect x="375" y="245" width="22" height="60" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="400" y="225" width="26" height="68" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="430" y="240" width="22" height="62" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="455" y="220" width="24" height="70" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="482" y="245" width="22" height="58" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="508" y="235" width="26" height="65" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="538" y="255" width="20" height="50" fill="#FCFAF5" opacity="0.95"></rect>
+    <rect x="562" y="240" width="22" height="60" fill="#FCFAF5" opacity="0.95"></rect>
+    <!-- Roofs -->
+    <path d="M 373 245 L 386 232 L 399 245 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 398 225 L 413 210 L 428 225 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 428 240 L 441 227 L 454 240 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 453 220 L 467 205 L 481 220 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 480 245 L 493 232 L 506 245 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 506 235 L 521 220 L 536 235 Z" fill="#E89870" opacity="0.9"></path>
+    <path d="M 536 255 L 548 244 L 560 255 Z" fill="#C5694A" opacity="0.9"></path>
+    <path d="M 560 240 L 573 227 L 586 240 Z" fill="#E89870" opacity="0.9"></path>
+    <!-- Janelas detalhes -->
+    <rect x="383" y="262" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="389" y="262" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="408" y="245" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="414" y="245" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="438" y="260" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="444" y="260" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="463" y="240" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+    <rect x="469" y="240" width="3" height="5" fill="#7B5E3D" opacity="0.6"></rect>
+  </g>
+
+  <!-- Mar turquesa -->
+  <rect x="0" y="380" width="700" height="160" fill="url(#aq2v2-sea)" filter="url(#aq2v2-soft)"></rect>
+  <!-- Sea highlights (ondulações) -->
+  <path d="M 0 405 Q 100 400 200 408 T 400 404 T 600 408 T 700 404" stroke="#FCFAF5" stroke-width="0.9" fill="none" opacity="0.7"></path>
+  <path d="M 0 435 Q 130 430 260 438 T 480 434 T 700 438" stroke="#FCFAF5" stroke-width="0.7" fill="none" opacity="0.55"></path>
+  <path d="M 0 465 Q 150 461 300 467 T 560 465 T 700 468" stroke="#FCFAF5" stroke-width="0.6" fill="none" opacity="0.45"></path>
+  <path d="M 0 495 Q 180 491 360 496 T 700 494" stroke="#FCFAF5" stroke-width="0.5" fill="none" opacity="0.35"></path>
+
+  <!-- Wordmark sobre céu -->
+</svg><p>  <text x="350" y="120" text-anchor="middle" font-size="100" class="aq2v2-word">Amalfi</text>
+  <text x="350" y="160" text-anchor="middle" font-size="11" class="aq2v2-tag">COSTA AMALFITANA · 2025</text>
+</p>
+<p><strong>Vibe</strong>: este É a referência que você mandou — Positano luminoso, casas brancas em cascata, cúpula verde icônica, mar turquesa.
+<strong>Uso ideal</strong>: hero de site, fundo de embalagem, capa de Instagram, abertura de catálogo.
+<strong>Diferencial v2</strong>: a cúpula verde-teal é a <strong>assinatura visual</strong> que ninguém copia.</p>
+<hr>
+<h3 id="🎨-concept-3--emblem-refinado-v2">🎨 Concept 3 — <strong>EMBLEM</strong> (refinado v2)</h3>
+<p>Medalhão circular aquarela ao lado do wordmark Cormorant SemiBold caps. Refinado pra incluir cúpula verde + casas brancas + mar turquesa.</p>
+<svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg" style="background:#F5EFE0; max-width:800px; width:100%; border-radius:8px;">
+  <defs>
+    <filter id="aq3v2-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="13"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="2.5"></feDisplacementMap>
+    </filter>
+    <filter id="aq3v2-soft">
+      <feGaussianBlur stdDeviation="1.4"></feGaussianBlur>
+    </filter>
+    <clipPath id="aq3v2-clip">
+      <circle cx="120" cy="120" r="74"></circle>
+    </clipPath>
+    <linearGradient id="aq3v2-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F4D8B8" stop-opacity="0.4"></stop>
+      <stop offset="100%" stop-color="#F5EFE0" stop-opacity="0.3"></stop>
+    </linearGradient>
+    <linearGradient id="aq3v2-sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6BAEC4" stop-opacity="0.65"></stop>
+      <stop offset="100%" stop-color="#3D7A95" stop-opacity="0.85"></stop>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=Inter:wght@400;500&amp;display=swap');
+      .aq3v2-word { font-family: 'Cormorant Garamond', serif; font-weight: 500; fill: #1B3A5C; letter-spacing: 0.18em; }
+      .aq3v2-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #7B5E3D; letter-spacing: 0.4em; }
+    </style>
+  </defs>
+
+  <!-- Medalhão -->
+  <g clip-path="url(#aq3v2-clip)">
+    <!-- Sky -->
+    <rect x="46" y="46" width="148" height="60" fill="url(#aq3v2-sky)" filter="url(#aq3v2-soft)"></rect>
+    <!-- Penhasco verde -->
+    <g filter="url(#aq3v2-rough)">
+      <path d="M 46 110 Q 70 95 90 102 L 90 130 L 46 130 Z" fill="#A8B99B" opacity="0.5"></path>
+      <path d="M 194 105 Q 175 95 158 100 L 158 130 L 194 130 Z" fill="#A8B99B" opacity="0.5"></path>
+    </g>
+    <!-- Casas brancas -->
+    <g filter="url(#aq3v2-rough)">
+      <rect x="70" y="100" width="9" height="22" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="81" y="95" width="8" height="27" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="91" y="100" width="9" height="22" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="102" y="92" width="8" height="30" fill="#FCFAF5" opacity="0.95"></rect>
+      <!-- Igreja com cúpula verde no centro -->
+      <rect x="113" y="98" width="14" height="24" fill="#FCFAF5" opacity="0.97"></rect>
+      <path d="M 113 98 Q 120 84 127 98 Z" fill="#7BA8A0" opacity="0.95"></path>
+      <line x1="120" y1="84" x2="120" y2="79" stroke="#7B5E3D" stroke-width="0.7"></line>
+      <!-- Mais casas -->
+      <rect x="129" y="95" width="8" height="27" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="139" y="100" width="9" height="22" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="150" y="93" width="8" height="29" fill="#FCFAF5" opacity="0.95"></rect>
+      <rect x="160" y="100" width="9" height="22" fill="#FCFAF5" opacity="0.95"></rect>
+      <!-- Roofs -->
+      <path d="M 68 100 L 74 94 L 80 100 Z" fill="#E89870" opacity="0.9"></path>
+      <path d="M 80 95 L 85 89 L 90 95 Z" fill="#C5694A" opacity="0.9"></path>
+      <path d="M 89 100 L 95 94 L 101 100 Z" fill="#E89870" opacity="0.9"></path>
+      <path d="M 101 92 L 106 86 L 111 92 Z" fill="#C5694A" opacity="0.9"></path>
+      <path d="M 128 95 L 133 89 L 138 95 Z" fill="#E89870" opacity="0.9"></path>
+      <path d="M 137 100 L 143 94 L 149 100 Z" fill="#C5694A" opacity="0.9"></path>
+      <path d="M 148 93 L 154 87 L 160 93 Z" fill="#E89870" opacity="0.9"></path>
+      <path d="M 158 100 L 164 94 L 170 100 Z" fill="#C5694A" opacity="0.9"></path>
+    </g>
+    <!-- Mar turquesa -->
+    <rect x="46" y="130" width="148" height="64" fill="url(#aq3v2-sea)" filter="url(#aq3v2-soft)"></rect>
+    <!-- Sea highlights -->
+    <path d="M 46 148 Q 80 145 120 150 T 194 148" stroke="#FCFAF5" stroke-width="0.8" fill="none" opacity="0.65"></path>
+    <path d="M 46 165 Q 90 162 140 167 T 194 165" stroke="#FCFAF5" stroke-width="0.6" fill="none" opacity="0.5"></path>
+    <path d="M 46 180 Q 100 177 150 182 T 194 180" stroke="#FCFAF5" stroke-width="0.5" fill="none" opacity="0.4"></path>
+  </g>
+  <!-- Anéis do medalhão -->
+  <circle cx="120" cy="120" r="74" fill="none" stroke="#7B5E3D" stroke-width="1.5"></circle>
+  <circle cx="120" cy="120" r="68" fill="none" stroke="#C5694A" stroke-width="0.7" opacity="0.5"></circle>
+
+  <!-- Wordmark -->
+</svg><p>  <text x="240" y="135" font-size="64" class="aq3v2-word">AMALFI</text>
+  <text x="242" y="170" font-size="11" class="aq3v2-tag">COMPANY · COSTA AMALFITANA · 2025</text>
+</p>
+<p><strong>Vibe</strong>: atelier italiano elegante, medalhão como selo de origem. <strong>A cúpula verde dentro do círculo é o ponto focal</strong>.
+<strong>Uso ideal</strong>: papelaria premium, embalagem, header social, logo principal universal. Medalhão sozinho funciona como <strong>avatar de Instagram/WhatsApp</strong> sem o wordmark.</p>
+<hr>
+<h2 id="🪞-sistema-dual-mantido--recomendação-central">🪞 Sistema Dual (mantido — recomendação central)</h2>
+<table>
+<thead>
+<tr>
+<th>Contexto</th>
+<th>Logo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cartão de visita frente</td>
+<td>Concept 3 (medalhão + wordmark) ou Concept 1 (horizonte)</td>
+</tr>
+<tr>
+<td>Cartão de visita verso</td>
+<td>Wordmark sólido Cormorant Italic Tirreno Noite (sem aquarela)</td>
+</tr>
+<tr>
+<td>Capa de embalagem</td>
+<td>Concept 2 (Positano hero) ou Concept 3</td>
+</tr>
+<tr>
+<td>Etiqueta pequena de embalagem</td>
+<td>Wordmark sólido + cúpula verde reduzida</td>
+</tr>
+<tr>
+<td>Header de site (light)</td>
+<td>Wordmark Cormorant Tirreno Noite (sem aquarela)</td>
+</tr>
+<tr>
+<td>Hero de site / abertura</td>
+<td>Concept 2 fullscreen</td>
+</tr>
+<tr>
+<td>Anuncio-app (header dark)</td>
+<td>Wordmark sólido Caliça (Concept 3 do doc 01 — Sans Whisper)</td>
+</tr>
+<tr>
+<td>WhatsApp avatar</td>
+<td>Medalhão isolado de Concept 3</td>
+</tr>
+<tr>
+<td>WhatsApp banner business</td>
+<td>Concept 1 horizonte</td>
+</tr>
+<tr>
+<td>Favicon (16×16, 32×32)</td>
+<td>Cúpula verde-teal isolada (super-icônico em pixel pequeno)</td>
+</tr>
+<tr>
+<td>Watermark em foto produto</td>
+<td>Wordmark sólido translúcido Pergaminho</td>
+</tr>
+<tr>
+<td>Email signature</td>
+<td>Wordmark sólido Tirreno + linha contato Inter</td>
+</tr>
+<tr>
+<td>Capa de PDF</td>
+<td>Concept 3</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 <strong>Insight v2</strong>: a cúpula verde isolada vira favicon perfeito. Único, identificável, escala de 16px a 1024px sem perder leitura. Preciso ouro.</p>
+</blockquote>
+<hr>
+<h2 id="🤖-higgsfield-briefings-v2-alinhados-à-referência">🤖 Higgsfield Briefings v2 (alinhados à referência)</h2>
+<p>Cola estes prompts no Higgsfield, gera 4 variações, escolhe a melhor, me manda.</p>
+<h3 id="briefing-1--faixa-horizontal-concept-1">Briefing 1 — Faixa horizontal (Concept 1)</h3>
+<pre><code>Hand-painted watercolor illustration in airy editorial style, horizontal banner composition, depicting an aerial-perspective view of the Amalfi Coast cliffside village (Positano-inspired): predominantly WHITE-WASHED Mediterranean houses cascading down a cliff, with terracotta and warm peach sloped roofs as accents, ONE iconic green-teal majolica church dome at the center (Santa Maria Assunta style), surrounded by sage-green cliffside vegetation; bright turquoise-teal Tyrrhenian sea below with subtle white wave highlights and abundant white paper showing through. Loose, airy watercolor washes with visible cold-press paper texture, organic bleeding edges, transparent layered pigments, sun-bleached Mediterranean light, optimistic and luminous mood. Color palette: warm white #FCFAF5 (dominant for houses), peach terracotta #E89870, deeper terracotta #C5694A (roofs only — accent), iconic teal-green dome #7BA8A0, turquoise sea #6BAEC4, deeper sea #3D7A95, sage cliff vegetation #A8B99B, pale stone #B8AC95, soft sun-warm sky #F4D8B8, parchment background #F5EFE0. CRITICAL: NO black ink lines, NO heavy outlines, NO crisp digital edges, NO photorealism, NO modern elements (no cars, no people, no signs), NO cartoon, NO saturated neon colors, NO heavy sepia/vintage filter — keep it LIGHT and BRIGHT. Style references: editorial Cabana Magazine plates, Aesop botanical illustrations, classic Italian travel watercolor postcards. Aspect ratio 4:1 (banner), high resolution, cream/parchment background.
+</code></pre>
+<h3 id="briefing-2--cena-hero-ampla-concept-2">Briefing 2 — Cena hero ampla (Concept 2)</h3>
+<pre><code>Hand-painted watercolor illustration in luminous editorial poster style, square or vertical composition, depicting the iconic Amalfi Coast view (Positano-inspired): clusters of WHITE-WASHED Mediterranean houses cascading down both sides of a cliff, weathered terracotta and warm peach sloped roofs (NOT dominant — only as accent on rooftops), ONE iconic green-teal majolica church dome of Santa Maria Assunta as the visual center, bell tower beside it, sage-green cliffside vegetation, bright turquoise-teal Tyrrhenian sea below reflecting soft warm sky tones, distant misty rocky cliffs. Loose airy watercolor washes with visible cold-press paper texture, organic bleeding edges, abundant white paper showing through, transparent layered pigments, sun-drenched Mediterranean morning light, optimistic and breathable mood. Color palette: warm white #FCFAF5 (dominant for houses), peach terracotta #E89870, deeper terracotta #C5694A (roofs only), ICONIC teal-green dome #7BA8A0 (signature element), turquoise sea #6BAEC4, deeper sea #3D7A95, sage cliff #A8B99B, pale stone #B8AC95, soft sun-warm sky wash #F4D8B8, parchment background #F5EFE0. CRITICAL: NO black ink lines, NO heavy outlines, NO crisp digital edges, NO photorealism, NO modern elements (no cars, no people, no signs, no power lines), NO cartoon, NO neon, NO heavy vintage sepia — keep it LIGHT, BRIGHT, AIRY. Style references: editorial Cabana Magazine, Aesop botanical packaging, Italian travel watercolor postcards from 1960s, Le Sirenuse hotel illustrations. Aspect ratio 1:1 (square) preferred, high resolution.
+</code></pre>
+<h3 id="briefing-3--medalhão-circular-concept-3">Briefing 3 — Medalhão circular (Concept 3)</h3>
+<pre><code>Hand-painted watercolor illustration confined to a circular emblem composition (vignette style), depicting a tiny luminous Amalfi Coast scene viewed as if through a porthole window: cluster of WHITE-WASHED Mediterranean houses with terracotta and peach sloped roofs (accents only), ONE iconic green-teal majolica church dome at the visual center (Santa Maria Assunta of Positano), small bell tower beside it, hint of sage-green cliffside vegetation framing the sides, bright turquoise-teal Tyrrhenian sea below. Loose airy watercolor washes with visible cold-press paper texture, organic bleeding circular edges that fade naturally outward into parchment cream, abundant white paper showing through, transparent layered pigments, optimistic Mediterranean light. Color palette: warm white #FCFAF5 (dominant houses), peach terracotta #E89870, deeper terracotta #C5694A (roofs accent), ICONIC teal-green dome #7BA8A0 (focal point), turquoise sea #6BAEC4, deeper sea #3D7A95, sage cliff #A8B99B, soft sun-warm sky #F4D8B8, parchment background #F5EFE0. CRITICAL: NO black ink lines, NO heavy outlines, NO photorealism, NO text inside the emblem, NO modern elements (no cars, no people, no signs), NO cartoon, NO neon, NO heavy sepia — keep it LIGHT, AIRY, LUMINOUS. The teal-green dome MUST be visually central as the unique signature. Style references: vintage botanical seal, Le Labo apothecary emblem, Diptyque candle label, Italian travel postcard medallion. Aspect ratio 1:1, square format with circular subject, high resolution.
+</code></pre>
+<p><strong>Como usar</strong>:</p>
+<ol>
+<li>Cola o prompt no Higgsfield, gera 4 variações</li>
+<li>Escolhe a melhor</li>
+<li>Me manda a PNG/JPG (no Downloads ou onde você preferir)</li>
+<li>Eu integro a aquarela ao SVG do logo (texto sólido + aquarela como <code>&lt;image&gt;</code> embutida)</li>
+<li>Exportamos finais (SVG, PNG transparente, JPG fundo pergaminho)</li>
+</ol>
+<hr>
+<h2 id="⚠️-comparativo-v1-→-v2">⚠️ Comparativo v1 → v2</h2>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>v1 (descartada)</th>
+<th>v2 (atual)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Casas</td>
+<td>Terracotta dominante</td>
+<td><strong>Brancas dominantes</strong>, terracotta só nos telhados</td>
+</tr>
+<tr>
+<td>Cúpula verde</td>
+<td>Inexistente</td>
+<td><strong>Sim</strong> — assinatura visual icônica <code>#7BA8A0</code></td>
+</tr>
+<tr>
+<td>Mar</td>
+<td>Azul-bruma cinza <code>#5C7A95</code></td>
+<td><strong>Turquesa-teal</strong> <code>#6BAEC4</code></td>
+</tr>
+<tr>
+<td>Mood</td>
+<td>Sépia/vintage envelhecido</td>
+<td><strong>Luminoso, ensolarado, otimista</strong></td>
+</tr>
+<tr>
+<td>Paleta dominante</td>
+<td>Marrom/terra batida</td>
+<td><strong>Branco + cremê + turquesa</strong></td>
+</tr>
+<tr>
+<td>Reference fit</td>
+<td>~30%</td>
+<td><strong>~95%</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🎯-próximos-passos">🎯 Próximos passos</h2>
+<p>Manda 1 das opções:</p>
+<ol>
+<li><strong>"Concept X é o vencedor"</strong> (1, 2 ou 3) — finalizo a direção, você gera no Higgsfield, eu integro</li>
+<li><strong>"Mistura concepts X e Y"</strong> — me diz como</li>
+<li><strong>"Mexe em algo"</strong> — paleta? cúpula maior/menor? wordmark posição?</li>
+<li><strong>"Vou gerar no Higgsfield agora"</strong> — manda os PNGs depois com qual briefing usou, eu monto</li>
+</ol>
+<p>— Uma 💝</p>
+<hr>
+<p><em>Direção apresentada por @ux-design-expert (Uma) em 2026-05-05.</em>
+<em>Versão: v2 — alinhada com referência visual fornecida pelo owner.</em></p>
+
+	
+
+</line></body></html>

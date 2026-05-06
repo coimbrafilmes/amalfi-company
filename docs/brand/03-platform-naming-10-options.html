@@ -1,0 +1,602 @@
+<!DOCTYPE html><html><head><title>03-platform-naming-10-options — Amalfi Amazon</title><meta charset="utf-8"><style>/* Amalfi — Marco's listing render style
+ * Pragmatic, clean, designed for both PDF print + HTML browser viewing
+ * Optimized for: scannability, copy-paste para Seller Central, e clareza visual
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* Headings */
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0d2818;
+  border-bottom: 3px solid #4fb89c;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3d2c;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d5840;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a4a4a;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Paragraphs and inline */
+p {
+  margin: 10px 0;
+}
+
+strong, b {
+  color: #0d2818;
+  font-weight: 700;
+}
+
+em, i {
+  color: #555;
+}
+
+/* Inline code (specs, char counts, paths) */
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f5f4;
+  color: #0d4a35;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Code blocks (titulo, descrição HTML, prompts Higgsfield, backend keywords) */
+pre {
+  background: #f8faf9;
+  border: 1px solid #d6e0db;
+  border-left: 4px solid #4fb89c;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0;
+  color: #1a3d2c;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lists */
+ul, ol {
+  margin: 10px 0 14px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+li > strong:first-child {
+  color: #0d4a35;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+th {
+  background: #f3f5f4;
+  color: #0d2818;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4fb89c;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+tr:hover {
+  background: #f8faf9;
+}
+
+/* Horizontal rules — slim, subtle */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 28px 0;
+}
+
+/* Blockquotes (notas, alerts, A+ content disclaimer) */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: #fff8e8;
+  border-left: 4px solid #f0b22d;
+  color: #5c4a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* Links (raros aqui — só paths/refs) */
+a {
+  color: #0d4a35;
+  text-decoration: none;
+  border-bottom: 1px dotted #4fb89c;
+}
+
+/* Print-specific */
+@media print {
+  body {
+    padding: 0;
+    max-width: none;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, table {
+    break-inside: avoid;
+  }
+
+  pre {
+    font-size: 11px;
+  }
+}
+
+/* HTML browser-only styling (light shadow + container) */
+@media screen {
+  body {
+    background: #f5f7f6;
+  }
+
+  body > * {
+    background: white;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  html {
+    background: #f5f7f6;
+  }
+
+  body {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+    margin: 24px auto;
+    padding: 40px 48px;
+    border-radius: 10px;
+  }
+}
+/*# sourceURL=/Users/coimbrafilmes/Desktop/CLAUDE CODE/CLIENTES/AMALFI COMPANY/agents/amalfi-amazon/scripts/../assets/listing.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/opt/homebrew/lib/node_modules/md-to-pdf/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="naming-da-plataforma--10-opções-x-by-amalfi-co">Naming da Plataforma — 10 Opções "X by Amalfi Co."</h1>
+<blockquote>
+<p><strong>Squad envolvido</strong>: @ux-design-expert (Uma — brand alignment) + @analyst (research subagent — naming landscape, conflitos, padrões SaaS).
+<strong>Versão</strong>: v1 — 2026-05-06
+<strong>Formato obrigatório</strong>: <code>NOME by Amalfi Co.</code></p>
+</blockquote>
+<hr>
+<h2 id="🧭-contexto">🧭 Contexto</h2>
+<p>A plataforma é um clone-evolução do Gumpinho que vai gerar anúncios Amazon completos via IA (Gemini) — análise de mercado + 50 keywords + 10 títulos + descrição + bullets + FAQ + 7-12 briefings de imagem. Vai operar <strong>sob a marca-mãe Amalfi</strong> com identidade italiana editorial luminosa (paleta Cúpula Verde + Mar Turquesa + Caliça branca + Cormorant Italic + Inter UI).</p>
+<p>O nome precisa:</p>
+<ul>
+<li>Caber em "X by Amalfi Co." sem soar pesado</li>
+<li>Ressoar com <strong>italianidade editorial</strong> (sem ser caricato)</li>
+<li>Funcionar como <strong>palavra-única curta</strong> (1-3 sílabas)</li>
+<li>Não conflitar com SaaS/AI existente no nicho de e-commerce</li>
+</ul>
+<h2 id="🔬-o-que-descartamos-conflitos-diretos-confirmados-pelo-analyst">🔬 O que descartamos (conflitos diretos confirmados pelo @analyst)</h2>
+<table>
+<thead>
+<tr>
+<th>Nome</th>
+<th>Por quê foi cortado</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><del>Vela</del></td>
+<td><code>getvela.com</code> — AI edge for e-commerce sellers (mesmo nicho!)</td>
+</tr>
+<tr>
+<td><del>Mira</del></td>
+<td>Saturado: Mira YC S23, Mira AI Network, MiraAI — espaço lotado</td>
+</tr>
+<tr>
+<td><del>Opus</del></td>
+<td>Claude <strong>Opus</strong>, Opus.com, OpusClip — confusão imediata com o modelo de IA da Anthropic que rodamos</td>
+</tr>
+<tr>
+<td><del>Riva</del></td>
+<td>rivaengine.com (revenue ops AI) + NVIDIA Riva</td>
+</tr>
+<tr>
+<td><del>Cresta</del></td>
+<td>cresta.com — unicórnio AI ($270M+) em CX</td>
+</tr>
+<tr>
+<td><del>Folio</del></td>
+<td>folioai.com — e-commerce store builder (mesmo nicho)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🌿-as-10-opções-finais">🌿 As 10 Opções Finais</h2>
+<h3 id="1-saetta-✅-livre">1. <strong>Saetta</strong> ✅ livre</h3>
+<blockquote>
+<p><strong>Saetta by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>saetta</em> = flecha, raio.</li>
+<li><strong>Som</strong>: 3 sílabas, sa-é-ta — ritmo italiano clássico, fluído.</li>
+<li><strong>Por que funciona</strong>: velocidade. A plataforma entrega anúncio completo em ~3 minutos. <em>Saetta</em> evoca "rápido como uma flecha" — alinha o benefício prático sem perder elegância.</li>
+<li><strong>Risco</strong>: 3 sílabas (mais longo). Pronúncia em PT-BR pode ficar "saéta" simplificado.</li>
+<li><strong>Pinta visual</strong>: Cormorant Italic <em>Saetta</em> + linha fina champagne abaixo. Excelente em wordmark vertical.</li>
+<li><strong>Status pesquisa</strong>: nenhum SaaS/AI registrado com este nome. <strong>Recomendado @analyst</strong>.</li>
+</ul>
+<hr>
+<h3 id="2-bottega-✅-livre">2. <strong>Bottega</strong> ✅ livre</h3>
+<blockquote>
+<p><strong>Bottega by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>bottega</em> = atelier, oficina de artesão, loja-estúdio.</li>
+<li><strong>Som</strong>: 3 sílabas, bot-té-ga — italianíssimo, redondo.</li>
+<li><strong>Por que funciona</strong>: <strong>encaixe perfeito de posicionamento Amalfi</strong>. Você opera como atelier de produtos curados (10 SKUs curva A), não bazar genérico. <em>Bottega</em> comunica EXATAMENTE isso: oficina de craft.</li>
+<li><strong>Risco</strong>: associa imediatamente com <strong>Bottega Veneta</strong> (luxo, moda). Risco de "marca já conhecida" — mas Veneta opera em moda/couro, não em software. Pode ser visto como <strong>halo positivo</strong> (luxo italiano).</li>
+<li><strong>Pinta visual</strong>: lindo em todos os formatos. Pode virar logo monograma "B" também.</li>
+<li><strong>Status pesquisa</strong>: nenhum SaaS/AI direto. <strong>Recomendado @analyst</strong>.</li>
+</ul>
+<hr>
+<h3 id="3-atto-✅-livre-ish">3. <strong>Atto</strong> ✅ livre-ish</h3>
+<blockquote>
+<p><strong>Atto by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>atto</em> = ato (de teatro), gesto deliberado, ação.</li>
+<li><strong>Som</strong>: 2 sílabas, át-to — curto, percussivo, premium.</li>
+<li><strong>Por que funciona</strong>: cada listing gerado é um <em>atto</em> deliberado — não improviso. Posicionamento alinhado. <strong>2 sílabas + 4 letras = nome ultra-Apple-style</strong> (Linear, Stripe, Figma).</li>
+<li><strong>Risco</strong>: existe atto.com (time-tracking pequeno UK, baixo perfil) — não conflita com nicho e-commerce.</li>
+<li><strong>Pinta visual</strong>: <strong>um dos melhores em "X by Amalfi Co."</strong> Curto + breve = elegância máxima.</li>
+<li><strong>Status pesquisa</strong>: livre em AI SaaS. <strong>Top 3 do @analyst</strong>.</li>
+</ul>
+<hr>
+<h3 id="4-faro-✅-livre">4. <strong>Faro</strong> ✅ livre</h3>
+<blockquote>
+<p><strong>Faro by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>faro</em> = farol marítimo (e em PT-BR também).</li>
+<li><strong>Som</strong>: 2 sílabas, fá-ro — luminoso, marítimo.</li>
+<li><strong>Por que funciona</strong>: metáfora forte — <em>faro</em> é o farol que guia o seller na "neblina" do marketplace. Direção, clareza, segurança. Bate com "sofisticação dentro do ecommerce".</li>
+<li><strong>Risco</strong>: Faro também é cidade de Portugal — alguns associam com turismo. Pode soar genérico em PT-BR.</li>
+<li><strong>Pinta visual</strong>: clean, geométrico, Inter Light caps fica lindo.</li>
+<li><strong>Status pesquisa</strong>: livre em AI SaaS. Wildcard sugerido pelo @analyst.</li>
+</ul>
+<hr>
+<h3 id="5-cesello-✅-livre">5. <strong>Cesello</strong> ✅ livre</h3>
+<blockquote>
+<p><strong>Cesello by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>cesello</em> = cinzel do ourives, ferramenta de gravura fina em metal.</li>
+<li><strong>Som</strong>: 3 sílabas, cé-zé-lo — fluido, raro, italiano puro.</li>
+<li><strong>Por que funciona</strong>: <strong>alma editorial absoluta</strong>. <em>Cesello</em> é o cinzel que esculpe joia detalhe por detalhe. Cada listing = peça cinzelada. Diferenciador massivo do nicho (todo concorrente fala "fast/easy/AI" — você fala "craft").</li>
+<li><strong>Risco</strong>: 3 sílabas + palavra rara — pronúncia menos óbvia em PT-BR ("cesêlo"). Curva de aprendizado.</li>
+<li><strong>Pinta visual</strong>: gourmet em Cormorant. Wordmark vira instrumento visual.</li>
+<li><strong>Status pesquisa</strong>: livre. Wildcard do @analyst.</li>
+</ul>
+<hr>
+<h3 id="6-limone-✅-livre">6. <strong>Limone</strong> ✅ livre</h3>
+<blockquote>
+<p><strong>Limone by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>limone</em> = limão. <strong>Limão Amalfi (Sfusato Amalfitano)</strong> é DOP, ingrediente icônico da costa.</li>
+<li><strong>Som</strong>: 3 sílabas, li-mó-ne — musical, citrino.</li>
+<li><strong>Por que funciona</strong>: <strong>referência identitária máxima</strong>. O limão de Amalfi é A fruta da costa. Conecta diretamente com a viagem de origem da marca. Funciona em embalagem e em comunicação visual.</li>
+<li><strong>Risco</strong>: <strong>risco de caricato</strong> (você disse "anti-caricato" no brief). Pode soar "tema mediterrâneo na carinha". Mitigação: se a UI da plataforma for editorial sóbria (Cormorant + Inter, paleta luminosa), o nome vira poesia, não decoração.</li>
+<li><strong>Pinta visual</strong>: tem que ser executado com elegância — risco maior de "tropicalidade".</li>
+<li><strong>Status pesquisa</strong>: livre. Wildcard do @analyst.</li>
+</ul>
+<hr>
+<h3 id="7-lume-⚠️-zona-amarela">7. <strong>Lume</strong> ⚠️ zona amarela</h3>
+<blockquote>
+<p><strong>Lume by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>lume</em> = luz, lume, vislumbre. Romântico, editorial.</li>
+<li><strong>Som</strong>: 2 sílabas, lú-me — soft, melódico.</li>
+<li><strong>Por que funciona</strong>: a plataforma "ilumina" o produto pra ele aparecer no marketplace. Metáfora poética alinha com posicionamento editorial.</li>
+<li><strong>Risco</strong>: ⚠️ <strong>Lume.ai</strong> (data mapping startup) acabou de ser adquirida pela Harvey em 2025. Lume.com tomado. Não conflita NICHO (data ≠ e-commerce), mas o nome circula em mídia tech.</li>
+<li><strong>Pinta visual</strong>: 2 sílabas premium, Cormorant fica lindo.</li>
+<li><strong>Status pesquisa</strong>: zona amarela. Aceitável se owner aceita a vizinhança.</li>
+</ul>
+<hr>
+<h3 id="8-stilo-⚠️-zona-amarela">8. <strong>Stilo</strong> ⚠️ zona amarela</h3>
+<blockquote>
+<p><strong>Stilo by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>stilo</em> = estilete antigo, caneta. Ferramenta de escrever do escriba.</li>
+<li><strong>Som</strong>: 2 sílabas, stí-lo — italiano premium.</li>
+<li><strong>Por que funciona</strong>: a plataforma é o <em>stilo</em> que escreve o anúncio. Direto ao verbo de criação.</li>
+<li><strong>Risco</strong>: ⚠️ Stilo.ai existe (journaling app) + stilo.com (XML editor B2B). Não bate em e-commerce, mas mesma "verbo AI escrever".</li>
+<li><strong>Pinta visual</strong>: lindo, breve, premium.</li>
+<li><strong>Status pesquisa</strong>: zona amarela. Semantica imbatível pra "criação de conteúdo".</li>
+</ul>
+<hr>
+<h3 id="9-conto-✅-assumido-livre-verificar-tm-final">9. <strong>Conto</strong> ✅ assumido livre (verificar TM final)</h3>
+<blockquote>
+<p><strong>Conto by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>conto</em> = conto, narrativa breve.</li>
+<li><strong>Som</strong>: 2 sílabas, kón-to — italiano elegante.</li>
+<li><strong>Por que funciona</strong>: <strong>cada listing é um conto sobre o produto</strong>. Posicionamento editorial puro. Diferenciador absoluto: ninguém no nicho fala "narrativa" — todos falam "copy/listing".</li>
+<li><strong>Risco</strong>: em PT-BR, "conto" é quase idêntico ao significado italiano (conto = narrative). Pode parecer português coloquial.</li>
+<li><strong>Pinta visual</strong>: forte em Cormorant SemiBold. Cabe em wordmark Sans Whisper também.</li>
+<li><strong>Status pesquisa</strong>: nenhum SaaS AI conflitante encontrado. <strong>Verificar TM final antes de fechar</strong>.</li>
+</ul>
+<hr>
+<h3 id="10-verso-✅-assumido-livre-verificar-tm-final">10. <strong>Verso</strong> ✅ assumido livre (verificar TM final)</h3>
+<blockquote>
+<p><strong>Verso by Amalfi Co.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Etimologia</strong>: it. <em>verso</em> = verso (poesia, página). Também: "lado", direção.</li>
+<li><strong>Som</strong>: 2 sílabas, vér-so — clássico literário italiano.</li>
+<li><strong>Por que funciona</strong>: cada listing é um <em>verso</em> na poética da marca. Editorial puro, sem competidor no nicho. Funciona também como "outro lado" (outra forma de fazer ecommerce).</li>
+<li><strong>Risco</strong>: "Verso" tem outros usos em design (Verso Books — editora). Genérico-pesado se mal-executado.</li>
+<li><strong>Pinta visual</strong>: lindo, mas exige tipografia editorial pra não soar genérico.</li>
+<li><strong>Status pesquisa</strong>: nenhum SaaS AI conflitante direto. <strong>Verificar TM final</strong>.</li>
+</ul>
+<hr>
+<h2 id="🏆-recomendação-squad-uma--analyst">🏆 Recomendação Squad (Uma + @analyst)</h2>
+<h3 id="pódio">Pódio</h3>
+<table>
+<thead>
+<tr>
+<th>Pos</th>
+<th>Nome</th>
+<th>Por quê</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>🥇</td>
+<td><strong>Bottega</strong></td>
+<td>Maior alinhamento de posicionamento (atelier curado = exatamente Amalfi). Sonoro, italiano, livre. Halo positivo de Bottega Veneta.</td>
+</tr>
+<tr>
+<td>🥈</td>
+<td><strong>Atto</strong></td>
+<td>Brevidade premium (4 letras, 2 sílabas). Apple/Linear-DNA. Conceito gestual elegante. Quase livre.</td>
+</tr>
+<tr>
+<td>🥉</td>
+<td><strong>Saetta</strong></td>
+<td>Único totalmente livre + semântica de velocidade alinha benefício prático. Bom mix de italianidade e funcionalidade.</td>
+</tr>
+</tbody></table>
+<h3 id="wildcards-a-considerar">Wildcards a considerar</h3>
+<ul>
+<li><strong>Cesello</strong> — se você quiser ir mais culto/raro/diferenciado</li>
+<li><strong>Conto</strong> — se quiser puxar ainda mais a narrativa editorial</li>
+<li><strong>Limone</strong> — se você topar a referência DOP italiana sem cair no caricato</li>
+</ul>
+<h3 id="descarte-sugerido">Descarte sugerido</h3>
+<ul>
+<li><strong>Lume, Stilo</strong> — zona amarela, vizinhança apertada com outras AI tools. Não cortados, mas se for por mim, evitaria.</li>
+</ul>
+<hr>
+<h2 id="🎨-como-cada-um-aparece-no-formato-final">🎨 Como cada um aparece no formato final</h2>
+<pre><code>Bottega by Amalfi Co.       ← curadoria, atelier
+Atto by Amalfi Co.          ← gesto, ação, brevidade
+Saetta by Amalfi Co.        ← velocidade, flecha
+Faro by Amalfi Co.          ← guia marítimo
+Cesello by Amalfi Co.       ← cinzel de ourives
+Limone by Amalfi Co.        ← limão Amalfi DOP
+Lume by Amalfi Co.          ← luz editorial
+Stilo by Amalfi Co.         ← caneta italiana
+Conto by Amalfi Co.         ← narrativa
+Verso by Amalfi Co.         ← poesia editorial
+</code></pre>
+<hr>
+<h2 id="⏭️-próximos-passos">⏭️ Próximos passos</h2>
+<p>Manda 1 das opções:</p>
+<ol>
+<li><strong>"Vai de [NOME]"</strong> — fechamos esse e eu sigo com:<ul>
+<li>Verificação TM/domínio definitiva</li>
+<li>Definição de logo da plataforma (extensão do logo Amalfi mãe)</li>
+<li>Token/CSS adaptados</li>
+<li>Brief pro @architect/@dev pra construir</li>
+</ul>
+</li>
+<li><strong>"Top 3 são X, Y, Z — me deixa pensar"</strong> — você isola e responde depois</li>
+<li><strong>"Nenhum me ganhou — gera mais 5"</strong> — eu volto pra mesa</li>
+<li><strong>"Mistura concept de A com sonoridade de B"</strong> — me explica e eu refino</li>
+</ol>
+<p>— Uma, com o squad 💝
+<em>Pesquisa colaborativa: @analyst (research subagent) + @ux-design-expert (Uma — curadoria final + brand alignment)</em></p>
+
+	
+
+</body></html>

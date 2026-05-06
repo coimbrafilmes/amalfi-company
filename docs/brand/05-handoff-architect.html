@@ -1,0 +1,731 @@
+<!DOCTYPE html><html><head><title>05-handoff-architect — Amalfi Amazon</title><meta charset="utf-8"><style>/* Amalfi — Marco's listing render style
+ * Pragmatic, clean, designed for both PDF print + HTML browser viewing
+ * Optimized for: scannability, copy-paste para Seller Central, e clareza visual
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* Headings */
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0d2818;
+  border-bottom: 3px solid #4fb89c;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3d2c;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d5840;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a4a4a;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Paragraphs and inline */
+p {
+  margin: 10px 0;
+}
+
+strong, b {
+  color: #0d2818;
+  font-weight: 700;
+}
+
+em, i {
+  color: #555;
+}
+
+/* Inline code (specs, char counts, paths) */
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f5f4;
+  color: #0d4a35;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Code blocks (titulo, descrição HTML, prompts Higgsfield, backend keywords) */
+pre {
+  background: #f8faf9;
+  border: 1px solid #d6e0db;
+  border-left: 4px solid #4fb89c;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0;
+  color: #1a3d2c;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lists */
+ul, ol {
+  margin: 10px 0 14px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+li > strong:first-child {
+  color: #0d4a35;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+th {
+  background: #f3f5f4;
+  color: #0d2818;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4fb89c;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+tr:hover {
+  background: #f8faf9;
+}
+
+/* Horizontal rules — slim, subtle */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 28px 0;
+}
+
+/* Blockquotes (notas, alerts, A+ content disclaimer) */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: #fff8e8;
+  border-left: 4px solid #f0b22d;
+  color: #5c4a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* Links (raros aqui — só paths/refs) */
+a {
+  color: #0d4a35;
+  text-decoration: none;
+  border-bottom: 1px dotted #4fb89c;
+}
+
+/* Print-specific */
+@media print {
+  body {
+    padding: 0;
+    max-width: none;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, table {
+    break-inside: avoid;
+  }
+
+  pre {
+    font-size: 11px;
+  }
+}
+
+/* HTML browser-only styling (light shadow + container) */
+@media screen {
+  body {
+    background: #f5f7f6;
+  }
+
+  body > * {
+    background: white;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  html {
+    background: #f5f7f6;
+  }
+
+  body {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+    margin: 24px auto;
+    padding: 40px 48px;
+    border-radius: 10px;
+  }
+}
+/*# sourceURL=/Users/coimbrafilmes/Desktop/CLAUDE CODE/CLIENTES/AMALFI COMPANY/agents/amalfi-amazon/scripts/../assets/listing.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/opt/homebrew/lib/node_modules/md-to-pdf/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="handoff--bottega-by-amalfi--co">Handoff — Bottega by Amalfi &amp; Co.</h1>
+<h2 id="para-architect-aria-começar-o-spec-técnico">Para @architect (Aria) começar o spec técnico</h2>
+<blockquote>
+<p><strong>De</strong>: @ux-design-expert (Uma) → <strong>Para</strong>: @architect (Aria)
+<strong>Data</strong>: 2026-05-06
+<strong>Status</strong>: visual aprovado pelo owner. Pronto pra Aria fazer spec técnico.</p>
+</blockquote>
+<hr>
+<h2 id="🎯-o-que-é-a-bottega">🎯 O que é a Bottega</h2>
+<p>Plataforma SaaS interna do owner Amalfi &amp; Co. (seller Amazon BR, categoria Casa). Clone-evolução do <strong>Gumpinho</strong> (<code>gerador-de-anucio10de10.netlify.app</code>) — gera anúncios Amazon completos via IA Gemini. Vai operar <strong>single-user offline-first</strong> (não é SaaS multi-tenant — é ferramenta interna do owner).</p>
+<p><strong>Operação atual</strong>: ~10 SKUs curva A. Volume baixo, exigência alta.</p>
+<p><strong>Posicionamento</strong>: "Bottega" = atelier italiano. Não é "ferramenta produtiva gritante" — é "espaço de criação editorial calmo". Cada anúncio gerado é um <em>atto</em> curado.</p>
+<hr>
+<h2 id="📦-material-que-você-aria-já-tem-disponível">📦 Material que você (Aria) já tem disponível</h2>
+<table>
+<thead>
+<tr>
+<th>Artefato</th>
+<th>Caminho</th>
+<th>O que é</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Brandbook oficial</strong></td>
+<td><code>/Users/coimbrafilmes/Downloads/Amalfi Co. — Manual de Marca.pdf</code></td>
+<td>18 páginas. Fonte de verdade absoluta da identidade</td>
+</tr>
+<tr>
+<td><strong>Mockup HTML aprovado</strong></td>
+<td><code>docs/brand/04-bottega-interface-v1.html</code></td>
+<td>High-fidelity, 2 telas (Atelier + Novo Anúncio), abre no browser</td>
+</tr>
+<tr>
+<td><strong>Tokens CSS</strong></td>
+<td><code>docs/brand/tokens/tokens.css</code></td>
+<td>Custom properties prontas pra :root</td>
+</tr>
+<tr>
+<td><strong>Tokens Tailwind</strong></td>
+<td><code>docs/brand/tokens/tailwind.config.js</code></td>
+<td>Config completo Tailwind v3/v4</td>
+</tr>
+<tr>
+<td><strong>Tokens DTCG JSON</strong></td>
+<td><code>docs/brand/tokens/tokens.json</code></td>
+<td>Format W3C, plug-and-play em Style Dictionary</td>
+</tr>
+<tr>
+<td><strong>Memória do projeto</strong></td>
+<td><code>~/.claude/projects/.../memory/project_brand_direction.md</code></td>
+<td>Contexto completo da marca</td>
+</tr>
+<tr>
+<td><strong>Análise GUMPINHO</strong></td>
+<td>conversa anterior + <code>/tmp/gumpinho-analysis/bundle.js</code></td>
+<td>Tech stack, prompts Gemini extraídos, fluxo da plataforma de referência</td>
+</tr>
+<tr>
+<td><strong>API key Gemini</strong></td>
+<td><code>.env</code> (linha <code>GEMINI_API_KEY=AIza...</code>)</td>
+<td>Já configurada — gitignored</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🧩-inventário-atômico-brad-frost--atomic-design">🧩 Inventário Atômico (Brad Frost / Atomic Design)</h2>
+<p>Pra você desenhar a arquitetura de componentes, aqui está o que identifiquei no mockup:</p>
+<h3 id="atoms-12">Atoms (12)</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Tokens consumidos</th>
+<th>Notas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Eyebrow</code></td>
+<td><code>eyebrow</code> font, <code>letter-spacing-eyebrow</code>, <code>text-secondary</code></td>
+<td>CAPS 11px sempre</td>
+</tr>
+<tr>
+<td><code>Display</code></td>
+<td><code>font-display</code>, <code>font-size-display-*</code></td>
+<td>Headlines com DM Serif</td>
+</tr>
+<tr>
+<td><code>Editorial</code></td>
+<td><code>font-editorial</code> italic</td>
+<td>Cormorant para frases-conceito (NUNCA texto longo)</td>
+</tr>
+<tr>
+<td><code>BodyText</code></td>
+<td><code>font-ui</code> light 300</td>
+<td>Inter Light pra sensação arejada</td>
+</tr>
+<tr>
+<td><code>Button</code> (variants: primary, ghost, terra, inverse)</td>
+<td>tokens cor + button</td>
+<td>CAPS 11px tracking 0.18em sempre</td>
+</tr>
+<tr>
+<td><code>Input</code></td>
+<td><code>border-default</code>, <code>font-ui</code></td>
+<td>Sem border-radius</td>
+</tr>
+<tr>
+<td><code>Textarea</code></td>
+<td>mesmo Input</td>
+<td>min-height 110px</td>
+</tr>
+<tr>
+<td><code>Slider</code></td>
+<td><code>mar</code> (fill), <code>terracota</code> (handle)</td>
+<td>Custom (Range API ou Radix)</td>
+</tr>
+<tr>
+<td><code>Toggle</code> (group)</td>
+<td>tokens primary</td>
+<td>3 opções: Lifestyle/Infográfico/Misto</td>
+</tr>
+<tr>
+<td><code>Badge</code></td>
+<td><code>terracota</code> bg + <code>osso</code> fg</td>
+<td>"Novo", status</td>
+</tr>
+<tr>
+<td><code>Avatar</code></td>
+<td><code>tinta</code> bg + <code>osso</code> fg</td>
+<td>Inicial em DM Serif</td>
+</tr>
+<tr>
+<td><code>Dot</code> (status indicator)</td>
+<td><code>mar</code> ou <code>terracota</code></td>
+<td>6×6px circular</td>
+</tr>
+</tbody></table>
+<h3 id="molecules-10">Molecules (10)</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Composto de</th>
+<th>Notas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Stat</code></td>
+<td>Eyebrow + DisplayValue + Editorial delta</td>
+<td>Linha vertical separadora</td>
+</tr>
+<tr>
+<td><code>Lockup</code></td>
+<td>DisplayWord + EditorialWord</td>
+<td>"Bottega by Amalfi &amp; Co."</td>
+</tr>
+<tr>
+<td><code>MonogramaA</code></td>
+<td>Display "A" + meta "·co.·"</td>
+<td>Circular, terracota bg</td>
+</tr>
+<tr>
+<td><code>Field</code></td>
+<td>Label + Input/Textarea + Hint editorial</td>
+<td>Hint em italic</td>
+</tr>
+<tr>
+<td><code>Dropzone</code></td>
+<td>Title + sub italic + drag handler</td>
+<td>Border dashed</td>
+</tr>
+<tr>
+<td><code>KeywordChip</code></td>
+<td>text + border</td>
+<td>Variant "accent" com terracota</td>
+</tr>
+<tr>
+<td><code>TabItem</code></td>
+<td>num italic + text caps</td>
+<td>Active state com underline terracota</td>
+</tr>
+<tr>
+<td><code>CardAnuncio</code></td>
+<td>Media + body + meta</td>
+<td>Hover state suave</td>
+</tr>
+<tr>
+<td><code>BriefingTile</code></td>
+<td>num display + title editorial + tag</td>
+<td>Variants por cor da paleta secundária</td>
+</tr>
+<tr>
+<td><code>TituloListItem</code></td>
+<td>numeral italic + title display + char count meta</td>
+<td>Lista ordenada</td>
+</tr>
+</tbody></table>
+<h3 id="organisms-8">Organisms (8)</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Composto de</th>
+<th>Notas</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Brandbar</code></td>
+<td>Lockup + Nav + Avatar</td>
+<td>Sticky, border bottom</td>
+</tr>
+<tr>
+<td><code>HeroEditorial</code></td>
+<td>Eyebrow + H1 mixed (display+editorial) + lede + actions + meta</td>
+<td>Bg Tinta + manchas aquarela</td>
+</tr>
+<tr>
+<td><code>StatsRow</code></td>
+<td>3× Stat</td>
+<td>Bg Areia</td>
+</tr>
+<tr>
+<td><code>CatalogoSection</code></td>
+<td>Section header + grid 3× CardAnuncio</td>
+<td>Bg Osso</td>
+</tr>
+<tr>
+<td><code>FormCriacao</code></td>
+<td>6× Field + Slider + Toggle + Actions</td>
+<td>Coluna esquerda (480px)</td>
+</tr>
+<tr>
+<td><code>ResultsTabs</code></td>
+<td>TabItem nav + TabPanel content</td>
+<td>Coluna direita (Tinta dark)</td>
+</tr>
+<tr>
+<td><code>ResultsBlock</code></td>
+<td>Eyebrow + Headline + Text + content</td>
+<td>Reutilizado em todas as tabs</td>
+</tr>
+<tr>
+<td><code>GlobalFooter</code></td>
+<td>Lockup + Cols + Monograma</td>
+<td>Encerramento</td>
+</tr>
+</tbody></table>
+<h3 id="templates-2">Templates (2)</h3>
+<ul>
+<li><code>TemplateAtelier</code> — dashboard layout (Brandbar + Hero + Stats + Catalogo + Footer)</li>
+<li><code>TemplateCriacao</code> — split form/results layout (Brandbar + grid 480/auto + Footer)</li>
+</ul>
+<h3 id="pages-futuras">Pages (futuras)</h3>
+<ul>
+<li><code>/atelier</code> — dashboard</li>
+<li><code>/novo</code> — criação de anúncio</li>
+<li><code>/anuncio/:id</code> — visualização/edição</li>
+<li><code>/catalogo</code> — listagem completa</li>
+<li><code>/colecoes-keywords</code> — palavras-chave salvas</li>
+<li><code>/configuracoes</code> — settings + API key</li>
+</ul>
+<hr>
+<h2 id="❓-perguntas-abertas-pra-aria-responder-no-spec">❓ Perguntas abertas pra Aria responder no spec</h2>
+<h3 id="1-stack-técnica">1. Stack técnica</h3>
+<ul>
+<li><strong>Confirma</strong>: Vite + React 18 + TypeScript + Tailwind v4? Ou prefere algo diferente (Next.js? SvelteKit?)</li>
+<li>Single-page ou multi-page? Sugestão: SPA com React Router (menor complexidade pra single-user offline-first)</li>
+<li>Estado global: Zustand (simples)? Context (nativo)? Jotai (atomic)?</li>
+</ul>
+<h3 id="2-integração-gemini">2. Integração Gemini</h3>
+<ul>
+<li>Cliente: <code>@google/genai</code> SDK oficial (mesmo do GUMPINHO)? Ou REST direto?</li>
+<li><strong>Atenção</strong>: GUMPINHO embeda a chave no front (vimos no bundle). Pra single-user <strong>interno</strong> isso é aceitável (a key tá em <code>.env</code> e o app só roda local/Netlify privado). Mas se um dia for compartilhado, precisa proxy backend. Confirme a estratégia.</li>
+<li>Modelos a usar: Gemini 2.5 Flash (texto) + Imagen 4 (imagem)? Confirmar.</li>
+</ul>
+<h3 id="3-persistência">3. Persistência</h3>
+<ul>
+<li>Opções:<ul>
+<li><strong>(a)</strong> localStorage simples — anúncios + briefings ficam só no navegador. Simples. Risco: perde se trocar de browser.</li>
+<li><strong>(b)</strong> Filesystem via OPFS / Origin Private File System — moderno, mais robusto.</li>
+<li><strong>(c)</strong> Supabase free tier — sync entre dispositivos. Mas adiciona complexidade.</li>
+<li><strong>(d)</strong> Export/import JSON manual — usuário baixa snapshot.</li>
+</ul>
+</li>
+<li>Recomendação minha: começa em <strong>(a)</strong> + <strong>(d)</strong> pra MVP, considera (c) se owner usar de múltiplos devices.</li>
+</ul>
+<h3 id="4-geração-de-imagem">4. Geração de imagem</h3>
+<ul>
+<li>Imagen 4 via Gemini API: ok confirma?</li>
+<li>Tamanhos: 1024×1024 default. Owner vai precisar upscale pra 2000×2000 (regra Amazon). Sharp (server) ou client-side com canvas?</li>
+<li>O hero (foto real do produto) <strong>NÃO pode ser IA</strong> (regra Amazon). Suporte upload de foto real pelo usuário, depois processamento (background remove + fundo branco). Sugestão: integrar <code>@imgly/background-removal</code> (roda local, free).</li>
+</ul>
+<h3 id="5-export-de-bundle">5. Export de bundle</h3>
+<ul>
+<li>GUMPINHO exporta ZIP via JSZip. Replicar?</li>
+<li>Sugestão alternativa: além do ZIP, gerar <strong>PDF + HTML editorial</strong> (igual o <code>render.sh</code> que o Marco já usa). Aproveita pipeline existente.</li>
+</ul>
+<h3 id="6-roteamento-e-navegação">6. Roteamento e navegação</h3>
+<ul>
+<li>React Router v6+? TanStack Router? Hash router (mais simples pra deploy estático)?</li>
+</ul>
+<h3 id="7-forms">7. Forms</h3>
+<ul>
+<li>React Hook Form + Zod pra validação? Ou nativo?</li>
+</ul>
+<h3 id="8-component-library">8. Component library</h3>
+<ul>
+<li>Headless UI / Radix UI pra primitives (Slider, Tabs, Dialog, Toggle)? Ou tudo custom?</li>
+<li><strong>Recomendo Radix</strong> — não vem com estilo, encaixa perfeito nos nossos tokens, accessibility de graça.</li>
+</ul>
+<h3 id="9-deploy">9. Deploy</h3>
+<ul>
+<li>Netlify free (sugestão owner)? Vercel? Cloudflare Pages?</li>
+<li>Build output: <code>dist/</code> SPA estática. Qualquer um serve.</li>
+</ul>
+<h3 id="10-cicd">10. CI/CD</h3>
+<ul>
+<li>GitHub Actions pra deploy automático? Ou push manual no Netlify CLI?</li>
+</ul>
+<h3 id="11-estrutura-de-pasta">11. Estrutura de pasta</h3>
+<ul>
+<li><code>packages/bottega/</code> (monorepo) ou <code>apps/bottega/</code> (Turborepo) ou root direto?</li>
+<li>Considerando que é projeto Amalfi e a Bottega é parte dele, sugiro <code>packages/bottega/</code> mantendo o repo monorepo.</li>
+</ul>
+<h3 id="12-workflow-de-geração-5-etapas-gemini">12. Workflow de geração (5 etapas Gemini)</h3>
+<p>GUMPINHO sequencia (visto no bundle decompilado):</p>
+<ol>
+<li><strong>Análise de mercado</strong> — Gemini 2.5 Flash + Google Search grounding → JSON estruturado</li>
+<li><strong>50 keywords SEO</strong> — Gemini + Google Search → keyword groups</li>
+<li><strong>10 títulos</strong> (5 produto + 5 dor) — Gemini → JSON ordenado</li>
+<li><strong>Descrição + Bullets + FAQ + HTML A+</strong> — Gemini → estrutura rica</li>
+<li><strong>7-12 briefings de imagem</strong> com narrativa de conversão (GANCHO → DOR → MECANISMO → PROVA → OBJEÇÕES → DECISÃO) — Gemini → array de briefs</li>
+<li><strong>Render imagens</strong> — Imagen 4 — paralelo</li>
+</ol>
+<p>Confirma essa sequência ou propõe outra? Tem alguma etapa que você quer paralelizar pra reduzir tempo total?</p>
+<h3 id="13-tom-da-copy-gerada">13. Tom da copy gerada</h3>
+<p>A Bottega gera anúncios pro <strong>Amazon BR</strong> — ou seja, a copy precisa <strong>vender no marketplace</strong> (palavras de busca BR, padrão Amazon, mobile-first). MAS a interface da Bottega segue o tom <strong>editorial sereno Amalfi</strong> (sem CAPS, sem urgência).</p>
+<p>A copy gerada PARA O ANÚNCIO deve ser híbrida: <strong>fundamentalmente Amazon BR</strong> (vende), mas com um filtro de honestidade Amalfi (sem "PROMOÇÃO IMPERDÍVEL", sem "premium soft touch"). Quer que eu (Uma) escreva esse system prompt junto com o Marco antes de você fechar o spec?</p>
+<hr>
+<h2 id="🎨-constraints-visuais-não-negociáveis-vêm-do-brandbook">🎨 Constraints visuais não-negociáveis (vêm do brandbook)</h2>
+<ul>
+<li>❌ <strong>Zero cantos arredondados</strong> (border-radius: 0 default, exceções raras 2px, e só circle pra A·co.)</li>
+<li>❌ <strong>Zero gradientes</strong> em UI (apenas em "manchas aquarela" decorativas no hero)</li>
+<li>❌ <strong>Zero sombras</strong> em logo/typography (só shadow muito sutil em modais se precisar)</li>
+<li>❌ <strong>Zero cores fora da paleta</strong> (especialmente vermelho saturado, neon, cores quentes agressivas)</li>
+<li>❌ <strong>Zero CAPS LOCK</strong> em copy editorial (só em eyebrows e botões)</li>
+<li>✅ <strong>Sempre Display + Editorial juntos</strong> em headlines de impacto (ex: "A vida boa <em>cabe em pequenos gestos</em>")</li>
+<li>✅ <strong>Mín. 32px de respiro</strong> entre seções</li>
+<li>✅ <strong>Inter Light 300</strong> em texto corrido (sensação arejada)</li>
+<li>✅ <strong>Tracking 0.18em</strong> em CAPS (eyebrows, botões)</li>
+<li>✅ <strong>Combinações 60-25-15</strong> Tinta · Mar · Terracota (não desbalancear)</li>
+</ul>
+<hr>
+<h2 id="📈-critérios-de-complexidade-pra-você-classificar">📈 Critérios de complexidade (pra você classificar)</h2>
+<p>Pelos 5 dimensions do AIOX:</p>
+<ul>
+<li><strong>Scope</strong>: ~25-40 arquivos React + tokens. Médio.</li>
+<li><strong>Integration</strong>: 2 APIs externas (Gemini text + Imagen). Médio.</li>
+<li><strong>Infrastructure</strong>: Netlify free + GitHub. Baixo.</li>
+<li><strong>Knowledge</strong>: React + Tailwind = stack comum. Médio (Gemini é novo pro time).</li>
+<li><strong>Risk</strong>: app interno single-user, não crítico, não trata dados sensíveis externos. Baixo.</li>
+</ul>
+<p><strong>Estimativa minha</strong>: classe <strong>STANDARD</strong> (score 9-15) — passa pelas 6 fases do Spec Pipeline, não precisa de revision cycle.</p>
+<p><strong>Tempo total estimado</strong> (pode revisar): 8-15h de trabalho do @dev distribuído em 3-5 stories.</p>
+<hr>
+<h2 id="✅-próximo-passo-concreto">✅ Próximo passo concreto</h2>
+<p>Owner deve invocar:</p>
+<pre><code>@architect
+</code></pre>
+<p>E em seguida pedir:</p>
+<pre><code>*assess
+</code></pre>
+<p>Você (Aria) avalia complexidade dos requisitos (este doc), gera <code>complexity.json</code> e aí sequencia: research (já feito por mim e analyst), spec.md, critique, implementation.yaml.</p>
+<p><strong>Eu (Uma) fico de plantão</strong> caso você precise de mais detalhe visual em qualquer ponto. Marco também tá disponível se precisar do system prompt da copy de anúncio.</p>
+<hr>
+<p><em>Handoff preparado por @ux-design-expert (Uma) em 2026-05-06.</em>
+<em>Próximo agente: @architect (Aria).</em></p>
+
+	
+
+</body></html>

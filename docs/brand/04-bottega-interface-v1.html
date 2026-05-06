@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bottega by Amalfi &amp; Co. — Interface v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   AMALFI & CO. — Design Tokens (extraídos do brandbook oficial)
+   ========================================================= */
+:root {
+  /* Cores primárias (60-25-15) */
+  --tinta: #1F2A3A;        /* primary 60% */
+  --mar: #2D5D7B;          /* secondary 25% */
+  --terracota: #C47855;    /* accent 15% */
+
+  /* Cores secundárias */
+  --aqua: #6E9BB3;
+  --ceu: #CFDFE6;
+  --ocre: #D4A05A;
+  --areia: #E6D6BF;
+  --osso: #F4EDE0;         /* background principal light */
+
+  /* Aux derivados (usados pra hover/borders) */
+  --tinta-alpha-08: rgba(31,42,58,0.08);
+  --tinta-alpha-15: rgba(31,42,58,0.15);
+  --tinta-alpha-50: rgba(31,42,58,0.50);
+  --osso-alpha-15: rgba(244,237,224,0.15);
+  --osso-alpha-50: rgba(244,237,224,0.50);
+  --osso-alpha-80: rgba(244,237,224,0.80);
+
+  /* Tipografia */
+  --font-display: 'DM Serif Display', 'Times New Roman', Georgia, serif;
+  --font-editorial: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Espaçamento (mínimo 32px de respiro entre seções) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+}
+
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--osso);
+  color: var(--tinta);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ---- Eyebrow CAPS (11px, tracking generoso) ---- */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  opacity: 0.7;
+}
+.eyebrow--light { color: var(--osso); opacity: 0.6; }
+.eyebrow--terra { color: var(--terracota); opacity: 1; }
+
+/* ---- Display (DM Serif) ---- */
+.display-xl { font-family: var(--font-display); font-weight: 400; font-size: 96px; line-height: 1.05; letter-spacing: -0.02em; }
+.display-l  { font-family: var(--font-display); font-weight: 400; font-size: 64px; line-height: 1.08; letter-spacing: -0.01em; }
+.display-m  { font-family: var(--font-display); font-weight: 400; font-size: 48px; line-height: 1.1;  letter-spacing: -0.005em; }
+.display-s  { font-family: var(--font-display); font-weight: 400; font-size: 32px; line-height: 1.15; }
+
+/* ---- Editorial (Cormorant Italic) ---- */
+.editorial-xl { font-family: var(--font-editorial); font-style: italic; font-weight: 400; font-size: 32px; line-height: 1.25; }
+.editorial-l  { font-family: var(--font-editorial); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.4; }
+.editorial-m  { font-family: var(--font-editorial); font-style: italic; font-weight: 400; font-size: 18px; line-height: 1.5; }
+
+/* ---- UI body ---- */
+.body-l { font-family: var(--font-ui); font-weight: 300; font-size: 16px; line-height: 1.7; }
+.body   { font-family: var(--font-ui); font-weight: 300; font-size: 14px; line-height: 1.7; }
+.meta   { font-family: var(--font-ui); font-weight: 400; font-size: 12px; line-height: 1.5; opacity: 0.65; }
+
+/* ---- Botões (sempre CAPS Inter Medium 11-12px) ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 16px 28px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  background: transparent;
+  color: var(--tinta);
+  white-space: nowrap;
+}
+.btn--primary {
+  background: var(--tinta);
+  color: var(--osso);
+  border-color: var(--tinta);
+}
+.btn--primary:hover {
+  background: var(--mar);
+  border-color: var(--mar);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--tinta);
+  border-color: var(--tinta);
+}
+.btn--ghost:hover {
+  background: var(--tinta);
+  color: var(--osso);
+}
+.btn--terra {
+  background: var(--terracota);
+  color: var(--osso);
+  border-color: var(--terracota);
+}
+.btn--terra:hover {
+  background: #B6643F;
+  border-color: #B6643F;
+}
+.btn--small {
+  padding: 10px 18px;
+  font-size: 10px;
+}
+.btn--inverse {
+  background: var(--osso);
+  color: var(--tinta);
+  border-color: var(--osso);
+}
+.btn--inverse:hover {
+  background: transparent;
+  color: var(--osso);
+  border-color: var(--osso);
+}
+.btn--inverse-ghost {
+  background: transparent;
+  color: var(--osso);
+  border-color: var(--osso);
+}
+.btn--inverse-ghost:hover {
+  background: var(--osso);
+  color: var(--tinta);
+}
+
+/* ---- Page wrapper ---- */
+.page {
+  max-width: 1440px;
+  margin: 0 auto;
+  background: var(--osso);
+}
+
+/* ---- Top brandbar (sticky) ---- */
+.brandbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--osso);
+  border-bottom: 1px solid var(--tinta-alpha-08);
+  padding: 18px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brandbar__lockup {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.brandbar__lockup-bottega {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--tinta);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.brandbar__lockup-by {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--tinta);
+  opacity: 0.6;
+}
+.brandbar__lockup-amalfi {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--tinta);
+}
+.brandbar__lockup-co {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--tinta);
+  margin-left: 4px;
+}
+.brandbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+.brandbar__nav-item {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  opacity: 0.65;
+  transition: opacity 0.15s;
+  position: relative;
+  padding-bottom: 4px;
+}
+.brandbar__nav-item:hover { opacity: 1; }
+.brandbar__nav-item--active {
+  opacity: 1;
+}
+.brandbar__nav-item--active::after {
+  content: '';
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--terracota);
+}
+.brandbar__user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.brandbar__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--tinta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--osso);
+}
+
+/* ---- Section "screen" delimiter ---- */
+.screen-label {
+  background: var(--tinta);
+  color: var(--osso);
+  padding: 14px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.screen-label__title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.screen-label__hint {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* =========================================================
+   TELA 1 — ATELIER (DASHBOARD)
+   ========================================================= */
+.atelier {
+  background: var(--osso);
+  padding: 0;
+}
+
+/* Hero block — Tinta + Osso (combinação Serenidade) */
+.atelier__hero {
+  background: var(--tinta);
+  color: var(--osso);
+  padding: 96px 48px 80px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 72px;
+  align-items: end;
+  position: relative;
+  overflow: hidden;
+}
+.atelier__hero::before {
+  /* mancha aquarela Mar — assinatura visual */
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -120px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(45,93,123,0.45) 0%, rgba(45,93,123,0) 65%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+.atelier__hero-text { position: relative; z-index: 1; }
+.atelier__hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.atelier__hero-eyebrow-line {
+  width: 32px;
+  height: 1px;
+  background: var(--terracota);
+}
+.atelier__hero-h1 {
+  font-family: var(--font-display);
+  font-size: 88px;
+  line-height: 1.02;
+  margin: 0 0 24px;
+  letter-spacing: -0.015em;
+}
+.atelier__hero-h1-italic {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+.atelier__hero-lede {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.5;
+  max-width: 540px;
+  opacity: 0.85;
+  margin: 0 0 40px;
+}
+.atelier__hero-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.atelier__hero-meta {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  text-align: right;
+  line-height: 2;
+}
+.atelier__hero-meta strong {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  display: block;
+  margin-top: 4px;
+  opacity: 0.95;
+}
+
+/* Stats row — Areia bg (combinação Presença / suave) */
+.atelier__stats {
+  background: var(--areia);
+  padding: 56px 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+.stat {
+  border-left: 1px solid var(--tinta-alpha-15);
+  padding: 8px 0 8px 24px;
+}
+.stat:first-child { border-left: none; padding-left: 0; }
+.stat__label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 16px;
+}
+.stat__value {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--tinta);
+}
+.stat__delta {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--mar);
+}
+
+/* Coleção atual — listagem editorial estilo "catálogo" */
+.atelier__catalogo {
+  background: var(--osso);
+  padding: 96px 48px;
+}
+.atelier__catalogo-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 56px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--tinta-alpha-15);
+}
+.atelier__catalogo-head h2 {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1;
+  margin: 16px 0 0;
+}
+.atelier__catalogo-head h2 em {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+.atelier__catalogo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.card-anuncio {
+  background: var(--osso);
+  border: 1px solid var(--tinta-alpha-15);
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.card-anuncio:hover {
+  border-color: var(--tinta);
+  transform: translateY(-2px);
+}
+.card-anuncio__media {
+  background: var(--areia);
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.card-anuncio__media--mar { background: var(--mar); }
+.card-anuncio__media--ceu { background: var(--ceu); }
+.card-anuncio__media--areia { background: var(--areia); }
+.card-anuncio__media--terra { background: var(--terracota); }
+.card-anuncio__placeholder {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.card-anuncio__placeholder--light { color: var(--osso); }
+.card-anuncio__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--terracota);
+  color: var(--osso);
+  padding: 4px 10px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.card-anuncio__body {
+  padding: 24px 28px 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.card-anuncio__eyebrow {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 12px;
+}
+.card-anuncio__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+.card-anuncio__sub {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  opacity: 0.75;
+  margin: 0 0 20px;
+  flex: 1;
+}
+.card-anuncio__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--tinta-alpha-08);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+.card-anuncio__meta-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-anuncio__meta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mar);
+}
+.card-anuncio__meta-dot--terra { background: var(--terracota); }
+
+/* =========================================================
+   TELA 2 — NOVO ANÚNCIO (CRIAÇÃO)
+   ========================================================= */
+.criacao {
+  background: var(--osso);
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  min-height: 800px;
+}
+
+/* Coluna esquerda — Form (Areia bg) */
+.criacao__form {
+  background: var(--areia);
+  padding: 64px 48px 80px;
+  border-right: 1px solid var(--tinta-alpha-15);
+}
+.criacao__form-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.criacao__form-eyebrow-num {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--terracota);
+}
+.criacao__form-h2 {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+.criacao__form-h2 em {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+.criacao__form-sub {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  opacity: 0.75;
+  margin: 0 0 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--tinta-alpha-15);
+}
+.field {
+  margin-bottom: 28px;
+}
+.field__label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.7;
+}
+.field__hint {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13px;
+  opacity: 0.55;
+  margin-top: 6px;
+  display: block;
+}
+.field__input,
+.field__textarea {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--osso);
+  border: 1px solid var(--tinta-alpha-15);
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: 15px;
+  color: var(--tinta);
+  transition: border-color 0.15s;
+  border-radius: 0;
+}
+.field__input:focus,
+.field__textarea:focus {
+  outline: none;
+  border-color: var(--tinta);
+}
+.field__textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+.field__dropzone {
+  background: var(--osso);
+  border: 1.5px dashed var(--tinta-alpha-15);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.field__dropzone:hover {
+  border-color: var(--tinta);
+  background: #FBF7EE;
+}
+.field__dropzone-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.field__dropzone-sub {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* Slider visual */
+.slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.slider-row__value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--tinta);
+}
+.slider-row__edges {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
+.slider-track {
+  width: 100%;
+  height: 2px;
+  background: var(--tinta-alpha-15);
+  position: relative;
+}
+.slider-track__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--mar);
+  width: 60%;
+}
+.slider-track__handle {
+  position: absolute;
+  top: 50%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--terracota);
+  border: 2px solid var(--osso);
+  box-shadow: 0 0 0 1px var(--tinta-alpha-15);
+}
+
+/* Toggle group estilo */
+.toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--tinta-alpha-15);
+  background: var(--osso);
+}
+.toggle-group__item {
+  padding: 14px 8px;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-right: 1px solid var(--tinta-alpha-15);
+  opacity: 0.6;
+  transition: all 0.15s;
+}
+.toggle-group__item:last-child { border-right: none; }
+.toggle-group__item:hover { opacity: 1; }
+.toggle-group__item--active {
+  background: var(--tinta);
+  color: var(--osso);
+  opacity: 1;
+}
+
+.criacao__form-actions {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--tinta-alpha-15);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.credit-line {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+/* Coluna direita — Results (Tinta bg, dark editorial) */
+.criacao__results {
+  background: var(--tinta);
+  color: var(--osso);
+  position: relative;
+}
+.criacao__results-tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--osso-alpha-15);
+  padding: 0 48px;
+}
+.criacao__results-tab {
+  padding: 22px 0;
+  margin-right: 36px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.criacao__results-tab:hover { opacity: 0.8; }
+.criacao__results-tab--active {
+  opacity: 1;
+}
+.criacao__results-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--terracota);
+}
+.criacao__results-tab-num {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 12px;
+  margin-right: 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--terracota);
+  opacity: 0.85;
+}
+.criacao__results-body {
+  padding: 56px 48px 80px;
+  max-width: 760px;
+}
+.criacao__results-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.criacao__results-eyebrow-line {
+  width: 32px;
+  height: 1px;
+  background: var(--terracota);
+}
+.criacao__results-h2 {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+.criacao__results-h2 em {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+}
+.criacao__results-lede {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.5;
+  opacity: 0.85;
+  margin: 0 0 48px;
+}
+.criacao__results-block {
+  padding: 32px 0;
+  border-top: 1px solid var(--osso-alpha-15);
+}
+.criacao__results-block:first-of-type { border-top: none; padding-top: 0; }
+.criacao__results-block-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 16px;
+}
+.criacao__results-block-headline {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.criacao__results-block-text {
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+  opacity: 0.85;
+  max-width: 640px;
+}
+.criacao__results-block-text strong {
+  font-weight: 500;
+  color: var(--ocre);
+}
+
+/* keyword chips */
+.kw-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.kw-chip {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 7px 14px;
+  border: 1px solid var(--osso-alpha-15);
+  border-radius: 0;
+  letter-spacing: 0.02em;
+  background: rgba(244,237,224,0.04);
+  color: var(--osso);
+  opacity: 0.85;
+}
+.kw-chip--accent {
+  border-color: var(--terracota);
+  color: var(--terracota);
+  opacity: 1;
+}
+
+/* Lista de títulos */
+.titulo-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.titulo-list li {
+  padding: 14px 0;
+  border-top: 1px solid var(--osso-alpha-15);
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+.titulo-list li:first-child { border-top: none; padding-top: 0; }
+.titulo-list-num {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  color: var(--terracota);
+  width: 24px;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+.titulo-list-text {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1.35;
+  flex: 1;
+}
+.titulo-list-meta {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+/* Briefings de imagem (mosaic) */
+.briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.briefing-tile {
+  background: var(--mar);
+  aspect-ratio: 1;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.briefing-tile--areia { background: var(--areia); color: var(--tinta); }
+.briefing-tile--terra { background: var(--terracota); color: var(--osso); }
+.briefing-tile--mar   { background: var(--mar); color: var(--osso); }
+.briefing-tile--ceu   { background: var(--ceu); color: var(--tinta); }
+.briefing-tile--ocre  { background: var(--ocre); color: var(--tinta); }
+.briefing-tile--osso  { background: rgba(244,237,224,0.08); color: var(--osso); border: 1px solid var(--osso-alpha-15); }
+.briefing-tile__num {
+  font-family: var(--font-display);
+  font-size: 16px;
+  opacity: 0.7;
+}
+.briefing-tile__title {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.3;
+}
+.briefing-tile__tag {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Info bar (rodapé da tela) */
+.criacao__footer {
+  background: var(--tinta);
+  padding: 24px 48px;
+  border-top: 1px solid var(--osso-alpha-15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--osso);
+}
+.criacao__footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.criacao__footer-quote {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* =========================================================
+   FOOTER GLOBAL DO MOCKUP (apresentação)
+   ========================================================= */
+.global-footer {
+  background: var(--osso);
+  border-top: 1px solid var(--tinta-alpha-15);
+  padding: 56px 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.global-footer__lockup {
+  font-family: var(--font-display);
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.global-footer__lockup em {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 32px;
+}
+.global-footer__by {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 16px;
+  opacity: 0.7;
+}
+.global-footer__monograma {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--terracota);
+  color: var(--osso);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-left: auto;
+}
+.global-footer__monograma-A {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1;
+}
+.global-footer__monograma-co {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+.global-footer__col {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 2;
+  opacity: 0.65;
+}
+.global-footer__col h4 {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  opacity: 1;
+}
+
+/* Annotation banner (explica que é mockup) */
+.mockup-banner {
+  background: var(--ocre);
+  color: var(--tinta);
+  padding: 12px 48px;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 14px;
+  text-align: center;
+}
+.mockup-banner strong {
+  font-family: var(--font-ui);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-right: 12px;
+}
+
+/* Smooth divider */
+hr.divider {
+  border: none;
+  height: 1px;
+  background: var(--tinta-alpha-15);
+  margin: 0;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ========== Banner explicativo ========== -->
+  <div class="mockup-banner">
+    <strong>Mockup v1</strong>
+    Bottega by Amalfi &amp; Co. — interface aplicando 100% dos tokens oficiais do brandbook (paleta, tipografia, princípios). Validar antes do dev.
+  </div>
+
+  <!-- ========== Brandbar (header global) ========== -->
+  <header class="brandbar">
+    <div class="brandbar__lockup">
+      <span class="brandbar__lockup-bottega">Bottega</span>
+      <span class="brandbar__lockup-by">by</span>
+      <span class="brandbar__lockup-amalfi">Amalfi</span>
+      <span class="brandbar__lockup-co">&amp; Co.</span>
+    </div>
+    <nav class="brandbar__nav">
+      <a class="brandbar__nav-item brandbar__nav-item--active">Atelier</a>
+      <a class="brandbar__nav-item">Novo Anúncio</a>
+      <a class="brandbar__nav-item">Catálogo</a>
+      <a class="brandbar__nav-item">Coleções</a>
+      <a class="brandbar__nav-item">Configurações</a>
+    </nav>
+    <div class="brandbar__user">
+      <div class="brandbar__avatar">S</div>
+    </div>
+  </header>
+
+  <!-- ============================================== -->
+  <!-- TELA 1 — ATELIER (Dashboard inicial)             -->
+  <!-- ============================================== -->
+  <div class="screen-label">
+    <span class="screen-label__title">01 · Atelier · Página inicial</span>
+    <span class="screen-label__hint">Onde você revisa o que já existe antes de criar mais.</span>
+  </div>
+
+  <section class="atelier">
+
+    <!-- Hero block — Tinta + Osso -->
+    <div class="atelier__hero">
+      <div class="atelier__hero-text">
+        <div class="atelier__hero-eyebrow">
+          <span class="atelier__hero-eyebrow-line"></span>
+          <span class="eyebrow eyebrow--light">Volume Um · Maio 2026</span>
+        </div>
+        <h1 class="atelier__hero-h1">
+          A vida boa<br>
+          <span class="atelier__hero-h1-italic">cabe em pequenos gestos.</span>
+        </h1>
+        <p class="atelier__hero-lede">
+          Hoje você tem três anúncios em curadoria e quatorze briefings de imagem prontos.
+          Comece pelo essencial.
+        </p>
+        <div class="atelier__hero-actions">
+          <a class="btn btn--terra">Novo Anúncio</a>
+          <a class="btn btn--inverse-ghost">Continuar curadoria</a>
+        </div>
+      </div>
+      <div class="atelier__hero-meta">
+        Sarah Mendes
+        <strong>Curadora · Fundadora</strong>
+        <br><br>
+        Última edição<br>
+        <strong>há 3 horas — Tomada NBR 14136</strong>
+      </div>
+    </div>
+
+    <!-- Stats row — Areia bg -->
+    <div class="atelier__stats">
+      <div class="stat">
+        <div class="stat__label">Anúncios ativos</div>
+        <div class="stat__value">12</div>
+        <div class="stat__delta">três aguardando aprovação</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Palavras-chave geradas</div>
+        <div class="stat__value">487</div>
+        <div class="stat__delta">média de 41 por anúncio</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Briefings de imagem</div>
+        <div class="stat__value">94</div>
+        <div class="stat__delta">prontos para Higgsfield</div>
+      </div>
+    </div>
+
+    <!-- Coleção atual / catálogo -->
+    <div class="atelier__catalogo">
+      <div class="atelier__catalogo-head">
+        <div>
+          <span class="eyebrow">A Coleção · 2026 · Casa &amp; Decoração</span>
+          <h2>Coleção <em>atual</em>.</h2>
+        </div>
+        <a class="btn btn--ghost btn--small">Ver todos</a>
+      </div>
+
+      <div class="atelier__catalogo-grid">
+
+        <!-- Card 1 -->
+        <article class="card-anuncio">
+          <div class="card-anuncio__media card-anuncio__media--mar">
+            <span class="card-anuncio__placeholder card-anuncio__placeholder--light">Lifestyle · Cozinha ao entardecer</span>
+            <span class="card-anuncio__badge">Novo</span>
+          </div>
+          <div class="card-anuncio__body">
+            <div class="card-anuncio__eyebrow">Material elétrico · Casa</div>
+            <h3 class="card-anuncio__title">Tomada 10A 250V <em style="font-family:var(--font-editorial); font-style:italic;">branca, NBR 14136.</em></h3>
+            <p class="card-anuncio__sub">Compatível com o padrão brasileiro. Encaixa em caixa 4x2. Pequenos gestos para uma casa que dura.</p>
+            <div class="card-anuncio__meta">
+              <span class="card-anuncio__meta-status">
+                <span class="card-anuncio__meta-dot"></span>
+                Em revisão
+              </span>
+              <span>v1 · 2026.05.05</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card-anuncio">
+          <div class="card-anuncio__media card-anuncio__media--areia">
+            <span class="card-anuncio__placeholder">Still · Vista frontal</span>
+          </div>
+          <div class="card-anuncio__body">
+            <div class="card-anuncio__eyebrow">Têxtil · Quarto</div>
+            <h3 class="card-anuncio__title">Jogo de lençóis <em style="font-family:var(--font-editorial); font-style:italic;">linho lavado.</em></h3>
+            <p class="card-anuncio__sub">Dois corpos. Cor aveia. Linho italiano. Para os meses quentes — e para os frios também.</p>
+            <div class="card-anuncio__meta">
+              <span class="card-anuncio__meta-status">
+                <span class="card-anuncio__meta-dot"></span>
+                Publicado
+              </span>
+              <span>v3 · 2026.04.21</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card-anuncio">
+          <div class="card-anuncio__media card-anuncio__media--ceu">
+            <span class="card-anuncio__placeholder">Detalhe · Textura</span>
+          </div>
+          <div class="card-anuncio__body">
+            <div class="card-anuncio__eyebrow">Cerâmica · Mesa</div>
+            <h3 class="card-anuncio__title">Jarra <em style="font-family:var(--font-editorial); font-style:italic;">Vietri.</em></h3>
+            <p class="card-anuncio__sub">Cerâmica trabalhada à mão. 1,8 litros. Acabamento natural — escolhido em uma feira em Vietri sul Mare.</p>
+            <div class="card-anuncio__meta">
+              <span class="card-anuncio__meta-status">
+                <span class="card-anuncio__meta-dot card-anuncio__meta-dot--terra"></span>
+                Rascunho
+              </span>
+              <span>v1 · 2026.05.04</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================== -->
+  <!-- TELA 2 — NOVO ANÚNCIO (Criação split)            -->
+  <!-- ============================================== -->
+  <div class="screen-label">
+    <span class="screen-label__title">02 · Novo anúncio · Espaço de criação</span>
+    <span class="screen-label__hint">Forma à esquerda · respiração à direita.</span>
+  </div>
+
+  <section class="criacao">
+
+    <!-- Coluna esquerda — Formulário -->
+    <div class="criacao__form">
+
+      <div class="criacao__form-eyebrow">
+        <span class="criacao__form-eyebrow-num">01</span>
+        <span class="eyebrow">O Produto</span>
+      </div>
+      <h2 class="criacao__form-h2">Comece pelo <em>essencial.</em></h2>
+      <p class="criacao__form-sub">Cole a foto, dê um nome, conte os detalhes que importam. Evitamos pressa.</p>
+
+      <!-- Campo: Nome do produto -->
+      <div class="field">
+        <label class="field__label">Nome do produto</label>
+        <input class="field__input" type="text" placeholder="Tomada NBR 14136 · branca · 10A" value="Tomada 10A 250V branca">
+        <span class="field__hint">o nome simples — sem "incrível", sem "premium".</span>
+      </div>
+
+      <!-- Campo: Foto (drop) -->
+      <div class="field">
+        <label class="field__label">Foto crua do produto</label>
+        <div class="field__dropzone">
+          <div class="field__dropzone-title">Arraste uma foto.</div>
+          <div class="field__dropzone-sub">PNG, JPG ou HEIC · até 10 MB · luz natural lateral é a nossa preferida.</div>
+        </div>
+      </div>
+
+      <!-- Campo: Detalhes técnicos -->
+      <div class="field">
+        <label class="field__label">Detalhes técnicos</label>
+        <textarea class="field__textarea" placeholder="Voltagem · material · dimensões · conteúdo da caixa · garantia">2P+T · 10A · 250V · termoplástico branco com proteção UV · padrão NBR 14136 · encaixa em caixa 4x2 · inclui suporte 4x2 e 2 parafusos · 5 anos garantia</textarea>
+      </div>
+
+      <!-- Campo: Título atual (opcional) -->
+      <div class="field">
+        <label class="field__label">Título atual <span style="opacity:0.5; font-weight:300; letter-spacing:0;">(opcional)</span></label>
+        <input class="field__input" type="text" placeholder="Cole se já existe — para evitarmos repetir palavras.">
+      </div>
+
+      <!-- Slider: imagens -->
+      <div class="field">
+        <label class="field__label">Quantas imagens</label>
+        <div class="slider-row">
+          <span class="slider-row__edges">7</span>
+          <span class="slider-row__value">9</span>
+          <span class="slider-row__edges">12</span>
+        </div>
+        <div class="slider-track">
+          <div class="slider-track__fill"></div>
+          <div class="slider-track__handle"></div>
+        </div>
+        <span class="field__hint">nove é a média para uma página que respira.</span>
+      </div>
+
+      <!-- Toggle: estilo -->
+      <div class="field">
+        <label class="field__label">Estilo das imagens</label>
+        <div class="toggle-group">
+          <div class="toggle-group__item toggle-group__item--active">Lifestyle</div>
+          <div class="toggle-group__item">Infográfico</div>
+          <div class="toggle-group__item">Misto</div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="criacao__form-actions">
+        <a class="btn btn--primary" style="width:100%;">Criar anúncio</a>
+        <a class="btn btn--ghost btn--small" style="width:100%;">Salvar rascunho</a>
+        <span class="credit-line">Cada criação leva, em média, três minutos.</span>
+      </div>
+
+    </div>
+
+    <!-- Coluna direita — Resultados (placeholder editorial) -->
+    <div class="criacao__results">
+
+      <!-- Tabs -->
+      <div class="criacao__results-tabs">
+        <a class="criacao__results-tab criacao__results-tab--active">
+          <span class="criacao__results-tab-num">01</span>Análise de mercado
+        </a>
+        <a class="criacao__results-tab">
+          <span class="criacao__results-tab-num">02</span>Palavras-chave
+        </a>
+        <a class="criacao__results-tab">
+          <span class="criacao__results-tab-num">03</span>Títulos
+        </a>
+        <a class="criacao__results-tab">
+          <span class="criacao__results-tab-num">04</span>Descrição &amp; Bullets
+        </a>
+        <a class="criacao__results-tab">
+          <span class="criacao__results-tab-num">05</span>Briefings de Imagem
+        </a>
+      </div>
+
+      <!-- Body -->
+      <div class="criacao__results-body">
+
+        <div class="criacao__results-eyebrow">
+          <span class="criacao__results-eyebrow-line"></span>
+          <span class="eyebrow eyebrow--light">A leitura do mercado</span>
+        </div>
+        <h2 class="criacao__results-h2">Quem compra <em>e por quê.</em></h2>
+        <p class="criacao__results-lede">
+          Antes de escrever, observamos. Quem está procurando este produto agora,
+          em que momento da casa, com que palavras.
+        </p>
+
+        <!-- Bloco: Persona -->
+        <div class="criacao__results-block">
+          <div class="criacao__results-block-eyebrow">Persona dominante</div>
+          <h3 class="criacao__results-block-headline">Reformando aos poucos.</h3>
+          <p class="criacao__results-block-text">
+            Mulher 32–48, classe B+, mora em apartamento próprio em capital ou interior, está
+            <strong>trocando tomadas antigas por padrão NBR 14136</strong>. Compra por exigência
+            (padrão obrigatório) e por estética (acabamento branco fosco). Decide em até 48 horas.
+            Lê os comentários antes do título.
+          </p>
+        </div>
+
+        <!-- Bloco: Dores -->
+        <div class="criacao__results-block">
+          <div class="criacao__results-block-eyebrow">Dores reais</div>
+          <h3 class="criacao__results-block-headline">A casa antiga já não cabe nos plugues novos.</h3>
+          <p class="criacao__results-block-text">
+            Os aparelhos modernos vêm com plugue de três pinos redondos. As tomadas antigas
+            (americano de dois pinos) <strong>não aterram, não recebem o terceiro pino</strong>,
+            e ainda dão pequenos choques. A reforma é pequena — mas é uma reforma.
+          </p>
+        </div>
+
+        <!-- Bloco: Keywords preview -->
+        <div class="criacao__results-block">
+          <div class="criacao__results-block-eyebrow">Palavras que ressoam</div>
+          <h3 class="criacao__results-block-headline">Vinte que se repetem na busca.</h3>
+          <div class="kw-grid">
+            <span class="kw-chip">tomada 10a</span>
+            <span class="kw-chip">tomada 2p+t</span>
+            <span class="kw-chip">nbr 14136</span>
+            <span class="kw-chip kw-chip--accent">padrão brasileiro</span>
+            <span class="kw-chip">tomada branca</span>
+            <span class="kw-chip">tomada 4x2</span>
+            <span class="kw-chip">três pinos</span>
+            <span class="kw-chip">novo padrão</span>
+            <span class="kw-chip">aterramento</span>
+            <span class="kw-chip">embutida</span>
+            <span class="kw-chip">bivolt</span>
+            <span class="kw-chip kw-chip--accent">parede</span>
+            <span class="kw-chip">reforma</span>
+            <span class="kw-chip">apartamento</span>
+            <span class="kw-chip">comercial</span>
+            <span class="kw-chip">com suporte</span>
+            <span class="kw-chip">com parafusos</span>
+            <span class="kw-chip">termoplástico</span>
+            <span class="kw-chip">5 anos garantia</span>
+            <span class="kw-chip">proteção uv</span>
+          </div>
+        </div>
+
+        <!-- Bloco: Títulos preview -->
+        <div class="criacao__results-block">
+          <div class="criacao__results-block-eyebrow">Cinco títulos · foco no produto</div>
+          <h3 class="criacao__results-block-headline">Começar pelo nome.</h3>
+          <ol class="titulo-list">
+            <li>
+              <span class="titulo-list-num">i.</span>
+              <span class="titulo-list-text">Tomada 10A 250V Branca 2P+T NBR 14136 — Inclui Suporte 4x2 e Parafusos</span>
+              <span class="titulo-list-meta">119 / 200</span>
+            </li>
+            <li>
+              <span class="titulo-list-num">ii.</span>
+              <span class="titulo-list-text">Tomada Padrão Brasileiro 10A · Encaixe 4x2 · Branca · Kit com Suporte</span>
+              <span class="titulo-list-meta">94 / 200</span>
+            </li>
+            <li>
+              <span class="titulo-list-num">iii.</span>
+              <span class="titulo-list-text">Tomada de Parede 2P+T NBR 14136 — 10 Amperes · Bivolt · Branca Fosca</span>
+              <span class="titulo-list-meta">102 / 200</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Bloco: Briefings preview -->
+        <div class="criacao__results-block">
+          <div class="criacao__results-block-eyebrow">Briefings de imagem · 9 cenas</div>
+          <h3 class="criacao__results-block-headline">Da capa ao detalhe.</h3>
+          <div class="briefing-grid">
+            <div class="briefing-tile briefing-tile--areia">
+              <div class="briefing-tile__num">01</div>
+              <div class="briefing-tile__title">Hero <span style="font-style:normal;">·</span> produto isolado, fundo Osso, 80% do frame</div>
+              <div class="briefing-tile__tag">Capa</div>
+            </div>
+            <div class="briefing-tile briefing-tile--mar">
+              <div class="briefing-tile__num">02</div>
+              <div class="briefing-tile__title">Lifestyle <span style="font-style:normal;">·</span> sala ao entardecer, luz lateral suave</div>
+              <div class="briefing-tile__tag">Mood</div>
+            </div>
+            <div class="briefing-tile briefing-tile--ceu">
+              <div class="briefing-tile__num">03</div>
+              <div class="briefing-tile__title">Detalhe <span style="font-style:normal;">·</span> três pinos, encaixe, micro</div>
+              <div class="briefing-tile__tag">Detalhe</div>
+            </div>
+            <div class="briefing-tile briefing-tile--terra">
+              <div class="briefing-tile__num">04</div>
+              <div class="briefing-tile__title">Conteúdo da caixa <span style="font-style:normal;">·</span> tomada + suporte + 2 parafusos</div>
+              <div class="briefing-tile__tag">Inventário</div>
+            </div>
+            <div class="briefing-tile briefing-tile--osso">
+              <div class="briefing-tile__num">05</div>
+              <div class="briefing-tile__title">Compatibilidade <span style="font-style:normal;">·</span> caixa 4x2 padrão brasileiro</div>
+              <div class="briefing-tile__tag">Técnico</div>
+            </div>
+            <div class="briefing-tile briefing-tile--ocre">
+              <div class="briefing-tile__num">06</div>
+              <div class="briefing-tile__title">Manhã na cozinha <span style="font-style:normal;">·</span> aparelho conectado, vapor</div>
+              <div class="briefing-tile__tag">Lifestyle</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer da tela -->
+      <div class="criacao__footer">
+        <div class="criacao__footer-left">
+          <span class="eyebrow eyebrow--light">v1 · gerado há 12 minutos</span>
+        </div>
+        <div class="criacao__footer-quote">
+          "A gente fala como quem oferece café num fim de tarde."
+        </div>
+        <div>
+          <a class="btn btn--inverse btn--small" style="margin-right:8px;">Exportar PDF</a>
+          <a class="btn btn--inverse-ghost btn--small">Aprovar &amp; arquivar</a>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============================================== -->
+  <!-- FOOTER do mockup                                  -->
+  <!-- ============================================== -->
+  <footer class="global-footer">
+    <div>
+      <div class="global-footer__lockup">Bottega <em>by</em></div>
+      <div class="global-footer__by">Amalfi &amp; Co.</div>
+      <p class="meta" style="margin-top:24px; max-width:280px; line-height:1.7;">
+        Atelier digital de criação de anúncios. Pequenos gestos que cabem na vida boa.
+      </p>
+    </div>
+    <div class="global-footer__col">
+      <h4>Plataforma</h4>
+      Atelier<br>
+      Novo Anúncio<br>
+      Catálogo<br>
+      Coleções de palavras<br>
+      Briefings
+    </div>
+    <div style="display:flex; align-items:flex-start; justify-content:flex-end;">
+      <div class="global-footer__monograma">
+        <div class="global-footer__monograma-A">A</div>
+        <div class="global-footer__monograma-co">· co. ·</div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
