@@ -12,11 +12,9 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
 
-# Functions: TypeScript native via esbuild.
-# @netlify/blobs DEVE ser external — bundlar inline quebra os runtime hooks
-# que injetam Blobs context em produção.
+# Functions: deixa Netlify usar bundler default (zisi) que mantem hooks runtime.
+# Esbuild como bundler costuma quebrar os hooks que injetam Blobs context.
 [functions]
-  node_bundler = "esbuild"
   external_node_modules = ["@google/genai", "@netlify/blobs"]
 
 # SPA routing — qualquer rota não encontrada cai no index (React Router resolve).
