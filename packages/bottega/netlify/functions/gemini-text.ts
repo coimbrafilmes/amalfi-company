@@ -56,11 +56,14 @@ const handler: Handler = async (event: HandlerEvent) => {
   const start = Date.now();
   try {
     const client = new GoogleGenAI({ apiKey });
-    const config: Record<string, unknown> = {
-      responseMimeType: 'application/json',
-    };
+    // Gemini API: tools (Search) + responseMimeType:json são mutuamente exclusivos.
+    // Quando Search está ativo, retorno vem em texto livre (que pode envolver JSON
+    // em markdown). O cliente trata isso via extractJson.
+    const config: Record<string, unknown> = {};
     if (body.useSearch) {
       config.tools = [{ googleSearch: {} }];
+    } else {
+      config.responseMimeType = 'application/json';
     }
 
     const result = await Promise.race([
