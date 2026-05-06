@@ -4,7 +4,7 @@ import { GlobalFooter } from '../components/organisms/GlobalFooter';
 import { Editorial } from '../components/atoms/Editorial';
 import { Eyebrow } from '../components/atoms/Eyebrow';
 import { Button } from '../components/atoms/Button';
-import { USE_MOCK, HAS_VALID_KEY, GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL } from '../lib/utils/env';
+import { USE_MOCK } from '../lib/utils/env';
 
 export function ConfiguracoesPage() {
   const [smokeStatus, setSmokeStatus] = useState<'idle' | 'rodando' | 'ok' | 'erro'>('idle');
@@ -14,8 +14,8 @@ export function ConfiguracoesPage() {
     setSmokeStatus('rodando');
     setSmokeOutput('');
     try {
-      const { smokeTestGemini } = await import('../lib/gemini/client');
-      const r = await smokeTestGemini();
+      const { smokeTestGeminiViaFn } = await import('../lib/gemini/orchestrator');
+      const r = await smokeTestGeminiViaFn();
       setSmokeStatus(r.ok ? 'ok' : 'erro');
       setSmokeOutput(
         r.ok
@@ -47,23 +47,13 @@ export function ConfiguracoesPage() {
           </h2>
           <p className="font-ui font-light leading-loose mb-5">
             {USE_MOCK
-              ? 'A Bottega está usando dados de exemplo (mock). Nenhuma chamada à API Gemini ou Imagen é feita. Para ativar geração real, edite o arquivo .env na raiz: troque VITE_USE_MOCK=true para VITE_USE_MOCK=false e reinicie o dev server.'
-              : 'A Bottega está conectada ao Gemini real. Cada criação consome créditos da sua API key. Imagens via Imagen 4 custam ~$0.04 por foto.'}
+              ? 'A Bottega está usando dados de exemplo (mock). Nenhuma chamada à API Gemini ou Imagen é feita. Para ativar geração real, edite VITE_USE_MOCK=false em .env e reinicie o servidor.'
+              : 'A Bottega está conectada ao Gemini real via Netlify Functions (key segura, server-side). Cada criação consome créditos. Imagens via Imagen 4 custam ~$0.04 por foto.'}
           </p>
           <div className="font-ui text-sm space-y-2 opacity-80">
             <div>
-              <strong className="font-medium">API key Gemini:</strong>{' '}
-              {HAS_VALID_KEY ? (
-                <span className="text-mar">configurada ✓</span>
-              ) : (
-                <span className="text-terracota">faltando ou inválida</span>
-              )}
-            </div>
-            <div>
-              <strong className="font-medium">Modelo de texto:</strong> {GEMINI_TEXT_MODEL}
-            </div>
-            <div>
-              <strong className="font-medium">Modelo de imagem:</strong> {GEMINI_IMAGE_MODEL}
+              <strong className="font-medium">Arquitetura:</strong>{' '}
+              <span className="text-mar">Server-side proxy (Netlify Functions) — key nunca exposta no client.</span>
             </div>
           </div>
         </section>
@@ -74,13 +64,13 @@ export function ConfiguracoesPage() {
             Testar a chave <em className="font-editorial italic font-regular">do Gemini.</em>
           </h2>
           <p className="font-ui font-light leading-loose mb-5">
-            Faz uma chamada mínima ao Gemini 2.5 Flash (free tier) pra confirmar que sua chave está viva.
+            Faz uma chamada mínima ao Gemini 2.5 Flash (via Netlify Function) pra confirmar que a chave do servidor responde.
             Não custa nada.
           </p>
           <Button
             variant="primary"
             onClick={onSmokeTest}
-            disabled={!HAS_VALID_KEY || smokeStatus === 'rodando'}
+            disabled={smokeStatus === 'rodando'}
           >
             {smokeStatus === 'rodando' ? 'Verificando…' : 'Verificar agora'}
           </Button>
@@ -88,7 +78,7 @@ export function ConfiguracoesPage() {
           {smokeOutput && (
             <div
               className={`mt-6 px-5 py-4 font-editorial italic text-[16px] leading-snug ${
-                smokeStatus === 'ok' ? 'bg-aqua/30 text-tinta' : 'bg-terracota/20 text-tinta'
+                smokeStatus === 'ok' ? 'bg-ceu/30 text-tinta' : 'bg-terracota/20 text-tinta'
               }`}
             >
               {smokeOutput}

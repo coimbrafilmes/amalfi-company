@@ -56,7 +56,25 @@ export const useAnunciosStore = create<AnunciosState>()(
     }),
     {
       name: 'bottega.anuncios',
-      version: 1,
+      version: 2,
+      migrate: (persistedState, version) => {
+        const state = persistedState as Partial<AnunciosState> | undefined;
+        if (!state) return { anuncios: [], current: null } as Partial<AnunciosState>;
+        // v1 → v2: garante que cada anuncio.results.imagens (se existir) tem o flag falhou
+        if (version < 2 && Array.isArray(state.anuncios)) {
+          state.anuncios = state.anuncios.map((a) => ({
+            ...a,
+            results: {
+              ...a.results,
+              imagens: a.results.imagens?.map((img) => ({
+                ...img,
+                falhou: img.falhou ?? !img.base64,
+              })),
+            },
+          }));
+        }
+        return state;
+      },
     },
   ),
 );

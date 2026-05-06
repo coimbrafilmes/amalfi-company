@@ -90,10 +90,11 @@ export interface BriefingImagem {
 
 export interface ImagemGerada {
   briefingNumero: number;
-  base64: string;             // mock = data URI placeholder
+  base64: string;             // mock = data URI placeholder; "" se falhou
   largura: number;
   altura: number;
   modelUsado?: string;
+  falhou?: boolean;           // true se Imagen retornou erro / vazio
 }
 
 /** Resultado completo da geração */

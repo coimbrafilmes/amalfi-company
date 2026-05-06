@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * Smoke test — valida que VITE_GEMINI_API_KEY responde.
+ * Smoke test direto à API Gemini — útil pra validar a key fora do contexto Netlify.
  * Custo: $0 (Gemini 2.5 Flash, prompt mínimo, free tier).
  *
- * Rodar com: node scripts/smoke-test.mjs
+ * Lê GEMINI_API_KEY (server-side, sem prefixo VITE_) do .env.
+ *
+ * Usar: node scripts/smoke-test.mjs
  */
 
 import { GoogleGenAI } from '@google/genai';
@@ -24,11 +26,11 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-const apiKey = env.VITE_GEMINI_API_KEY ?? process.env.VITE_GEMINI_API_KEY;
-const model = env.VITE_GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
+const apiKey = env.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
+const model = env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
 
 if (!apiKey) {
-  console.error('✗ VITE_GEMINI_API_KEY não encontrada em .env');
+  console.error('✗ GEMINI_API_KEY não encontrada em .env (sem prefixo VITE_)');
   process.exit(1);
 }
 
