@@ -14,6 +14,7 @@ import type {
   TitulosResult,
   DescricaoResult,
   BriefingImagem,
+  BriefingAPlus,
   ImagemGerada,
 } from '../../types/anuncio';
 
@@ -194,29 +195,6 @@ Especificações técnicas:
 
 Indicado para residências, escritórios, lojas, consultórios, ambientes comerciais. Combina com decoração moderna, minimalista, industrial ou clássica.`,
 
-  descriptionHTML: `
-<h2>Atualize sua casa ao padrão NBR 14136</h2>
-<p><strong>Esta Tomada 2P+T 10A 250V Branca</strong> entrega conexão segura e durável em qualquer ambiente. Compatível com o padrão brasileiro de 3 pinos redondos, funciona em redes 127V e 220V.</p>
-
-<h2>O que vem na embalagem</h2>
-<ul>
-  <li>1 Tomada 2P+T 10A 250V branca</li>
-  <li>1 Suporte 4x2 (espelho)</li>
-  <li>2 Parafusos de fixação</li>
-</ul>
-
-<h2>Especificações</h2>
-<table>
-  <tr><th>Corrente máxima</th><td>10 amperes</td></tr>
-  <tr><th>Tensão</th><td>250V (compatível com 127V e 220V)</td></tr>
-  <tr><th>Padrão</th><td>NBR 14136 (2 polos + terra)</td></tr>
-  <tr><th>Material</th><td>Termoplástico branco com proteção UV</td></tr>
-  <tr><th>Encaixe</th><td>Caixa 4x2 padrão brasileiro</td></tr>
-</table>
-
-<p><em>Indicado para residências, escritórios, lojas, consultórios. Combina com decoração moderna, minimalista, industrial ou clássica.</em></p>
-`,
-
   amazonBulletPoints: [
     'PADRÃO BRASILEIRO NBR 14136: Tomada 2P+T (2 polos + terra) compatível com o padrão obrigatório no Brasil desde 2010. Plug de 3 pinos redondos, encaixa em caixas 4x2 padrão de toda residência e comércio modernos.',
     '10A / 250V — APARELHOS ATÉ 1100W EM 127V OU 2200W EM 220V: Suporta carga ideal para o dia a dia. TV, micro-ondas, ferro de passar, ventilador, computador, carregadores de notebook.',
@@ -382,8 +360,75 @@ export function gerarMockImagens(briefings: BriefingImagem[]): ImagemGerada[] {
     const cor = PALETA_HEX[b.paletaCor ?? 'mar'] ?? PALETA_HEX.mar;
     return {
       briefingNumero: b.numero,
+      variante: 'anuncio',
       base64: svgPlaceholder(cor, `cena ${b.numero}`),
-      largura: 600,
+      largura: 1024,
+      altura: 1024,
+      modelUsado: 'mock-svg',
+    };
+  });
+}
+
+// === Mock briefings A+ Content ===
+export const mockBriefingsAPlus: BriefingAPlus[] = [
+  {
+    numero: 1,
+    estagio: 'aplus-header',
+    titulo: 'Pequenos gestos para uma vida costeira',
+    prompt: 'Mock A+ header banner — Costa Amalfitana inspired serene domestic scene.',
+    overlayText: 'A vida boa cabe em pequenos gestos',
+    paletaCor: 'mar',
+  },
+  {
+    numero: 2,
+    estagio: 'aplus-beneficio-1',
+    titulo: 'Padrão NBR 14136',
+    prompt: 'Mock A+ beneficio 1 — encaixe NBR 14136 destacado.',
+    overlayText: 'Encaixe perfeito, padrão brasileiro',
+    paletaCor: 'areia',
+  },
+  {
+    numero: 3,
+    estagio: 'aplus-beneficio-2',
+    titulo: 'Compatibilidade 127V e 220V',
+    prompt: 'Mock A+ beneficio 2 — bivolt visualmente sutil.',
+    overlayText: 'Funciona em 127V ou 220V',
+    paletaCor: 'ceu',
+  },
+  {
+    numero: 4,
+    estagio: 'aplus-comparacao',
+    titulo: 'Tomada padrão vs antiga',
+    prompt: 'Mock A+ comparacao — antes/depois conceitual.',
+    overlayText: 'O padrão certo é o atual',
+    paletaCor: 'osso-outline',
+  },
+  {
+    numero: 5,
+    estagio: 'aplus-lifestyle-amplo',
+    titulo: 'Sala de estar discreta',
+    prompt: 'Mock A+ lifestyle amplo — sala com a tomada presente sem ostentar.',
+    overlayText: 'Discreta, mas presente',
+    paletaCor: 'terracota',
+  },
+  {
+    numero: 6,
+    estagio: 'aplus-detalhe-tecnico',
+    titulo: 'Detalhe do contato em latão',
+    prompt: 'Mock A+ detalhe tecnico — macro nos contatos internos.',
+    overlayText: 'Latão. Encaixe firme.',
+    paletaCor: 'ocre',
+  },
+];
+
+export function gerarMockImagensAPlus(briefings: BriefingAPlus[]): ImagemGerada[] {
+  return briefings.map((b) => {
+    const cor = PALETA_HEX[b.paletaCor ?? 'mar'] ?? PALETA_HEX.mar;
+    return {
+      briefingNumero: b.numero,
+      variante: 'aplus',
+      base64: svgPlaceholder(cor, `A+ ${b.numero}`),
+      largura: 970,
       altura: 600,
       modelUsado: 'mock-svg',
     };
@@ -403,7 +448,12 @@ export async function gerarMockTudo(_input: CriacaoForm): Promise<CriacaoResults
     titulos: mockTitulos,
     descricao: mockDescricao,
     briefings: mockBriefings,
-    imagens: gerarMockImagens(mockBriefings),
+    briefingsAPlus: mockBriefingsAPlus,
+    imagens: [
+      ...gerarMockImagens(mockBriefings),
+      ...gerarMockImagensAPlus(mockBriefingsAPlus),
+    ],
+    visualSpec: 'Mock visual spec — produto descrito visualmente.',
     geradoEm: new Date().toISOString(),
     modoGeracao: 'mock',
   };

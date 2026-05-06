@@ -9,10 +9,11 @@ export type StatusAnuncio = 'rascunho' | 'em-revisao' | 'publicado' | 'arquivado
 /** Form de entrada do owner ao criar um anúncio */
 export interface CriacaoForm {
   nomeProduto: string;
-  fotoBase64?: string;        // foto crua do produto
+  /** Até 3 fotos de referência do produto. base64 (data URI ou cru). */
+  fotosBase64?: string[];
   detalhesTecnicos: string;
   tituloAtual?: string;
-  numeroImagens: number;       // 7-12
+  numeroImagens: number;       // 7-12 (apenas pra aba Anúncio; A+ é fixo 6)
   estiloImagem: EstiloImagem;
 }
 
@@ -54,17 +55,21 @@ export interface TitulosResult {
   dor: Titulo[];          // 5
 }
 
-/** Descrição completa (etapa 4) */
+/**
+ * Descrição (etapa 4).
+ * Amazon depreciou HTML em descriptions desde julho/2021 — só plain text +
+ * `<br>` é tolerado. `description` agora é plain text com `\n\n` como
+ * separador de parágrafos. Bullets continuam plain text.
+ */
 export interface FAQItem { pergunta: string; resposta: string; }
 export interface DescricaoResult {
-  description: string;          // texto plano
-  descriptionHTML: string;      // HTML A+ style
-  amazonBulletPoints: string[]; // 5 bullets Amazon
-  bulletPoints: string[];       // bullets genéricos
+  description: string;          // plain text Amazon-compatible (parágrafos com \n\n)
+  amazonBulletPoints: string[]; // 5 bullets Amazon (plain)
+  bulletPoints: string[];       // bullets curtos genéricos
   faq: FAQItem[];
 }
 
-/** Briefings de imagem (etapa 5) — 7-12 cenas */
+/** Briefings de imagem do anúncio principal (7-12 cenas, 1024×1024) */
 export type EstagioConversao =
   | 'capa'
   | 'gancho'
@@ -81,20 +86,45 @@ export interface BriefingImagem {
   isCover: boolean;
   estagio: EstagioConversao;
   titulo: string;            // 4-6 palavras pt-BR
-  prompt: string;            // prompt completo pra Imagen
+  prompt: string;            // prompt completo pra Gemini Image
   negativePrompt?: string;
   overlayText?: string;       // max 6 palavras
   dataPoints: string[];       // dados técnicos usados (sem inventar)
   paletaCor?: string;         // chave visual do briefing (mar/areia/terracota/etc)
 }
 
+/** Briefings de imagem do A+ Content (6 fixos, 970×600) */
+export type EstagioAPlus =
+  | 'aplus-header'
+  | 'aplus-beneficio-1'
+  | 'aplus-beneficio-2'
+  | 'aplus-comparacao'
+  | 'aplus-lifestyle-amplo'
+  | 'aplus-detalhe-tecnico';
+
+export interface BriefingAPlus {
+  numero: number;             // 1-6
+  estagio: EstagioAPlus;
+  titulo: string;             // 4-6 palavras pt-BR
+  prompt: string;
+  negativePrompt?: string;
+  overlayText?: string;
+  paletaCor?: string;
+}
+
+/** Imagem gerada — pode ser do anúncio (1024×1024) ou A+ (970×600) */
+export type VarianteImagem = 'anuncio' | 'aplus';
+
 export interface ImagemGerada {
   briefingNumero: number;
-  base64: string;             // mock = data URI placeholder; "" se falhou
+  variante: VarianteImagem;
+  base64: string;             // data URI base64; "" se falhou
   largura: number;
   altura: number;
   modelUsado?: string;
-  falhou?: boolean;           // true se Imagen retornou erro / vazio
+  falhou?: boolean;
+  /** ISO timestamp se foi regenerada (limite 1×); ausente = ainda não regenerada. */
+  regeneradaEm?: string;
 }
 
 /** Resultado completo da geração */
@@ -103,8 +133,11 @@ export interface CriacaoResults {
   keywords: KeywordsResult;
   titulos: TitulosResult;
   descricao: DescricaoResult;
-  briefings: BriefingImagem[];
-  imagens?: ImagemGerada[];     // opcional (Imagen é caro/custoso)
+  briefings: BriefingImagem[];        // anúncio (7-12)
+  briefingsAPlus: BriefingAPlus[];    // A+ (6 fixos)
+  imagens?: ImagemGerada[];           // todas (anúncio + A+), filtra por variante
+  /** Descrição visual extraída por Gemini Vision a partir das fotos de referência */
+  visualSpec?: string;
   geradoEm: string;             // ISO timestamp
   modoGeracao: 'mock' | 'real';
 }

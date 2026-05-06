@@ -15,7 +15,8 @@
 # Functions: deixa Netlify usar bundler default (zisi) que mantem hooks runtime.
 # Esbuild como bundler costuma quebrar os hooks que injetam Blobs context.
 [functions]
-  external_node_modules = ["@google/genai", "@netlify/blobs"]
+  external_node_modules = ["@google/genai", "@netlify/blobs", "sharp"]
+  included_files = ["node_modules/sharp/**", "node_modules/@img/**"]
 
 # SPA routing — qualquer rota não encontrada cai no index (React Router resolve).
 # Netlify roteia /.netlify/functions/* automaticamente; só precisamos do catch-all.

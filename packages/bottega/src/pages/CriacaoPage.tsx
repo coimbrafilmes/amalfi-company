@@ -9,7 +9,20 @@ import { useAnunciosStore } from '../store/anunciosStore';
 
 export function CriacaoPage() {
   const navigate = useNavigate();
-  const { form, results, status, loadingMessage, loadingStep, loadingProgress, errorMsg, setField, generate, reset } = useCriacaoStore();
+  const {
+    form,
+    results,
+    status,
+    loadingMessage,
+    loadingStep,
+    loadingProgress,
+    regenerating,
+    errorMsg,
+    setField,
+    generate,
+    regenerateImage,
+    reset,
+  } = useCriacaoStore();
   const addAnuncio = useAnunciosStore((s) => s.add);
   const lastSavedRef = useRef<string | null>(null);
 
@@ -54,6 +67,8 @@ export function CriacaoPage() {
           loadingMessage={loadingMessage}
           loadingStep={loadingStep}
           loadingProgress={loadingProgress}
+          regenerating={regenerating}
+          onRegenerate={regenerateImage}
         />
       </section>
 

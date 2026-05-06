@@ -1,21 +1,25 @@
 /**
- * Gemini orchestration pipeline — server-side.
+ * Gemini orchestration pipeline V2 — server-side.
  *
  * Importado pela background function gemini-anuncio-background.
- * Executa toda a sequência de geração de um anúncio:
- *   análise → [keywords | títulos | descrição] → briefings → imagens.
+ * Executa a sequência completa de criação de anúncio:
+ *   análise → [keywords|títulos|descrição] (paralelo) →
+ *   visualSpec (Gemini Vision) → briefings (anúncio + A+ paralelo) →
+ *   imagens (anúncio 1024×1024 + A+ 970×600, todas com refs).
  *
  * Atualiza o blob do job a cada etapa via callback `onStep`.
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Modality } from '@google/genai';
 import {
   promptAnalise,
   promptKeywords,
   promptTitulos,
   promptDescricao,
   promptBriefings,
-  buildImagenPrompt,
+  promptBriefingsAPlus,
+  promptVisualSpec,
+  buildImageGenPrompt,
 } from '../../../src/lib/gemini/prompts';
 import {
   analiseSchema,
@@ -23,20 +27,27 @@ import {
   titulosSchema,
   descricaoSchema,
   briefingsSchema,
+  briefingsAPlusSchema,
 } from '../../../src/lib/gemini/schemas';
 import type {
   CriacaoForm,
   CriacaoResults,
   BriefingImagem,
+  BriefingAPlus,
   ImagemGerada,
 } from '../../../src/types/anuncio';
+import { cropToSize } from './cropImage';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
-const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? 'imagen-4.0-generate-001';
+const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? 'gemini-2.5-flash-image';
 
-// Retry config — Gemini retorna 503 quando sobrecarregado. Background pode aguardar mais.
+// Retry config — Gemini retorna 503 quando sobrecarregado.
 const MAX_ATTEMPTS = 5;
 const BACKOFF_MS = [2_000, 5_000, 10_000, 20_000];
+
+// A+ Content target dimensions (Amazon spec)
+const APLUS_WIDTH = 970;
+const APLUS_HEIGHT = 600;
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -81,8 +92,7 @@ function extractJson(text: string, kind: string): unknown {
   let cleaned = text.trim();
   if (!cleaned) throw new Error(`[${kind}] resposta vazia do Gemini`);
 
-  // Remove prefácio conversacional ("Com certeza! Aqui está...") + markdown fence.
-  // Pega do primeiro { ou [ em diante.
+  // Pega do primeiro { ou [ em diante (remove prefácio conversacional)
   const startObj = cleaned.indexOf('{');
   const startArr = cleaned.indexOf('[');
   let start: number;
@@ -91,7 +101,7 @@ function extractJson(text: string, kind: string): unknown {
   else start = Math.min(startObj, startArr);
   if (start > 0) cleaned = cleaned.slice(start);
 
-  // Remove markdown trailing (``` no fim) e qualquer texto após o último } ou ]
+  // Remove texto após o último } ou ]
   const lastObj = cleaned.lastIndexOf('}');
   const lastArr = cleaned.lastIndexOf(']');
   const end = Math.max(lastObj, lastArr);
@@ -99,13 +109,10 @@ function extractJson(text: string, kind: string): unknown {
 
   cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
-  // Tentativa 1: parse direto
   try {
     return JSON.parse(cleaned);
   } catch {
-    // Tentativa 2: sanitiza control chars dentro de strings.
-    // Gemini com Search grounding às vezes retorna newlines literais não-escapados
-    // dentro de string values, o que viola JSON spec. Re-escapamos.
+    // Sanitiza control chars dentro de strings
     let inString = false;
     let escaped = false;
     let out = '';
@@ -128,7 +135,6 @@ function extractJson(text: string, kind: string): unknown {
         continue;
       }
       if (inString && code < 0x20) {
-        // Control char dentro de string — escape pra preservar JSON válido
         if (c === '\n') out += '\\n';
         else if (c === '\r') out += '\\r';
         else if (c === '\t') out += '\\t';
@@ -144,12 +150,21 @@ function extractJson(text: string, kind: string): unknown {
     return JSON.parse(cleaned);
   } catch (parseErr) {
     const preview = cleaned.slice(0, 200);
-    throw new Error(`[${kind}] JSON inválido após sanitização — prévia: ${preview}…`, { cause: parseErr });
+    throw new Error(`[${kind}] JSON inválido após sanitização — prévia: ${preview}…`, {
+      cause: parseErr,
+    });
   }
 }
 
 interface PipelineOpts {
   onStep: (step: string, progress?: { current: number; total: number }) => Promise<void>;
+}
+
+/** Strip data URI prefix se presente; retorna só os bytes base64. */
+function stripDataUri(b64: string): { data: string; mimeType: string } {
+  const m = b64.match(/^data:([^;]+);base64,(.+)$/);
+  if (m) return { mimeType: m[1], data: m[2] };
+  return { mimeType: 'image/jpeg', data: b64 };
 }
 
 export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts): Promise<CriacaoResults> {
@@ -158,7 +173,11 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
 
   const client = new GoogleGenAI({ apiKey });
   const inicio = Date.now();
+  const fotos = (form.fotosBase64 ?? []).slice(0, 3); // max 3 refs
 
+  // ---------------------------------------------------------
+  // Helper: Gemini text com retry + JSON validation
+  // ---------------------------------------------------------
   async function geminiText<T>(
     prompt: string,
     validator: (raw: unknown) => T,
@@ -188,14 +207,16 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
     }, kind);
   }
 
-  // === 1. Análise (com Search) ===
+  // ---------------------------------------------------------
+  // 1. Análise (sem Search — JSON estrito)
+  // ---------------------------------------------------------
   await opts.onStep('Lendo o mercado…');
-  // Search desligado — introduz texto conversacional + JSON malformado.
-  // Prompts já usam o conhecimento ambient do Gemini sobre Brasil/Amazon.
   const analise = await geminiText(promptAnalise(form), (r) => analiseSchema.parse(r), 'analise', false);
   const analiseContext = JSON.stringify(analise);
 
-  // === 2. Keywords + Títulos + Descrição (paralelo) ===
+  // ---------------------------------------------------------
+  // 2. Keywords + Títulos + Descrição (paralelo)
+  // ---------------------------------------------------------
   await opts.onStep('Curando palavras e títulos…');
   const [keywords, titulos, descricao] = await Promise.all([
     geminiText(promptKeywords(form, analiseContext), (r) => keywordsSchema.parse(r), 'keywords', false),
@@ -203,66 +224,159 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
     geminiText(promptDescricao(form, analiseContext), (r) => descricaoSchema.parse(r), 'descricao'),
   ]);
 
-  // === 3. Briefings de imagem ===
+  // ---------------------------------------------------------
+  // 3. Visual Spec (Gemini Vision lê fotos do produto, se houver)
+  // ---------------------------------------------------------
+  let visualSpec: string | undefined;
+  if (fotos.length > 0) {
+    await opts.onStep('Estudando o produto pelas fotos…');
+    visualSpec = await withRetry(async () => {
+      const visionContents: Array<unknown> = [
+        { text: promptVisualSpec() },
+        ...fotos.map((b64) => {
+          const { data, mimeType } = stripDataUri(b64);
+          return { inlineData: { mimeType, data } };
+        }),
+      ];
+      const result = await client.models.generateContent({
+        model: TEXT_MODEL,
+        contents: visionContents as never,
+      });
+      return (result.text ?? '').trim();
+    }, 'visual-spec');
+    console.log(`[pipeline] visualSpec: ${visualSpec.slice(0, 100)}…`);
+  }
+
+  // ---------------------------------------------------------
+  // 4. Briefings (anúncio + A+ em paralelo)
+  // ---------------------------------------------------------
   await opts.onStep('Compondo briefings de imagem…');
-  const briefings: BriefingImagem[] = await geminiText(
-    promptBriefings(form, analiseContext),
-    (r) => briefingsSchema.parse(r),
-    'briefings',
-  );
+  const [briefings, briefingsAPlus] = await Promise.all([
+    geminiText(promptBriefings(form, analiseContext), (r) => briefingsSchema.parse(r), 'briefings'),
+    geminiText(promptBriefingsAPlus(form, analiseContext), (r) => briefingsAPlusSchema.parse(r), 'briefings-aplus'),
+  ]);
 
-  // === 4. Imagens (paralelo, isolado) ===
-  await opts.onStep('Renderizando imagens…', { current: 0, total: briefings.length });
-
+  // ---------------------------------------------------------
+  // 5. Imagens — anúncio (1024×1024) + A+ (970×600 via crop)
+  // ---------------------------------------------------------
+  const totalImages = briefings.length + briefingsAPlus.length;
   let completed = 0;
-  const imagens: ImagemGerada[] = await Promise.all(
-    briefings.map(async (b): Promise<ImagemGerada> => {
-      try {
-        const result = await withRetry(
-          () =>
-            client.models.generateImages({
-              model: IMAGE_MODEL,
-              prompt: buildImagenPrompt(b.prompt, b.negativePrompt),
-              config: { numberOfImages: 1, aspectRatio: '1:1' },
-            }),
-          `imagen-${b.numero}`,
-        );
-        const first = result.generatedImages?.[0];
-        const base64 = first?.image?.imageBytes ?? '';
-        completed += 1;
-        await opts.onStep('Renderizando imagens…', { current: completed, total: briefings.length });
-        if (!base64) {
-          return {
-            briefingNumero: b.numero,
-            base64: '',
-            largura: 0,
-            altura: 0,
-            modelUsado: `${IMAGE_MODEL}-empty`,
-            falhou: true,
-          };
+  await opts.onStep('Renderizando imagens…', { current: 0, total: totalImages });
+
+  // Helper pra gerar 1 imagem com refs + retry
+  async function generateImage(
+    promptText: string,
+    aspectRatio: '1:1' | '4:3',
+    label: string,
+  ): Promise<string | null> {
+    try {
+      return await withRetry(async () => {
+        const contents: Array<unknown> = [
+          { text: promptText },
+          ...fotos.map((b64) => {
+            const { data, mimeType } = stripDataUri(b64);
+            return { inlineData: { mimeType, data } };
+          }),
+        ];
+        const result = await client.models.generateContent({
+          model: IMAGE_MODEL,
+          contents: contents as never,
+          config: {
+            responseModalities: [Modality.IMAGE],
+            imageConfig: { aspectRatio },
+          },
+        });
+        // Acessa partes inline da resposta
+        const parts = result.candidates?.[0]?.content?.parts ?? [];
+        for (const part of parts) {
+          if (part.inlineData?.data) {
+            return part.inlineData.data;
+          }
         }
-        return {
-          briefingNumero: b.numero,
-          base64: `data:image/png;base64,${base64}`,
-          largura: 1024,
-          altura: 1024,
-          modelUsado: IMAGE_MODEL,
-        };
-      } catch (err) {
-        completed += 1;
-        await opts.onStep('Renderizando imagens…', { current: completed, total: briefings.length });
-        console.error(`[pipeline] imagen #${b.numero} falhou:`, err);
-        return {
-          briefingNumero: b.numero,
-          base64: '',
-          largura: 0,
-          altura: 0,
-          modelUsado: 'imagen-failed',
-          falhou: true,
-        };
-      }
-    }),
-  );
+        throw new Error(`[${label}] sem imagem na resposta`);
+      }, label);
+    } catch (err) {
+      console.error(`[pipeline] ${label} falhou após retries:`, err);
+      return null;
+    }
+  }
+
+  // Anúncio (1024×1024 nativo)
+  const anuncioTasks: Promise<ImagemGerada>[] = briefings.map(async (b: BriefingImagem) => {
+    const finalPrompt = buildImageGenPrompt(b.prompt, visualSpec, {
+      negative: b.negativePrompt,
+      landscape: false,
+    });
+    const base64 = await generateImage(finalPrompt, '1:1', `anuncio-${b.numero}`);
+    completed += 1;
+    await opts.onStep('Renderizando imagens…', { current: completed, total: totalImages });
+    if (!base64) {
+      return {
+        briefingNumero: b.numero,
+        variante: 'anuncio',
+        base64: '',
+        largura: 0,
+        altura: 0,
+        modelUsado: `${IMAGE_MODEL}-failed`,
+        falhou: true,
+      };
+    }
+    return {
+      briefingNumero: b.numero,
+      variante: 'anuncio',
+      base64: `data:image/png;base64,${base64}`,
+      largura: 1024,
+      altura: 1024,
+      modelUsado: IMAGE_MODEL,
+    };
+  });
+
+  // A+ (4:3 nativo + crop pra 970×600 via Sharp)
+  const aplusTasks: Promise<ImagemGerada>[] = briefingsAPlus.map(async (b: BriefingAPlus) => {
+    const finalPrompt = buildImageGenPrompt(b.prompt, visualSpec, {
+      negative: b.negativePrompt,
+      landscape: true,
+    });
+    const base64 = await generateImage(finalPrompt, '4:3', `aplus-${b.numero}`);
+    completed += 1;
+    await opts.onStep('Renderizando imagens…', { current: completed, total: totalImages });
+    if (!base64) {
+      return {
+        briefingNumero: b.numero,
+        variante: 'aplus',
+        base64: '',
+        largura: 0,
+        altura: 0,
+        modelUsado: `${IMAGE_MODEL}-failed`,
+        falhou: true,
+      };
+    }
+    // Crop pra 970×600
+    try {
+      const cropped = await cropToSize(base64, APLUS_WIDTH, APLUS_HEIGHT);
+      return {
+        briefingNumero: b.numero,
+        variante: 'aplus',
+        base64: `data:image/png;base64,${cropped.base64}`,
+        largura: cropped.largura,
+        altura: cropped.altura,
+        modelUsado: IMAGE_MODEL,
+      };
+    } catch (err) {
+      console.error(`[pipeline] aplus-${b.numero} crop falhou:`, err);
+      // Fallback: usa imagem sem crop (será reescalada pelo CSS no client)
+      return {
+        briefingNumero: b.numero,
+        variante: 'aplus',
+        base64: `data:image/png;base64,${base64}`,
+        largura: 1024,
+        altura: 768,
+        modelUsado: `${IMAGE_MODEL}-uncropped`,
+      };
+    }
+  });
+
+  const imagens = await Promise.all([...anuncioTasks, ...aplusTasks]);
 
   console.log(`[pipeline] anúncio concluído em ${Date.now() - inicio}ms`);
 
@@ -272,8 +386,71 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
     titulos,
     descricao,
     briefings,
+    briefingsAPlus,
     imagens,
+    visualSpec,
     geradoEm: new Date().toISOString(),
     modoGeracao: 'real',
+  };
+}
+
+/**
+ * Regenera UMA imagem específica (chamada do regen-image function).
+ * Uso: novo briefing prompt + fotos refs → 1 imagem nova.
+ */
+export async function regenerateOneImage(
+  briefingPrompt: string,
+  variante: 'anuncio' | 'aplus',
+  fotos: string[],
+  visualSpec?: string,
+  negativePrompt?: string,
+): Promise<{ base64: string; largura: number; altura: number; modelUsado: string }> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada no servidor');
+
+  const client = new GoogleGenAI({ apiKey });
+  const aspectRatio = variante === 'aplus' ? '4:3' : '1:1';
+  const finalPrompt = buildImageGenPrompt(briefingPrompt, visualSpec, {
+    negative: negativePrompt,
+    landscape: variante === 'aplus',
+  });
+
+  const base64 = await withRetry(async () => {
+    const contents: Array<unknown> = [
+      { text: finalPrompt },
+      ...fotos.slice(0, 3).map((b64) => {
+        const { data, mimeType } = stripDataUri(b64);
+        return { inlineData: { mimeType, data } };
+      }),
+    ];
+    const result = await client.models.generateContent({
+      model: IMAGE_MODEL,
+      contents: contents as never,
+      config: {
+        responseModalities: [Modality.IMAGE],
+        imageConfig: { aspectRatio },
+      },
+    });
+    const parts = result.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) {
+      if (part.inlineData?.data) return part.inlineData.data;
+    }
+    throw new Error('sem imagem na resposta');
+  }, `regen-${variante}`);
+
+  if (variante === 'aplus') {
+    const cropped = await cropToSize(base64, APLUS_WIDTH, APLUS_HEIGHT);
+    return {
+      base64: `data:image/png;base64,${cropped.base64}`,
+      largura: cropped.largura,
+      altura: cropped.altura,
+      modelUsado: IMAGE_MODEL,
+    };
+  }
+  return {
+    base64: `data:image/png;base64,${base64}`,
+    largura: 1024,
+    altura: 1024,
+    modelUsado: IMAGE_MODEL,
   };
 }

@@ -29,11 +29,13 @@ function stripImageBase64(anuncios: Anuncio[]): Anuncio[] {
       imagens: a.results.imagens?.map(
         (img): ImagemGerada => ({
           briefingNumero: img.briefingNumero,
+          variante: img.variante ?? 'anuncio',
           base64: '',
           largura: img.largura,
           altura: img.altura,
           modelUsado: img.modelUsado,
           falhou: img.falhou,
+          regeneradaEm: img.regeneradaEm,
         }),
       ),
     },
@@ -83,7 +85,7 @@ export const useAnunciosStore = create<AnunciosState>()(
     }),
     {
       name: 'bottega.anuncios',
-      version: 3,
+      version: 4,
       // Strip base64 antes de gravar no localStorage (evita QuotaExceededError).
       partialize: (state) => ({
         ...state,
@@ -105,10 +107,33 @@ export const useAnunciosStore = create<AnunciosState>()(
             },
           }));
         }
-        // v2 → v3: strip base64 retroativo (resolve QuotaExceededError em users
-        // que tinham anúncios com imagens persistidas)
+        // v2 → v3: strip base64 retroativo (resolve QuotaExceededError)
         if (version < 3 && Array.isArray(state.anuncios)) {
           state.anuncios = stripImageBase64(state.anuncios);
+        }
+        // v3 → v4: schema V2 (briefingsAPlus + variante por imagem + form.fotosBase64)
+        if (version < 4 && Array.isArray(state.anuncios)) {
+          state.anuncios = state.anuncios.map((a) => {
+            // Migra form.fotoBase64 (string) → form.fotosBase64 (string[])
+            const oldForm = a.form as unknown as { fotoBase64?: string };
+            const newForm = { ...a.form };
+            if (oldForm.fotoBase64 && !newForm.fotosBase64) {
+              newForm.fotosBase64 = [oldForm.fotoBase64];
+            }
+            // Marca imagens antigas como variante: 'anuncio' e adiciona briefingsAPlus vazio
+            return {
+              ...a,
+              form: newForm,
+              results: {
+                ...a.results,
+                briefingsAPlus: a.results.briefingsAPlus ?? [],
+                imagens: a.results.imagens?.map((img) => ({
+                  ...img,
+                  variante: img.variante ?? 'anuncio',
+                })),
+              },
+            };
+          });
         }
         return state;
       },

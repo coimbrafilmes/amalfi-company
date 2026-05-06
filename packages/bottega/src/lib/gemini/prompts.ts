@@ -140,7 +140,7 @@ Retorne JSON estrito:
 }
 
 // ============================================================
-// 4. DESCRIÇÃO + BULLETS + FAQ + HTML A+
+// 4. DESCRIÇÃO (plain text Amazon-compatible — sem HTML)
 // ============================================================
 
 export function promptDescricao(form: CriacaoForm, analiseContext: string): string {
@@ -151,25 +151,28 @@ CONTEXTO DA ANÁLISE: ${analiseContext}
 
 Crie a página de produto completa pro anúncio Amazon BR.
 
-ENTREGUE 5 ARTEFATOS:
-1. description: texto corrido (1.500-2.000 chars) — descrição editorial, divisível em parágrafos curtos.
-2. descriptionHTML: mesmo conteúdo em HTML A+ style (h2, p, ul, table) — pra A+ Content premium.
-3. amazonBulletPoints: 5 bullets no formato "HEADLINE EM CAPS: descrição com benefício específico." (200-250 chars cada).
-4. bulletPoints: 5 bullets curtos genéricos (1 linha cada).
-5. faq: 4-6 perguntas frequentes do consumidor BR + respostas curtas (2-3 linhas).
+⚠️ AMAZON DEPRECIOU HTML EM DESCRIPTIONS desde julho/2021. Description deve ser
+PLAIN TEXT puro (sem <p>, <br>, <ul>, etc). Use \\n\\n entre parágrafos pra
+quebra. Bullets também são plain text — Amazon adiciona o "•" automaticamente.
+
+ENTREGUE 4 ARTEFATOS (JSON estrito):
+1. description: PLAIN TEXT (1500-2500 chars). Use \\n\\n pra parágrafos. ZERO HTML.
+2. amazonBulletPoints: 5 bullets no formato "HEADLINE EM CAPS: descrição com benefício específico." (200-250 chars cada). Plain text.
+3. bulletPoints: 5 bullets curtos genéricos (1 linha cada). Plain text.
+4. faq: 4-6 perguntas frequentes do consumidor BR + respostas curtas (2-3 linhas).
 
 REGRAS:
 - pt-BR fluente, não traduzido.
 - Use SOMENTE fatos dos detalhes técnicos. Zero invenção.
 - Sem URLs, sem emails, sem telefones.
 - Sem palavras proibidas Amazon: "Best seller", "Amazon's Choice", "Top vendido".
+- ABSOLUTAMENTE NENHUMA tag HTML em description. Nem <br>. Nem <p>. Nem &nbsp;.
 
 ${VOZ_AMALFI}
 
 Retorne JSON estrito:
 {
-  "description": "...",
-  "descriptionHTML": "<h2>...</h2><p>...</p>",
+  "description": "Parágrafo um.\\n\\nParágrafo dois.\\n\\nParágrafo três.",
   "amazonBulletPoints": ["...", "...", "...", "...", "..."],
   "bulletPoints": ["...", "...", "...", "...", "..."],
   "faq": [
@@ -246,13 +249,114 @@ Estágios válidos: capa | gancho | dor | mecanismo | prova | objecao | decisao 
 }
 
 // ============================================================
-// 6. PROMPT PARA IMAGEN (single image)
+// 6. BRIEFINGS A+ CONTENT (6 fixos, 970×600)
 // ============================================================
 
+export function promptBriefingsAPlus(form: CriacaoForm, analiseContext: string): string {
+  return `
+${CONTEXTO_PRODUTO(form)}
+
+CONTEXTO DA ANÁLISE: ${analiseContext}
+
+Você cria briefings de imagem pro CONTEÚDO A+ (Amazon A+ Content / Brand Story)
+deste produto. A+ é a página rica que aparece ABAIXO do anúncio principal.
+
+Cada imagem é 970×600 (formato paisagem 4:3 ratio aproximado), com mais espaço
+horizontal pra storytelling visual.
+
+ESTRUTURA OBRIGATÓRIA — 6 briefings nesta ordem exata:
+
+1. aplus-header — Banner principal (full width). Produto destacado em ambiente
+   Amalfi (Costa Amalfitana inspirada). Overlay text curto (max 8 palavras pt-BR).
+   Estabelece a marca + categoria.
+
+2. aplus-beneficio-1 — Foco no benefício PRINCIPAL do produto. Mostra "antes/depois"
+   ou "como funciona" visualmente. Overlay com headline curta.
+
+3. aplus-beneficio-2 — Benefício SECUNDÁRIO. Outra angulação de valor.
+
+4. aplus-comparacao — Visual comparativo. NÃO compare com marca de terceiro —
+   compare versões/alternativas genéricas (ex: "linho lavado" vs "algodão comum").
+   Pode ser dois produtos lado a lado ou diagrama.
+
+5. aplus-lifestyle-amplo — Cena lifestyle ampla, residência brasileira real.
+   Produto em uso natural. Mais espaço pra ambientação.
+
+6. aplus-detalhe-tecnico — Macro/zoom em detalhe técnico relevante. Textura,
+   acabamento, costura, encaixe — algo que valida qualidade.
+
+REGRAS OBRIGATÓRIAS:
+- Não inventar recursos, materiais, medidas, voltagem, compatibilidade.
+- Só usar claims que existem nos detalhes técnicos oficiais.
+- 1 cena coerente por briefing (sem colagem, grade, mosaico).
+- Overlay text em pt-BR, max 8 palavras, factual.
+- Format paisagem (referenciar "horizontal landscape orientation" no prompt).
+
+${VOZ_AMALFI}
+
+Retorne JSON ARRAY estrito (exatamente 6 itens):
+[
+  {
+    "numero": 1,
+    "estagio": "aplus-header",
+    "titulo": "frase pt-BR (4-8 palavras)",
+    "prompt": "prompt em INGLÊS pra Gemini Image (3-5 frases descritivas, fotorealista, horizontal landscape, 970x600 ratio)",
+    "negativePrompt": "things to avoid (inglês)",
+    "overlayText": "max 8 palavras pt-BR ou string vazia",
+    "paletaCor": "mar"
+  },
+  ...
+]
+
+Estágios válidos (em ordem): aplus-header, aplus-beneficio-1, aplus-beneficio-2, aplus-comparacao, aplus-lifestyle-amplo, aplus-detalhe-tecnico
+`.trim();
+}
+
+// ============================================================
+// 7. VISUAL SPEC (Gemini Vision lê fotos do produto)
+// ============================================================
+
+export function promptVisualSpec(): string {
+  return `
+Analise as imagens deste produto e descreva visualmente em detalhes técnicos
+EXATOS, pra que outra IA possa gerar imagens novas FIÉIS ao produto real.
+
+Capture:
+- Cor exata (use nomes técnicos: "branco osso", "off-white #F8F4EE", etc)
+- Formato e proporções
+- Materiais visíveis (plástico ABS, metal escovado, cerâmica esmaltada, etc)
+- Marcas, logos, gravações (transcreva texto se visível)
+- Detalhes funcionais visíveis (botões, encaixes, texturas, acabamentos)
+- Dimensões aparentes (relativas)
+- Características distintivas que distinguem do produto genérico
+
+Responda em INGLÊS, parágrafo único, 200-400 palavras, denso e factual.
+NÃO interprete uso, função ou marketing — só descreva o que SE VÊ.
+
+Comece com: "Product description for image generation:"
+`.trim();
+}
+
+// ============================================================
+// 8. PROMPT PARA IMAGE GENERATION (combina briefing + visual spec)
+// ============================================================
+
+export function buildImageGenPrompt(
+  briefingPrompt: string,
+  visualSpec: string | undefined,
+  options?: { negative?: string; landscape?: boolean },
+): string {
+  const fidelityClause = visualSpec
+    ? `\n\nIMPORTANT — render the EXACT product described:\n${visualSpec}`
+    : '';
+  const orientation = options?.landscape
+    ? '\n\nOrientation: horizontal landscape, 4:3 aspect ratio.'
+    : '\n\nOrientation: square 1:1 aspect ratio.';
+  const negative = options?.negative ? `\n\nAvoid: ${options.negative}` : '';
+  return `${briefingPrompt}${fidelityClause}${orientation}${negative}`;
+}
+
+/** @deprecated — use buildImageGenPrompt. Mantido pra retrocompat dos mocks. */
 export function buildImagenPrompt(prompt: string, negative?: string): string {
-  // Imagen 4 aceita prompt simples; negative vai concatenado em estilo "no X, no Y..."
-  if (negative) {
-    return `${prompt}\n\nAvoid: ${negative}`;
-  }
-  return prompt;
+  return buildImageGenPrompt(prompt, undefined, { negative });
 }

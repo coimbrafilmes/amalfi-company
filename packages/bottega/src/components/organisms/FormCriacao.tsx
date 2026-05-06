@@ -45,10 +45,14 @@ export function FormCriacao({ form, setField, onSubmit, isSubmitting }: FormCria
         />
       </Field>
 
-      <Field label="Foto crua do produto">
+      <Field
+        label="Fotos de referência"
+        hint="até 3 fotos do produto · usadas como referência fiel pra gerar todas as imagens."
+      >
         <Dropzone
-          preview={form.fotoBase64}
-          onFile={(_, base64) => setField('fotoBase64', base64)}
+          previews={form.fotosBase64 ?? []}
+          onFiles={(fotos) => setField('fotosBase64', fotos)}
+          maxFiles={3}
         />
       </Field>
 
