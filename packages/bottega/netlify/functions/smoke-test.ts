@@ -1,27 +1,20 @@
-import type { Handler, HandlerResponse } from '@netlify/functions';
+import type { Context } from '@netlify/functions';
 import { GoogleGenAI } from '@google/genai';
 
 /**
- * Netlify Function: smoke-test
- *
- * Health check — valida que GEMINI_API_KEY no servidor responde.
- * Retorna ok=true se Flash responde com algum texto.
- *
+ * smoke-test — Health check V2.
  * GET → { ok: boolean, latencyMs: number, sample: string, error?: string }
  */
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
 
-const json = (status: number, body: unknown): HandlerResponse => ({
-  statusCode: status,
-  headers: {
-    'Content-Type': 'application/json',
-    'Cache-Control': 'no-store',
-  },
-  body: JSON.stringify(body),
-});
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
 
-const handler: Handler = async () => {
+export default async (_req: Request, _context: Context) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return json(200, {
@@ -46,14 +39,15 @@ const handler: Handler = async () => {
       sample: text,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
     return json(200, {
       ok: false,
       latencyMs: Date.now() - start,
       sample: '',
-      error: msg,
+      error: err instanceof Error ? err.message : String(err),
     });
   }
 };
 
-export { handler };
+export const config = {
+  path: '/.netlify/functions/smoke-test',
+};

@@ -1,14 +1,13 @@
-import type { Handler, HandlerEvent } from '@netlify/functions';
+import type { Context } from '@netlify/functions';
 import { getJob, patchJob } from './_lib/jobs';
 import { runAnuncioPipeline } from './_lib/pipeline';
 import type { CriacaoForm } from '../../src/types/anuncio';
 
 /**
- * gemini-anuncio-background — Background function (até 15min de runtime).
+ * gemini-anuncio-background — Background function V2 (até 15min runtime).
  *
- * Detectada pelo sufixo `-background.ts`. Netlify retorna 202 imediatamente
- * ao client e continua executando. Output do client é zero — comunicação
- * acontece via blob storage (jobs).
+ * Detectada pelo sufixo `-background.ts`. Netlify retorna 202 imediato ao
+ * client e continua executando. Comunicação via Blobs (jobs store).
  *
  * POST /.netlify/functions/gemini-anuncio-background
  * body: { jobId }
@@ -18,29 +17,29 @@ interface RequestBody {
   jobId: string;
 }
 
-const handler: Handler = async (event: HandlerEvent) => {
+export default async (req: Request, _context: Context) => {
   let body: RequestBody;
   try {
-    body = JSON.parse(event.body ?? '{}') as RequestBody;
+    body = (await req.json()) as RequestBody;
   } catch {
     console.error('[bg-anuncio] body inválido');
-    return { statusCode: 400, body: 'invalid body' };
+    return new Response('invalid body', { status: 400 });
   }
 
   const { jobId } = body;
   if (!jobId) {
     console.error('[bg-anuncio] jobId ausente');
-    return { statusCode: 400, body: 'jobId required' };
+    return new Response('jobId required', { status: 400 });
   }
 
   const job = await getJob(jobId);
   if (!job) {
     console.error(`[bg-anuncio] job ${jobId} não encontrado`);
-    return { statusCode: 404, body: 'job not found' };
+    return new Response('job not found', { status: 404 });
   }
   if (job.status === 'done' || job.status === 'error') {
     console.warn(`[bg-anuncio] job ${jobId} já concluído (status=${job.status})`);
-    return { statusCode: 200, body: 'already finished' };
+    return new Response('already finished', { status: 200 });
   }
 
   console.log(`[bg-anuncio] iniciando job ${jobId}`);
@@ -68,7 +67,7 @@ const handler: Handler = async (event: HandlerEvent) => {
       result: results,
     });
     console.log(`[bg-anuncio] job ${jobId} concluído`);
-    return { statusCode: 200, body: 'ok' };
+    return new Response('ok', { status: 200 });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`[bg-anuncio] job ${jobId} falhou:`, msg);
@@ -77,8 +76,10 @@ const handler: Handler = async (event: HandlerEvent) => {
       errorAt: Date.now(),
       error: msg,
     });
-    return { statusCode: 500, body: 'error' };
+    return new Response('error', { status: 500 });
   }
 };
 
-export { handler };
+export const config = {
+  path: '/.netlify/functions/gemini-anuncio-background',
+};
