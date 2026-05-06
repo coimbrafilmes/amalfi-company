@@ -85,7 +85,7 @@ function extractJson(text: string, kind: string): unknown {
   // Pega do primeiro { ou [ em diante.
   const startObj = cleaned.indexOf('{');
   const startArr = cleaned.indexOf('[');
-  let start = -1;
+  let start: number;
   if (startObj === -1) start = startArr;
   else if (startArr === -1) start = startObj;
   else start = Math.min(startObj, startArr);
