@@ -11,6 +11,8 @@ interface ResultsTabsProps {
   results: CriacaoResults | null;
   isLoading: boolean;
   loadingMessage?: string;
+  loadingStep?: string;
+  loadingProgress?: { current: number; total: number } | null;
 }
 
 const PALETAS_PALETA: Array<BriefingImagem['paletaCor']> = ['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline'];
@@ -26,13 +28,24 @@ function imageInfoFor(imagens: ImagemGerada[] | undefined, n: number) {
 }
 
 /** ResultsTabs — coluna direita Tinta com 5 tabs. */
-export function ResultsTabs({ results, isLoading, loadingMessage }: ResultsTabsProps) {
+export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, loadingProgress }: ResultsTabsProps) {
   if (isLoading) {
+    const progressLabel = loadingProgress
+      ? ` · ${loadingProgress.current}/${loadingProgress.total}`
+      : '';
     return (
       <div className="bg-tinta text-osso flex flex-col items-center justify-center min-h-[800px] px-12 py-section-lg text-center gap-6">
         <div className="w-10 h-10 border-2 border-terracota border-t-transparent rounded-full animate-spin" />
+        {loadingStep && (
+          <span className="font-ui text-[11px] uppercase tracking-widest opacity-65">
+            {loadingStep}{progressLabel}
+          </span>
+        )}
         <p className="font-editorial italic text-[22px] max-w-md leading-snug">
           {loadingMessage ?? 'Compondo o anúncio com calma e precisão…'}
+        </p>
+        <p className="font-editorial italic text-[13px] opacity-50 max-w-md leading-snug">
+          Geração via Background Function · pode levar 1-3 minutos.
         </p>
       </div>
     );

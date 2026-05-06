@@ -1,267 +1,169 @@
 /**
- * Orchestrator REAL — chama as Netlify Functions (server-side proxy).
+ * Orchestrator REAL — usa Background Jobs (Netlify Functions).
  *
- * Não importa @google/genai no client: a key fica no servidor.
- * Importado lazy a partir do criacaoStore APENAS quando USE_MOCK=false.
+ * Padrão:
+ *   1. POST /job-create com o form → resposta { jobId }
+ *   2. POST /gemini-anuncio-background é disparado server-side
+ *   3. Loop de polling em GET /job-status?id={jobId} até status === 'done' | 'error'
+ *
+ * Toda lógica Gemini agora vive server-side em netlify/functions/_lib/pipeline.ts.
  */
 
-import { promptAnalise, promptKeywords, promptTitulos, promptDescricao, promptBriefings, buildImagenPrompt } from './prompts';
-import {
-  analiseSchema,
-  keywordsSchema,
-  titulosSchema,
-  descricaoSchema,
-  briefingsSchema,
-} from './schemas';
-import type { CriacaoForm, CriacaoResults, BriefingImagem, ImagemGerada } from '../../types/anuncio';
+import type { CriacaoForm, CriacaoResults } from '../../types/anuncio';
 
-const TEXT_FN = '/.netlify/functions/gemini-text';
-const IMAGE_FN = '/.netlify/functions/gemini-image';
-const TIMEOUT_MS = 95_000;
+const JOB_CREATE_FN = '/.netlify/functions/job-create';
+const JOB_STATUS_FN = '/.netlify/functions/job-status';
 
-// Retry config — Gemini retorna 503 quando sobrecarregado.
-// 4 tentativas total (1 + 3 retries). Backoff exponencial com jitter.
-const MAX_ATTEMPTS = 4;
-const BACKOFF_MS = [1_500, 4_000, 10_000];
+const POLL_TIMEOUT_MS = 6 * 60 * 1000; // 6 minutos máximo total
+const POLL_INITIAL_MS = 2_000;
+const POLL_RAMP_AT_MS = 30_000;
+const POLL_RAMP_MS = 3_000;
+const POLL_LATE_AT_MS = 90_000;
+const POLL_LATE_MS = 5_000;
 
-interface TextOk { text: string; latencyMs: number }
-interface FnError { error: string; latencyMs?: number }
-type TextResp = TextOk | FnError;
+interface JobStatusResp {
+  jobId: string;
+  status: 'pending' | 'running' | 'done' | 'error';
+  step?: string;
+  progress?: { current: number; total: number };
+  result?: CriacaoResults;
+  error?: string;
+  createdAt?: number;
+  startedAt?: number;
+}
 
-interface ImageOk { base64: string; modelUsado: string; latencyMs: number }
-type ImageResp = ImageOk | FnError;
+interface JobCreateResp {
+  jobId: string;
+  status: 'pending';
+  estimatedSeconds?: number;
+}
 
-const isError = <T extends object>(r: T | FnError): r is FnError =>
-  typeof (r as FnError).error === 'string';
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Detecta erros transientes que valem retry. */
+/** Detecta erros transientes — pra retentar a chamada de criação do job. */
 function isTransient(err: unknown): boolean {
   const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
   return (
     msg.includes('503') ||
     msg.includes('unavailable') ||
-    msg.includes('429') ||
-    msg.includes('resource_exhausted') ||
-    msg.includes('rate limit') ||
-    msg.includes('500') ||
-    msg.includes('internal') ||
+    msg.includes('502') ||
+    msg.includes('504') ||
     msg.includes('timeout') ||
-    msg.includes('aborterror') ||
     msg.includes('failed to fetch') ||
+    msg.includes('aborterror') ||
     msg.includes('network')
   );
 }
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/** Wrapper que aplica retry com backoff exponencial em erros transientes. */
-async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
+/** Chama job-create com retry leve. Retorna jobId. */
+async function triggerJob(form: CriacaoForm): Promise<string> {
+  const maxAttempts = 3;
   let lastErr: unknown;
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       if (attempt > 0) {
-        const base = BACKOFF_MS[attempt - 1] ?? 10_000;
-        const jitter = Math.floor(Math.random() * 500);
-        const delay = base + jitter;
-        console.warn(`[bottega] ${label} retry ${attempt}/${MAX_ATTEMPTS - 1} em ${delay}ms…`);
+        const delay = 1500 * attempt + Math.floor(Math.random() * 500);
+        console.warn(`[bottega] job-create retry ${attempt}/${maxAttempts - 1} em ${delay}ms…`);
         await wait(delay);
       }
-      return await fn();
+      const res = await fetch(JOB_CREATE_FN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ form }),
+      });
+      const ct = res.headers.get('content-type') ?? '';
+      if (!ct.includes('application/json')) {
+        throw new Error(`job-create resposta não-JSON (${res.status} ${res.statusText})`);
+      }
+      const data = (await res.json()) as JobCreateResp | { error?: string };
+      if (!res.ok || !('jobId' in data)) {
+        const msg = 'error' in data && data.error ? data.error : `HTTP ${res.status}`;
+        throw new Error(`job-create falhou: ${msg}`);
+      }
+      return data.jobId;
     } catch (err) {
       lastErr = err;
-      if (!isTransient(err) || attempt === MAX_ATTEMPTS - 1) {
-        throw err;
-      }
+      if (!isTransient(err) || attempt === maxAttempts - 1) throw err;
     }
   }
   throw lastErr;
 }
 
-/** Chama a function de texto. Retry interno em 503/429/timeout. */
-async function callTextFn(prompt: string, useSearch = false): Promise<string> {
-  return withRetry(async () => {
-    const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
+/** Lê status do job. Retorna o objeto bruto. */
+async function readJobStatus(jobId: string): Promise<JobStatusResp> {
+  const res = await fetch(`${JOB_STATUS_FN}?id=${encodeURIComponent(jobId)}`);
+  const ct = res.headers.get('content-type') ?? '';
+  if (!ct.includes('application/json')) {
+    throw new Error(`job-status resposta não-JSON (${res.status})`);
+  }
+  const data = (await res.json()) as JobStatusResp & { error?: string };
+  if (!res.ok) {
+    throw new Error(`job-status falhou: ${data.error ?? `HTTP ${res.status}`}`);
+  }
+  return data;
+}
+
+interface PollOptions {
+  onUpdate?: (status: JobStatusResp) => void;
+}
+
+/** Loop de polling com backoff progressivo. Resolve com result ou throw com erro. */
+async function pollJob(jobId: string, opts: PollOptions = {}): Promise<CriacaoResults> {
+  const startedAt = Date.now();
+  let pollMs = POLL_INITIAL_MS;
+  let lastStep: string | undefined;
+  let lastProgress: string | undefined;
+
+  while (Date.now() - startedAt < POLL_TIMEOUT_MS) {
+    await wait(pollMs);
+
+    let status: JobStatusResp;
     try {
-      const res = await fetch(TEXT_FN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, useSearch }),
-        signal: ctl.signal,
-      });
-      const data = (await res.json()) as TextResp;
-      if (!res.ok || isError(data)) {
-        const errMsg = isError(data) ? data.error : `HTTP ${res.status}`;
-        throw new Error(`gemini-text falhou: ${errMsg}`);
+      status = await readJobStatus(jobId);
+    } catch (err) {
+      // Falha de rede transitória — continua o loop, não derruba
+      if (isTransient(err)) {
+        console.warn(`[bottega] job-status transient err, continua poll:`, err);
+        continue;
       }
-      return data.text;
-    } finally {
-      clearTimeout(timer);
+      throw err;
     }
-  }, 'gemini-text');
-}
 
-/** Chama a function de imagem. Retry interno em transientes; null em erro permanente. */
-async function callImageFn(
-  prompt: string,
-  negativePrompt?: string,
-): Promise<{ base64: string; modelUsado: string } | null> {
-  try {
-    return await withRetry(async () => {
-      const ctl = new AbortController();
-      const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS + 30_000);
-      try {
-        const res = await fetch(IMAGE_FN, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, negativePrompt }),
-          signal: ctl.signal,
-        });
-        const data = (await res.json()) as ImageResp;
-        if (!res.ok || isError(data)) {
-          const errMsg = isError(data) ? data.error : `HTTP ${res.status}`;
-          throw new Error(`gemini-image falhou: ${errMsg}`);
-        }
-        return { base64: data.base64, modelUsado: data.modelUsado };
-      } finally {
-        clearTimeout(timer);
-      }
-    }, 'gemini-image');
-  } catch (err) {
-    console.error('[bottega] gemini-image desistiu após retries:', err);
-    return null;
-  }
-}
-
-/** Extrai JSON de respostas Gemini, tolerante a markdown wrapping. Throws com contexto se falhar. */
-function extractJson(text: string, kind: string): unknown {
-  const cleaned = text
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```\s*$/, '')
-    .trim();
-  if (!cleaned) {
-    throw new Error(`[${kind}] resposta vazia`);
-  }
-  try {
-    return JSON.parse(cleaned);
-  } catch (parseErr) {
-    const preview = cleaned.slice(0, 200);
-    throw new Error(`[${kind}] JSON inválido — prévia: ${preview}…`, { cause: parseErr });
-  }
-}
-
-/** Helper genérico: chama texto + extrai JSON + valida com Zod. */
-async function geminiJson<T>(
-  kind: string,
-  prompt: string,
-  validator: (raw: unknown) => T,
-  useSearch = false,
-): Promise<T> {
-  const text = await callTextFn(prompt, useSearch);
-  const raw = extractJson(text, kind);
-  try {
-    return validator(raw);
-  } catch (zodErr) {
-    const msg = zodErr instanceof Error ? zodErr.message : String(zodErr);
-    throw new Error(`[${kind}] schema falhou: ${msg}`, { cause: zodErr });
-  }
-}
-
-// ============================================================
-// 1. Análise (com Google Search)
-// ============================================================
-export async function gerarAnalise(form: CriacaoForm) {
-  return geminiJson('analise', promptAnalise(form), (r) => analiseSchema.parse(r), true);
-}
-
-// ============================================================
-// 2. Keywords (com Google Search)
-// ============================================================
-export async function gerarKeywords(form: CriacaoForm, contextoAnalise: string) {
-  return geminiJson('keywords', promptKeywords(form, contextoAnalise), (r) => keywordsSchema.parse(r), true);
-}
-
-// ============================================================
-// 3. Títulos
-// ============================================================
-export async function gerarTitulos(form: CriacaoForm, keywordsContext: string) {
-  return geminiJson('titulos', promptTitulos(form, keywordsContext), (r) => titulosSchema.parse(r));
-}
-
-// ============================================================
-// 4. Descrição
-// ============================================================
-export async function gerarDescricao(form: CriacaoForm, analiseContext: string) {
-  return geminiJson('descricao', promptDescricao(form, analiseContext), (r) => descricaoSchema.parse(r));
-}
-
-// ============================================================
-// 5. Briefings
-// ============================================================
-export async function gerarBriefings(form: CriacaoForm, analiseContext: string): Promise<BriefingImagem[]> {
-  return geminiJson('briefings', promptBriefings(form, analiseContext), (r) => briefingsSchema.parse(r));
-}
-
-// ============================================================
-// 6. Imagens (paralelo, graceful per-image)
-// ============================================================
-export async function gerarImagens(briefings: BriefingImagem[]): Promise<ImagemGerada[]> {
-  const tasks = briefings.map(async (b): Promise<ImagemGerada> => {
-    const finalPrompt = buildImagenPrompt(b.prompt, b.negativePrompt);
-    const result = await callImageFn(finalPrompt, b.negativePrompt);
-    if (!result) {
-      return {
-        briefingNumero: b.numero,
-        base64: '',
-        largura: 0,
-        altura: 0,
-        modelUsado: 'imagen-failed',
-        falhou: true,
-      };
+    // Notifica UI somente quando step ou progress mudam
+    const progressKey = status.progress ? `${status.progress.current}/${status.progress.total}` : '';
+    if (status.step !== lastStep || progressKey !== lastProgress) {
+      lastStep = status.step;
+      lastProgress = progressKey;
+      opts.onUpdate?.(status);
     }
-    return {
-      briefingNumero: b.numero,
-      base64: `data:image/png;base64,${result.base64}`,
-      largura: 1024,
-      altura: 1024,
-      modelUsado: result.modelUsado,
-    };
-  });
 
-  return Promise.all(tasks);
+    if (status.status === 'done') {
+      if (!status.result) throw new Error('Job concluído sem result no payload');
+      return status.result;
+    }
+    if (status.status === 'error') {
+      throw new Error(status.error ?? 'Job falhou sem mensagem');
+    }
+
+    // Backoff progressivo — manter <30 reqs/min mesmo em jobs longos
+    const elapsed = Date.now() - startedAt;
+    if (elapsed > POLL_LATE_AT_MS) pollMs = POLL_LATE_MS;
+    else if (elapsed > POLL_RAMP_AT_MS) pollMs = POLL_RAMP_MS;
+  }
+
+  throw new Error(`Polling excedeu ${Math.round(POLL_TIMEOUT_MS / 60_000)}min — job ${jobId} pode ainda estar rodando server-side`);
 }
 
-// ============================================================
-// ORCHESTRATOR principal
-// ============================================================
-export async function gerarTudoReal(form: CriacaoForm): Promise<CriacaoResults> {
-  const inicio = Date.now();
-  console.log('[Bottega] iniciando geração real…');
+interface GerarOptions {
+  onUpdate?: (status: JobStatusResp) => void;
+}
 
-  const analise = await gerarAnalise(form);
-  const analiseContext = JSON.stringify(analise);
-
-  const [keywords, titulos, descricao] = await Promise.all([
-    gerarKeywords(form, analiseContext),
-    gerarTitulos(form, analiseContext),
-    gerarDescricao(form, analiseContext),
-  ]);
-
-  const briefings = await gerarBriefings(form, analiseContext);
-  const imagens = await gerarImagens(briefings);
-
-  console.log(`[Bottega] geração real concluída em ${Date.now() - inicio}ms.`);
-
-  return {
-    analise,
-    keywords,
-    titulos,
-    descricao,
-    briefings,
-    imagens,
-    geradoEm: new Date().toISOString(),
-    modoGeracao: 'real',
-  };
+/** Gera o anúncio completo via Background Job. */
+export async function gerarTudoReal(form: CriacaoForm, opts: GerarOptions = {}): Promise<CriacaoResults> {
+  console.log('[Bottega] disparando job de criação…');
+  const jobId = await triggerJob(form);
+  console.log(`[Bottega] job ${jobId} criado, iniciando poll…`);
+  return pollJob(jobId, { onUpdate: opts.onUpdate });
 }
 
 /** Smoke test agora chama Function — sem expor key. */
@@ -283,3 +185,5 @@ export async function smokeTestGeminiViaFn(): Promise<{
     };
   }
 }
+
+export type { JobStatusResp };

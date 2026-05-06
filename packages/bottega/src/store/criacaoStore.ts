@@ -16,7 +16,9 @@ interface CriacaoState {
   form: CriacaoForm;
   results: CriacaoResults | null;
   status: 'idle' | 'gerando' | 'concluido' | 'erro';
-  loadingMessage: string;
+  loadingMessage: string;       // mensagem rotativa decorativa
+  loadingStep: string;          // etapa atual da pipeline (server-side)
+  loadingProgress: { current: number; total: number } | null; // ex: imagens 3/9
   errorMsg: string | null;
   setField<K extends keyof CriacaoForm>(k: K, v: CriacaoForm[K]): void;
   generate(): Promise<void>;
@@ -28,28 +30,35 @@ export const useCriacaoStore = create<CriacaoState>()((set, get) => ({
   results: null,
   status: 'idle',
   loadingMessage: LOADING_MESSAGES[0],
+  loadingStep: 'Iniciando…',
+  loadingProgress: null,
   errorMsg: null,
 
   setField: (k, v) => set((s) => ({ form: { ...s.form, [k]: v } })),
 
   generate: async () => {
-    // Guard: só uma geração por vez (resolve race condition de cliques duplos)
     if (get().status === 'gerando') {
       console.warn('[Bottega] geração já em andamento — ignorando duplicação.');
       return;
     }
 
     const { form } = get();
-    set({ status: 'gerando', errorMsg: null, results: null, loadingMessage: LOADING_MESSAGES[0] });
+    set({
+      status: 'gerando',
+      errorMsg: null,
+      results: null,
+      loadingMessage: LOADING_MESSAGES[0],
+      loadingStep: 'Iniciando…',
+      loadingProgress: null,
+    });
 
     let i = 0;
     const interval = setInterval(() => {
       i = (i + 1) % LOADING_MESSAGES.length;
-      // Só atualiza se ainda estiver gerando (evita override após erro/conclusão)
       if (get().status === 'gerando') {
         set({ loadingMessage: LOADING_MESSAGES[i] });
       }
-    }, 1200);
+    }, 1500);
 
     try {
       let results: CriacaoResults;
@@ -57,7 +66,17 @@ export const useCriacaoStore = create<CriacaoState>()((set, get) => ({
         results = await gerarMockTudo(form);
       } else {
         const { gerarTudoReal } = await import('../lib/gemini/orchestrator');
-        results = await gerarTudoReal(form);
+        results = await gerarTudoReal(form, {
+          onUpdate: (status) => {
+            // Atualiza step/progress conforme background avança
+            if (get().status === 'gerando') {
+              set({
+                loadingStep: status.step ?? 'Em andamento…',
+                loadingProgress: status.progress ?? null,
+              });
+            }
+          },
+        });
       }
       set({ results, status: 'concluido' });
     } catch (err) {
@@ -76,5 +95,7 @@ export const useCriacaoStore = create<CriacaoState>()((set, get) => ({
       status: 'idle',
       errorMsg: null,
       loadingMessage: LOADING_MESSAGES[0],
+      loadingStep: 'Iniciando…',
+      loadingProgress: null,
     }),
 }));
