@@ -76,7 +76,9 @@ export const briefingSchema = z.object({
   negativePrompt: z.string().max(1_500).optional(),
   overlayText: z.string().max(80).optional(),
   dataPoints: z.array(shortText).min(0).max(10),
-  paletaCor: z.enum(['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline']).optional(),
+  // paletaCor é hint visual; Gemini às vezes inventa cores ("dourado-claro").
+  // Aceitamos string livre + filtramos no client pra paletas conhecidas.
+  paletaCor: z.string().max(50).optional(),
 });
 
 export const briefingsSchema = z.array(briefingSchema).min(1).max(15);
@@ -96,7 +98,7 @@ export const briefingAPlusSchema = z.object({
   prompt: z.string().min(20).max(4_000),
   negativePrompt: z.string().max(1_500).optional(),
   overlayText: z.string().max(120).optional(),
-  paletaCor: z.enum(['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline']).optional(),
+  paletaCor: z.string().max(50).optional(),
 });
 
 export const briefingsAPlusSchema = z.array(briefingAPlusSchema).length(6);

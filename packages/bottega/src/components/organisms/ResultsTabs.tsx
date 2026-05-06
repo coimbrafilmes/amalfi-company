@@ -5,7 +5,7 @@ import { KeywordChip } from '../molecules/KeywordChip';
 import { TituloListItem } from '../molecules/TituloListItem';
 import { BriefingTile } from '../molecules/BriefingTile';
 import { Button } from '../atoms/Button';
-import type { CriacaoResults, ImagemGerada, BriefingImagem, VarianteImagem } from '../../types/anuncio';
+import type { CriacaoResults, ImagemGerada, VarianteImagem } from '../../types/anuncio';
 
 interface ResultsTabsProps {
   results: CriacaoResults | null;
@@ -19,11 +19,15 @@ interface ResultsTabsProps {
   onRegenerate?: (briefingNumero: number, variante: VarianteImagem) => void;
 }
 
-const PALETAS_PALETA: Array<BriefingImagem['paletaCor']> = ['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline'];
+type PaletaTile = 'areia' | 'mar' | 'ceu' | 'terracota' | 'ocre' | 'osso-outline';
+const PALETAS_PALETA: PaletaTile[] = ['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline'];
+const PALETAS_VALIDAS = new Set<string>(PALETAS_PALETA);
 
-function paletaPraTile(idx: number, paletaCor?: BriefingImagem['paletaCor']) {
-  return (paletaCor ?? PALETAS_PALETA[idx % PALETAS_PALETA.length]) as
-    | 'areia' | 'mar' | 'ceu' | 'terracota' | 'ocre' | 'osso-outline';
+function paletaPraTile(idx: number, paletaCor?: string): PaletaTile {
+  // Gemini às vezes retorna paleta fora do enum ("dourado-claro"); fazemos fallback
+  // pra ciclo determinístico baseado no idx.
+  if (paletaCor && PALETAS_VALIDAS.has(paletaCor)) return paletaCor as PaletaTile;
+  return PALETAS_PALETA[idx % PALETAS_PALETA.length];
 }
 
 function imageInfoFor(imagens: ImagemGerada[] | undefined, n: number, variante: VarianteImagem) {
