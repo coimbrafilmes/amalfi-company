@@ -1,0 +1,714 @@
+<!DOCTYPE html><html><head><title>01-direction-amalfi-editorial — Amalfi Amazon</title><meta charset="utf-8"><style>/* Amalfi — Marco's listing render style
+ * Pragmatic, clean, designed for both PDF print + HTML browser viewing
+ * Optimized for: scannability, copy-paste para Seller Central, e clareza visual
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 18mm 16mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: #ffffff;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+/* Headings */
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0d2818;
+  border-bottom: 3px solid #4fb89c;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a3d2c;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2d5840;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4a4a4a;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Paragraphs and inline */
+p {
+  margin: 10px 0;
+}
+
+strong, b {
+  color: #0d2818;
+  font-weight: 700;
+}
+
+em, i {
+  color: #555;
+}
+
+/* Inline code (specs, char counts, paths) */
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f3f5f4;
+  color: #0d4a35;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Code blocks (titulo, descrição HTML, prompts Higgsfield, backend keywords) */
+pre {
+  background: #f8faf9;
+  border: 1px solid #d6e0db;
+  border-left: 4px solid #4fb89c;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: "SF Mono", "JetBrains Mono", "Menlo", Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0;
+  color: #1a3d2c;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Lists */
+ul, ol {
+  margin: 10px 0 14px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+li > strong:first-child {
+  color: #0d4a35;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+th {
+  background: #f3f5f4;
+  color: #0d2818;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4fb89c;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+tr:hover {
+  background: #f8faf9;
+}
+
+/* Horizontal rules — slim, subtle */
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 28px 0;
+}
+
+/* Blockquotes (notas, alerts, A+ content disclaimer) */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: #fff8e8;
+  border-left: 4px solid #f0b22d;
+  color: #5c4a1a;
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+}
+
+blockquote p {
+  margin: 4px 0;
+}
+
+/* Links (raros aqui — só paths/refs) */
+a {
+  color: #0d4a35;
+  text-decoration: none;
+  border-bottom: 1px dotted #4fb89c;
+}
+
+/* Print-specific */
+@media print {
+  body {
+    padding: 0;
+    max-width: none;
+  }
+
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, table {
+    break-inside: avoid;
+  }
+
+  pre {
+    font-size: 11px;
+  }
+}
+
+/* HTML browser-only styling (light shadow + container) */
+@media screen {
+  body {
+    background: #f5f7f6;
+  }
+
+  body > * {
+    background: white;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  html {
+    background: #f5f7f6;
+  }
+
+  body {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 20px rgba(0,0,0,0.04);
+    margin: 24px auto;
+    padding: 40px 48px;
+    border-radius: 10px;
+  }
+}
+/*# sourceURL=/Users/coimbrafilmes/Desktop/CLAUDE CODE/CLIENTES/AMALFI COMPANY/agents/amalfi-amazon/scripts/../assets/listing.css*/</style><style>pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}/*# sourceURL=/opt/homebrew/lib/node_modules/md-to-pdf/node_modules/highlight.js/styles/github.css*/</style></head>
+	<body class="">
+		<h1 id="direção-visual--amalfi-editorial">Direção Visual — AMALFI EDITORIAL</h1>
+<blockquote>
+<p><strong>Síntese</strong>: 70% Costa Editorial (italiano poético, Playfair/Cormorant, Mediterrâneo) + 30% Tirreno Tech (Apple/Tesla rigor minimal, Söhne/Inter UI, dark mode native).
+<strong>Posicionamento</strong>: sofisticação italiana editorial dentro do ecommerce, com técnica Apple/Tesla por baixo.
+<strong>Versão</strong>: v1 — 2026-05-05</p>
+</blockquote>
+<hr>
+<h2 id="🌅-conceito-central">🌅 Conceito Central</h2>
+<p><strong>A Amalfi é italiana editorial primeiro, com rigor técnico Apple/Tesla por baixo.</strong></p>
+<p>Imagina uma página de revista <em>Cabana Magazine</em> ou <em>Apartamento</em>: foto grande, espaços generosos, serifa elegante chamando atenção, cor pontual e factual. Agora coloca essa página dentro de um app que tem a precisão de uma interface Apple Pro Display. Esse é o sweet spot da Amalfi.</p>
+<p><strong>Vocabulário visual</strong>: Costa Amalfitana ao amanhecer, papel pergaminho, azul profundo do mar Tirreno, coral discreto dos telhados Positano, dourado pontual de detalhes. Nada de neon, nada de colagem barulhenta.</p>
+<hr>
+<h2 id="🎨-paleta-consolidada">🎨 Paleta Consolidada</h2>
+<h3 id="cores-primárias">Cores Primárias</h3>
+<table>
+<tbody><tr>
+<td style="background:#1B3A5C; color:#FAF8F3; padding:24px; min-width:140px; border-radius:6px;">
+<b>Tirreno</b><br>
+<code style="background:rgba(255,255,255,0.15); color:#FAF8F3; padding:2px 6px; border-radius:3px;">#1B3A5C</code><br>
+<small>RGB 27 58 92</small>
+</td>
+<td style="background:#FAF8F3; color:#1B3A5C; padding:24px; min-width:140px; border-radius:6px; border:1px solid #E8E4DB;">
+<b>Caiado</b><br>
+<code style="background:rgba(0,0,0,0.06); padding:2px 6px; border-radius:3px;">#FAF8F3</code><br>
+<small>RGB 250 248 243</small>
+</td>
+<td style="background:#0D0F12; color:#FAF8F3; padding:24px; min-width:140px; border-radius:6px;">
+<b>Carvão</b><br>
+<code style="background:rgba(255,255,255,0.1); color:#FAF8F3; padding:2px 6px; border-radius:3px;">#0D0F12</code><br>
+<small>RGB 13 15 18</small>
+</td>
+</tr>
+</tbody></table>
+
+<ul>
+<li><strong>Tirreno</strong> <code>#1B3A5C</code> — azul-noite mediterrâneo. <strong>Cor primária da marca</strong>. Usar em wordmark, headlines, links primários, ações principais.</li>
+<li><strong>Caiado</strong> <code>#FAF8F3</code> — branco quente das casas Positano. <strong>Background light mode</strong>. Mais aconchegante que branco puro.</li>
+<li><strong>Carvão</strong> <code>#0D0F12</code> — quase-preto profundo, esfumaçado. <strong>Background dark mode</strong> (interfaces de trabalho).</li>
+</ul>
+<h3 id="acentos">Acentos</h3>
+<table>
+<tbody><tr>
+<td style="background:#D97757; color:#FAF8F3; padding:24px; min-width:140px; border-radius:6px;">
+<b>Coral</b><br>
+<code style="background:rgba(255,255,255,0.15); color:#FAF8F3; padding:2px 6px; border-radius:3px;">#D97757</code><br>
+<small>RGB 217 119 87</small>
+</td>
+<td style="background:#C8A560; color:#1B3A5C; padding:24px; min-width:140px; border-radius:6px;">
+<b>Champagne</b><br>
+<code style="background:rgba(0,0,0,0.1); padding:2px 6px; border-radius:3px;">#C8A560</code><br>
+<small>RGB 200 165 96</small>
+</td>
+<td style="background:#7A9276; color:#FAF8F3; padding:24px; min-width:140px; border-radius:6px;">
+<b>Sálvia</b><br>
+<code style="background:rgba(255,255,255,0.15); color:#FAF8F3; padding:2px 6px; border-radius:3px;">#7A9276</code><br>
+<small>RGB 122 146 118</small>
+</td>
+</tr>
+</tbody></table>
+
+<ul>
+<li><strong>Coral</strong> <code>#D97757</code> — terracota Positano. Acento principal — usar em CTAs secundários, tags, callouts editoriais. <strong>Não abusar</strong> (regra: max 10% da composição).</li>
+<li><strong>Champagne</strong> <code>#C8A560</code> — dourado de poente discreto (vindo da Tirreno Tech). Usar em <strong>detalhes premium</strong>: bordas, divisores especiais, marca d'água, ícones de destaque. <strong>Quase invisível mas eleva tudo</strong>.</li>
+<li><strong>Sálvia</strong> <code>#7A9276</code> — verde dos limoeiros. Acento secundário — sucesso, validação, orgânico. Usar com parcimônia.</li>
+</ul>
+<h3 id="neutros-escala">Neutros (escala)</h3>
+<table>
+<tbody><tr>
+<td style="background:#F2EFE7; color:#1B3A5C; padding:18px; min-width:100px;"><b>Pedra 50</b><br><code style="font-size:11px;">#F2EFE7</code></td>
+<td style="background:#E5E1D6; color:#1B3A5C; padding:18px; min-width:100px;"><b>Pedra 100</b><br><code style="font-size:11px;">#E5E1D6</code></td>
+<td style="background:#C8C2B5; color:#1B3A5C; padding:18px; min-width:100px;"><b>Pedra 200</b><br><code style="font-size:11px;">#C8C2B5</code></td>
+<td style="background:#A8A29E; color:#FAF8F3; padding:18px; min-width:100px;"><b>Pedra 400</b><br><code style="font-size:11px;">#A8A29E</code></td>
+<td style="background:#6B6864; color:#FAF8F3; padding:18px; min-width:100px;"><b>Pedra 600</b><br><code style="font-size:11px;">#6B6864</code></td>
+<td style="background:#3A3833; color:#FAF8F3; padding:18px; min-width:100px;"><b>Pedra 800</b><br><code style="font-size:11px;">#3A3833</code></td>
+</tr>
+</tbody></table>
+
+<p>Use a escala de neutros pra texto secundário, bordas, divisores, fundos sutis. <strong>Pedra 600</strong> pra texto de apoio, <strong>Pedra 200</strong> pra bordas finas.</p>
+<h3 id="mapa-de-uso-sintético">Mapa de uso (sintético)</h3>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Light Mode</th>
+<th>Dark Mode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Background base</td>
+<td>Caiado <code>#FAF8F3</code></td>
+<td>Carvão <code>#0D0F12</code></td>
+</tr>
+<tr>
+<td>Background card</td>
+<td><code>#FFFFFF</code></td>
+<td>Pedra 800 mix <code>#15181D</code></td>
+</tr>
+<tr>
+<td>Texto primário</td>
+<td>Tirreno <code>#1B3A5C</code></td>
+<td>Caiado <code>#FAF8F3</code></td>
+</tr>
+<tr>
+<td>Texto secundário</td>
+<td>Pedra 600 <code>#6B6864</code></td>
+<td>Pedra 200 <code>#C8C2B5</code></td>
+</tr>
+<tr>
+<td>Borda fina</td>
+<td>Pedra 100 <code>#E5E1D6</code></td>
+<td>rgba(250,248,243,0.08)</td>
+</tr>
+<tr>
+<td>CTA primário</td>
+<td>Tirreno <code>#1B3A5C</code> (texto Caiado)</td>
+<td>Caiado <code>#FAF8F3</code> (texto Tirreno)</td>
+</tr>
+<tr>
+<td>CTA secundário (raro)</td>
+<td>Coral <code>#D97757</code></td>
+<td>Coral <code>#D97757</code></td>
+</tr>
+<tr>
+<td>Detalhe premium</td>
+<td>Champagne <code>#C8A560</code></td>
+<td>Champagne <code>#C8A560</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="✒️-sistema-tipográfico">✒️ Sistema Tipográfico</h2>
+<h3 id="família-1--display-editorial-peso-70-b">Família 1 — Display Editorial (peso 70% B)</h3>
+<p><strong>Cormorant Garamond</strong> (Google Fonts grátis)</p>
+<ul>
+<li>Use: wordmark, headlines, títulos editoriais, citações</li>
+<li>Estilos: Italic 500 (signature), Regular 600 (caps tracking)</li>
+<li>Vibe: livraria italiana, Aesop, Hermès editorial</li>
+</ul>
+<h3 id="família-2--ui-sans-peso-30-a">Família 2 — UI Sans (peso 30% A)</h3>
+<p><strong>Inter</strong> (Google Fonts grátis — alternativa premium: <strong>Söhne</strong> se houver licença)</p>
+<ul>
+<li>Use: textos de interface, botões, formulários, tabelas, dashboards</li>
+<li>Estilos: Light 300, Regular 400, Medium 500, Semibold 600</li>
+<li>Vibe: Apple/Tesla/Linear/Vercel — clean tech humanist</li>
+</ul>
+<h3 id="família-3--body-editorial-opcional">Família 3 — Body Editorial (opcional)</h3>
+<p><strong>Tiempos Text</strong> (paga) ou <strong>Source Serif Pro</strong> (grátis)</p>
+<ul>
+<li>Use: parágrafos longos em contextos editoriais (blog, brandbook, sobre, manifesto)</li>
+<li>Estilos: Regular 400, Italic 400</li>
+<li>Vibe: revista editorial, livro de mesa</li>
+</ul>
+<h3 id="hierarquia-escala-fluida-pra-web">Hierarquia (escala fluida pra web)</h3>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Família</th>
+<th>Peso</th>
+<th>Tamanho</th>
+<th>Letter-spacing</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Display XL (hero)</td>
+<td>Cormorant Italic</td>
+<td>500</td>
+<td>96px / 6rem</td>
+<td>-0.02em</td>
+</tr>
+<tr>
+<td>Display L</td>
+<td>Cormorant Italic</td>
+<td>500</td>
+<td>64px / 4rem</td>
+<td>-0.01em</td>
+</tr>
+<tr>
+<td>H1</td>
+<td>Cormorant SemiBold</td>
+<td>600</td>
+<td>40px / 2.5rem</td>
+<td>-0.01em</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>Cormorant SemiBold</td>
+<td>600</td>
+<td>28px / 1.75rem</td>
+<td>0</td>
+</tr>
+<tr>
+<td>H3</td>
+<td>Inter Semibold</td>
+<td>600</td>
+<td>20px / 1.25rem</td>
+<td>-0.005em</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter Regular</td>
+<td>400</td>
+<td>16px / 1rem</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter Regular</td>
+<td>400</td>
+<td>13px / 0.8125rem</td>
+<td>0.01em</td>
+</tr>
+<tr>
+<td>Caps</td>
+<td>Inter Medium</td>
+<td>500</td>
+<td>11-12px</td>
+<td><strong>0.18em</strong> (tracking generoso)</td>
+</tr>
+</tbody></table>
+<p><strong>Regra editorial</strong>: serifa pra emoção, sans pra função. Mistura sem medo.</p>
+<hr>
+<h2 id="🔖-3-conceitos-de-logo-escolher-1-ou-mistura">🔖 3 Conceitos de Logo (escolher 1 ou mistura)</h2>
+<p>Logos abaixo são SVG vetoriais — abre o HTML pra ver renderizados em alta qualidade.</p>
+<h3 id="conceito-1--wordmark-editorial-italiano">Conceito 1 — Wordmark Editorial Italiano</h3>
+<p>Wordmark "Amalfi" em <strong>Cormorant Italic</strong> (a alma da direção). "company" em Inter caps espaçado. Mais "italiano puro".</p>
+<svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#FAF8F3; max-width:600px; width:100%; border-radius:8px;">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&amp;family=Inter:wght@500&amp;display=swap');
+    .a1-word { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; fill: #1B3A5C; }
+    .a1-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #6B6864; letter-spacing: 0.4em; }
+    .a1-rule { stroke: #C8A560; stroke-width: 1; }
+  </style>
+  <text x="300" y="140" text-anchor="middle" font-size="120" class="a1-word">Amalfi</text>
+  <line x1="240" y1="170" x2="360" y2="170" class="a1-rule"></line>
+  <text x="300" y="200" text-anchor="middle" font-size="13" class="a1-tag">COMPANY</text>
+</svg>
+
+<p><strong>Uso</strong>: marca principal, cabeçalho de site, capa de embalagem, cartão de visita.</p>
+<hr>
+<h3 id="conceito-2--monograma-a--wordmark-com-filete-dourado">Conceito 2 — Monograma A + Wordmark (com filete dourado)</h3>
+<p>Letra "A" em emblema circular (estilo Le Labo, Aesop). Wordmark ao lado. Filete champagne discreto. Mais <strong>completo</strong>, ar de "marca de verdade".</p>
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="background:#FAF8F3; max-width:720px; width:100%; border-radius:8px;">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;0,600&amp;family=Inter:wght@500&amp;display=swap');
+    .a2-word { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; fill: #1B3A5C; }
+    .a2-mono { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; fill: #1B3A5C; }
+    .a2-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #6B6864; letter-spacing: 0.36em; }
+    .a2-ring { fill: none; stroke: #1B3A5C; stroke-width: 1.5; }
+    .a2-gold { fill: none; stroke: #C8A560; stroke-width: 1; }
+  </style>
+  <!-- Monograma -->
+  <circle cx="100" cy="100" r="68" class="a2-ring"></circle>
+  <circle cx="100" cy="100" r="60" class="a2-gold"></circle>
+  <text x="100" y="128" text-anchor="middle" font-size="86" class="a2-mono">A</text>
+  <!-- Wordmark -->
+  <text x="220" y="115" font-size="80" class="a2-word">Amalfi</text>
+  <text x="222" y="148" font-size="11" class="a2-tag">COMPANY · COSTA AMALFITANA</text>
+</svg>
+
+<p><strong>Uso</strong>: lockup completo pra papelaria premium, redes sociais (avatar = só monograma), embalagem, dashboard.</p>
+<hr>
+<h3 id="conceito-3--sans-whisper-appletesla-dna-30-a">Conceito 3 — Sans Whisper (Apple/Tesla DNA, 30% A)</h3>
+<p>"AMALFI" em <strong>Inter Light caps</strong> com tracking Apple-style. Ponto coral (acento sangue mediterrâneo). Mais <strong>moderno tech</strong>.</p>
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" style="background:#FAF8F3; max-width:600px; width:100%; border-radius:8px;">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;500&amp;display=swap');
+    .a3-word { font-family: 'Inter', -apple-system, sans-serif; font-weight: 200; fill: #1B3A5C; letter-spacing: 0.18em; }
+    .a3-tag { font-family: 'Inter', sans-serif; font-weight: 500; fill: #6B6864; letter-spacing: 0.36em; }
+    .a3-dot { fill: #D97757; }
+  </style>
+  <text x="300" y="120" text-anchor="middle" font-size="64" class="a3-word">AMALFI</text>
+  <circle cx="300" cy="142" r="3" class="a3-dot"></circle>
+  <text x="300" y="170" text-anchor="middle" font-size="11" class="a3-tag">COMPANY</text>
+</svg>
+
+<p><strong>Uso</strong>: app interface (header), favicon, watermark de imagem produto, contextos onde precisa "desaparecer".</p>
+<hr>
+<h3 id="recomendação-uma">Recomendação Uma</h3>
+<p>Levar os <strong>três</strong>, mas usá-los em <strong>contextos diferentes</strong> dentro do mesmo sistema:</p>
+<ul>
+<li><strong>Conceito 1</strong> = identidade principal (papelaria, social, embalagem)</li>
+<li><strong>Conceito 2</strong> = lockup completo pra contextos formais (cartão, capa de PDF, abertura de site)</li>
+<li><strong>Conceito 3</strong> = "modo trabalho" (UI do anuncio-app, favicon, header pequeno)</li>
+</ul>
+<p>Não escolher é também uma escolha sofisticada — Apple usa wordmark + monograma + ícone, todos coerentes.</p>
+<hr>
+<h2 id="🗣️-tom-de-voz">🗣️ Tom de Voz</h2>
+<h3 id="princípios">Princípios</h3>
+<ul>
+<li><strong>Claro e conciso</strong> (Apple-DNA): nunca enche linguiça, vai direto.</li>
+<li><strong>Quente mediterrâneo</strong> (Costa-DNA): permite calor, especialmente em copy de produto. "Esta tomada chegou pra ficar" (sem "INCRÍVEL!!!" exagerado).</li>
+<li><strong>Confiante mas humilde</strong>: não promete o impossível. Não usa superlativos vazios ("o melhor", "único") — usa <strong>provas e específicos</strong> ("5 anos garantia", "padrão NBR 14136").</li>
+<li><strong>pt-BR fluente, não traduzido</strong>. Sem anglicismos desnecessários.</li>
+</ul>
+<h3 id="léxico-sim">Léxico SIM</h3>
+<p><em>Sofisticada · Cuidada · Selecionada · Curada · Atemporal · Discreta · Elegante · Funcional · Honesta · Considerada · Para casa · Para ficar</em></p>
+<h3 id="léxico-não">Léxico NÃO</h3>
+<p><em>Promoção imperdível · Best seller · Único · Incrível · Imbatível · Top vendido · Use já · Aproveite · 🚀✨💯🔥 (emoji-feirinha)</em></p>
+<hr>
+<h2 id="🖼️-aplicação-por-contexto-sketches-verbais">🖼️ Aplicação por Contexto (sketches verbais)</h2>
+<h3 id="1-whatsapp-comercial-banner">1. WhatsApp Comercial Banner</h3>
+<ul>
+<li>Fundo Caiado <code>#FAF8F3</code></li>
+<li>Logo Conceito 1 (wordmark editorial) centralizado</li>
+<li>Tagline pequena Inter caps: <code>SOFISTICAÇÃO PARA SUA CASA</code></li>
+<li>Filete champagne sutil</li>
+</ul>
+<h3 id="2-anuncio-app-futuro-web-app--estrutura-gumpinho-paleta-amalfi">2. Anuncio-App (futuro web app — estrutura GUMPINHO, paleta Amalfi)</h3>
+<ul>
+<li><strong>Dark mode default</strong> — fundo Carvão <code>#0D0F12</code></li>
+<li>Sidebar form esquerda (estrutura GUMPINHO) — bordas Pedra 800</li>
+<li>Header: logo Conceito 3 (Sans Whisper) + ações</li>
+<li>Tipografia: Inter pra UI 100%, Cormorant Italic só pra títulos de seção ("Análise de Mercado", "Briefings de Imagem")</li>
+<li>Botão primário: Caiado em fundo Tirreno (light) ou Tirreno em fundo Caiado (dark)</li>
+<li>Acentos coral só em alerts/badges importantes</li>
+<li><strong>Zero neon. Zero ciano. Zero vermelho-ácido.</strong></li>
+</ul>
+<h3 id="3-cartão-de-visita-futuro">3. Cartão de Visita (futuro)</h3>
+<ul>
+<li>Papel offwhite texturizado (estilo Aesop)</li>
+<li>Frente: logo Conceito 2 (lockup completo) centralizado, embossing do filete champagne</li>
+<li>Verso: nome + cargo Inter Light, contato Inter Regular, sem ícone</li>
+</ul>
+<h3 id="4-embalagem-futuro">4. Embalagem (futuro)</h3>
+<ul>
+<li>Etiqueta papel kraft natural ou pergaminho</li>
+<li>Logo Conceito 1, único elemento visual</li>
+<li>Carimbo champagne discreto na parte de trás (autenticidade)</li>
+</ul>
+<h3 id="5-listing-amazon-marco">5. Listing Amazon (Marco)</h3>
+<ul>
+<li>Briefings de imagem mantêm produto isolado fundo branco puro (regra Amazon — não muda)</li>
+<li>A+ Content (futuro, se Brand Registry): templates Cormorant headlines + Inter body, paleta Amalfi</li>
+<li>Watermark sutil dourado champagne em canto inferior direito (opcional)</li>
+</ul>
+<h3 id="6-redes-sociais-futuro">6. Redes Sociais (futuro)</h3>
+<ul>
+<li>Instagram: feed em grade editorial estilo <em>Cabana Magazine</em> — produto em ambientes reais, paleta consistente, espaços generosos, fontes Cormorant pra captions</li>
+<li>Avatar: monograma Conceito 2 isolado (círculo)</li>
+</ul>
+<hr>
+<h2 id="⚠️-próximos-passos-após-você-aprovar-esta-direção">⚠️ Próximos passos (após você aprovar esta direção)</h2>
+<ol>
+<li><strong>Você reage</strong> a este doc — gostou? Mistura algo? Refaz algo?</li>
+<li>Eu (Uma) detalho <strong>logo escolhido</strong> com:<ul>
+<li>5-7 variantes (positivo/negativo, monocromática, alturas mínimas, lockups horizontal/vertical)</li>
+<li>Construção (grade, proporções)</li>
+<li>Área de proteção</li>
+<li>Usos proibidos</li>
+</ul>
+</li>
+<li>Construo o <strong>brandbook completo</strong> (PDF + HTML) com tudo + templates de aplicação</li>
+<li>Extraio <strong>design tokens</strong> (<code>tokens.css</code>, <code>tokens.tailwind.config.js</code>, <code>tokens.json</code> DTCG-compliant)</li>
+<li>Atualizo <code>agents/amalfi-amazon/assets/listing.css</code> (Marco) com a paleta Amalfi — substitui o verde-água atual</li>
+<li>Quando o anuncio-app for construído (Caminho 3), <code>@dev</code> consome diretamente esses tokens</li>
+</ol>
+<hr>
+<p><em>Direção apresentada por @ux-design-expert (Uma) em 2026-05-05.</em>
+<em>Versão: v1 (rascunho pra aprovação).</em></p>
+
+	
+
+</body></html>

@@ -7,15 +7,17 @@
 
 ## 🏢 Sobre o Owner (Amalfi Company)
 
-- **Razão social**: coimbrafilmes / Amalfi Company
+- **Marca**: Amalfi Company (operação **independente** — NÃO confundir com Coimbra Filmes, que é outro negócio do mesmo dono via email contato@coimbrafilmescriativos.com.br)
+- **Origem do nome**: viagem à Costa Amalfitana (Itália) em 2025 — inspiração mediterrânea
 - **Tipo**: revendedor Amazon BR
-- **Marca própria**: NÃO (decisão consciente). Cadastra produtos como "Genérico"
+- **Marca própria nos produtos**: NÃO (decisão atual) — cadastra produtos como "Genérico" no Seller Central. Mas a Amalfi Company **vai virar marca de verdade no futuro** ("se Deus quiser")
 - **Estratégia**: catálogo curado de **curva A** (~10 SKUs), não volume
-- **Categoria principal**: Casa
+- **Categoria principal**: Casa (decoração + utilidade)
+- **Público-alvo dos produtos**: 70% mulher / 30% homem, 25-50 anos, classe B/B+
 - **Mercado único**: Amazon Brasil (não opera US/EU)
 - **Modelo logístico preferido**: FBA (a confirmar caso a caso)
 - **Operação**: single-user (apenas o owner)
-- **GitHub**: `coimbrafilmes/amalfi-company` (repo privado)
+- **Posicionamento desejado**: **sofisticação dentro do ecommerce**
 
 ---
 
@@ -55,6 +57,23 @@ Antes de gerar QUALQUER conteúdo:
 - Vocabulário Amazon natural (BSR, FBA, Buy Box) sem traduzir
 - Emoji baixo (📦 nas assinaturas, ✅/⚠️/🚨 quando útil)
 
+### Regra #6 — Sem Preço (decisão owner 2026-05-05)
+- **NUNCA** perguntar faixa de preço, custo ou margem em elicitações
+- **NUNCA** sugerir preço alvo em listings, audits ou outputs
+- Owner usa **planilha própria** pra precificação — agente fica fora dessa decisão
+- Aplicar a TODOS os SKUs (atuais e futuros)
+- Elicitação consolidada agora tem **7 campos** (ex-8): voltagem, autonomia, material, dimensões, peso, conteúdo, categoria, modo de venda (unidade/kit) — sem preço
+
+### Regra #7 — Sempre renderizar PDF + HTML (decisão owner 2026-05-05)
+- Após gerar QUALQUER output `.md` (listing, audit, ads-analysis), rodar **automaticamente**:
+  ```bash
+  ./agents/amalfi-amazon/scripts/render.sh agents/amalfi-amazon/outputs/{path}/{file}.md
+  ```
+- Gera **dois arquivos** ao lado do `.md`: `.pdf` (impressão/offline) e `.html` (preview no navegador, mais bonito pra revisar)
+- CSS aplicado: `agents/amalfi-amazon/assets/listing.css` (paleta verde-água Amalfi, tipografia limpa, mobile-first)
+- Owner usa o HTML/PDF pra **copy-paste** no Seller Central — não precisa abrir o markdown
+- Em caso de regeneração (`*regenerate-listing`), apaga PDF/HTML antigos e re-renderiza
+
 ---
 
 ## 📊 Padrões Aprendidos (atualizar conforme uso)
@@ -76,6 +95,8 @@ _(vazio inicialmente)_
 - 2026-05-04: Owner não quer criar marca própria (modelo revenda)
 - 2026-05-04: Owner usa Higgsfield pra geração de imagens
 - 2026-05-04: Owner trabalha solo (sem equipe)
+- 2026-05-05: Owner **não quer referência de preço** em outputs nem elicitações — usa planilha própria
+- 2026-05-05: Primeiro SKU = Tomada 2P+T 10A 250V (Schneider Lissê) — escolheu **Caminho B** (listing Genérico sem mencionar Schneider, copy 100% própria)
 
 ---
 

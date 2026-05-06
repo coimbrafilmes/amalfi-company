@@ -1,0 +1,46 @@
+# Bottega · by Amalfi & Co. — Netlify config
+# Ref: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+# netlify.toml vive em packages/bottega/. Site settings define base = "packages/bottega"
+# no painel — não duplicamos aqui (causaria caminho aninhado).
+[build]
+  publish = "dist"
+  command = "npm run build"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--prefer-offline --no-audit --progress=false"
+
+# Functions: deixa Netlify usar bundler default (zisi) que mantem hooks runtime.
+# Esbuild como bundler costuma quebrar os hooks que injetam Blobs context.
+[functions]
+  external_node_modules = ["@google/genai", "@netlify/blobs"]
+
+# SPA routing — qualquer rota não encontrada cai no index (React Router resolve).
+# Netlify roteia /.netlify/functions/* automaticamente; só precisamos do catch-all.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de segurança
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache estático longo pra assets versionados
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Functions: sem cache + CORS restrito ao próprio domínio
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Cache-Control = "no-store"

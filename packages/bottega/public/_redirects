@@ -1,0 +1,2 @@
+# Fallback SPA routing (caso netlify.toml não seja lido). React Router resolve client-side.
+/*    /index.html    200
