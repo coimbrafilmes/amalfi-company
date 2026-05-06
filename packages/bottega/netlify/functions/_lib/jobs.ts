@@ -27,7 +27,14 @@ export interface JobBase {
 const STORE_NAME = 'bottega-jobs';
 
 export function jobsStore() {
-  return getStore({ name: STORE_NAME, consistency: 'strong' });
+  // Em produção (Netlify Functions runtime), o contexto Blobs é injetado automaticamente.
+  // Em deploys CLI sem connect Git, NETLIFY_SITE_ID e NETLIFY_BLOBS_TOKEN viabilizam o fallback.
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN ?? process.env.NETLIFY_API_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token, consistency: 'strong' });
+  }
+  return getStore(STORE_NAME);
 }
 
 export async function setJob(job: JobBase): Promise<void> {

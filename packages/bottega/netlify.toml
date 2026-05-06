@@ -1,8 +1,9 @@
 # Bottega · by Amalfi & Co. — Netlify config
 # Ref: https://docs.netlify.com/configure-builds/file-based-configuration/
 
+# netlify.toml vive em packages/bottega/. Site settings define base = "packages/bottega"
+# no painel — não duplicamos aqui (causaria caminho aninhado).
 [build]
-  base = "packages/bottega"
   publish = "dist"
   command = "npm run build"
   functions = "netlify/functions"
