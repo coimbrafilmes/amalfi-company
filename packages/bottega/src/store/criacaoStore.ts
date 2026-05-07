@@ -5,10 +5,10 @@ import { USE_MOCK } from '../lib/utils/env';
 
 const formInicial = (): CriacaoForm => ({
   nomeProduto: '',
-  fotoBase64: undefined,
+  fotosBase64: undefined,
   detalhesTecnicos: '',
   tituloAtual: '',
-  numeroImagens: 9,
+  numeroImagens: 7,
   estiloImagem: 'lifestyle',
 });
 

@@ -194,29 +194,6 @@ Especificações técnicas:
 
 Indicado para residências, escritórios, lojas, consultórios, ambientes comerciais. Combina com decoração moderna, minimalista, industrial ou clássica.`,
 
-  descriptionHTML: `
-<h2>Atualize sua casa ao padrão NBR 14136</h2>
-<p><strong>Esta Tomada 2P+T 10A 250V Branca</strong> entrega conexão segura e durável em qualquer ambiente. Compatível com o padrão brasileiro de 3 pinos redondos, funciona em redes 127V e 220V.</p>
-
-<h2>O que vem na embalagem</h2>
-<ul>
-  <li>1 Tomada 2P+T 10A 250V branca</li>
-  <li>1 Suporte 4x2 (espelho)</li>
-  <li>2 Parafusos de fixação</li>
-</ul>
-
-<h2>Especificações</h2>
-<table>
-  <tr><th>Corrente máxima</th><td>10 amperes</td></tr>
-  <tr><th>Tensão</th><td>250V (compatível com 127V e 220V)</td></tr>
-  <tr><th>Padrão</th><td>NBR 14136 (2 polos + terra)</td></tr>
-  <tr><th>Material</th><td>Termoplástico branco com proteção UV</td></tr>
-  <tr><th>Encaixe</th><td>Caixa 4x2 padrão brasileiro</td></tr>
-</table>
-
-<p><em>Indicado para residências, escritórios, lojas, consultórios. Combina com decoração moderna, minimalista, industrial ou clássica.</em></p>
-`,
-
   amazonBulletPoints: [
     'PADRÃO BRASILEIRO NBR 14136: Tomada 2P+T (2 polos + terra) compatível com o padrão obrigatório no Brasil desde 2010. Plug de 3 pinos redondos, encaixa em caixas 4x2 padrão de toda residência e comércio modernos.',
     '10A / 250V — APARELHOS ATÉ 1100W EM 127V OU 2200W EM 220V: Suporta carga ideal para o dia a dia. TV, micro-ondas, ferro de passar, ventilador, computador, carregadores de notebook.',
@@ -382,12 +359,34 @@ export function gerarMockImagens(briefings: BriefingImagem[]): ImagemGerada[] {
     const cor = PALETA_HEX[b.paletaCor ?? 'mar'] ?? PALETA_HEX.mar;
     return {
       briefingNumero: b.numero,
+      variante: 'anuncio' as const,
       base64: svgPlaceholder(cor, `cena ${b.numero}`),
-      largura: 600,
-      altura: 600,
+      largura: 1024,
+      altura: 1024,
       modelUsado: 'mock-svg',
     };
   });
+}
+
+// Mock briefings A+ (V3)
+const mockBriefingsAPlus: import('../../types/anuncio').BriefingAPlus[] = [
+  { numero: 1, estagio: 'aplus-header', titulo: 'A+ hero', prompt: 'mock' },
+  { numero: 2, estagio: 'aplus-beneficio-1', titulo: 'Antes/Depois', prompt: 'mock' },
+  { numero: 3, estagio: 'aplus-beneficio-2', titulo: 'Specs', prompt: 'mock' },
+  { numero: 4, estagio: 'aplus-comparacao', titulo: 'Casos de uso', prompt: 'mock' },
+  { numero: 5, estagio: 'aplus-lifestyle-amplo', titulo: 'Validação', prompt: 'mock' },
+  { numero: 6, estagio: 'aplus-detalhe-tecnico', titulo: 'CTA final', prompt: 'mock' },
+];
+
+function gerarMockImagensAPlus(): ImagemGerada[] {
+  return mockBriefingsAPlus.map((b, i) => ({
+    briefingNumero: b.numero,
+    variante: 'aplus' as const,
+    base64: svgPlaceholder(Object.values(PALETA_HEX)[i % 6] ?? PALETA_HEX.mar, `A+ ${b.numero}`),
+    largura: 970,
+    altura: 600,
+    modelUsado: 'mock-svg',
+  }));
 }
 
 // ============================================================
@@ -395,7 +394,6 @@ export function gerarMockImagens(briefings: BriefingImagem[]): ImagemGerada[] {
 // ============================================================
 
 export async function gerarMockTudo(_input: CriacaoForm): Promise<CriacaoResults> {
-  // simula latência editorial — nem rápido demais nem lento demais
   await delay(900);
   return {
     analise: mockAnalise,
@@ -403,9 +401,11 @@ export async function gerarMockTudo(_input: CriacaoForm): Promise<CriacaoResults
     titulos: mockTitulos,
     descricao: mockDescricao,
     briefings: mockBriefings,
-    imagens: gerarMockImagens(mockBriefings),
+    briefingsAPlus: mockBriefingsAPlus,
+    imagens: [...gerarMockImagens(mockBriefings), ...gerarMockImagensAPlus()],
     geradoEm: new Date().toISOString(),
     modoGeracao: 'mock',
+    schemaVersion: 3,
   };
 }
 

@@ -140,7 +140,7 @@ Retorne JSON estrito:
 }
 
 // ============================================================
-// 4. DESCRIÇÃO + BULLETS + FAQ + HTML A+
+// 4. DESCRIÇÃO (plain text Amazon-compatible — sem HTML)
 // ============================================================
 
 export function promptDescricao(form: CriacaoForm, analiseContext: string): string {
@@ -151,31 +151,57 @@ CONTEXTO DA ANÁLISE: ${analiseContext}
 
 Crie a página de produto completa pro anúncio Amazon BR.
 
-ENTREGUE 5 ARTEFATOS:
-1. description: texto corrido (1.500-2.000 chars) — descrição editorial, divisível em parágrafos curtos.
-2. descriptionHTML: mesmo conteúdo em HTML A+ style (h2, p, ul, table) — pra A+ Content premium.
-3. amazonBulletPoints: 5 bullets no formato "HEADLINE EM CAPS: descrição com benefício específico." (200-250 chars cada).
-4. bulletPoints: 5 bullets curtos genéricos (1 linha cada).
-5. faq: 4-6 perguntas frequentes do consumidor BR + respostas curtas (2-3 linhas).
+⚠️ AMAZON DEPRECIOU HTML EM DESCRIPTIONS desde julho/2021. Description deve ser
+PLAIN TEXT puro (sem <p>, <br>, <ul>, etc). Use \\n\\n entre parágrafos pra
+quebra de linha. Bullets também são plain text.
+
+ENTREGUE 4 ARTEFATOS (JSON estrito):
+1. description: PLAIN TEXT (1500-2500 chars). Use \\n\\n pra parágrafos. ZERO HTML.
+2. amazonBulletPoints: 5 bullets formato "HEADLINE EM CAPS: descrição com benefício." (200-250 chars cada). Plain text.
+3. bulletPoints: 5 bullets curtos genéricos (1 linha cada). Plain text.
+4. faq: 4-6 perguntas frequentes do consumidor BR + respostas curtas.
 
 REGRAS:
 - pt-BR fluente, não traduzido.
 - Use SOMENTE fatos dos detalhes técnicos. Zero invenção.
-- Sem URLs, sem emails, sem telefones.
+- Sem URLs, emails, telefones.
 - Sem palavras proibidas Amazon: "Best seller", "Amazon's Choice", "Top vendido".
+- ABSOLUTAMENTE NENHUMA tag HTML em description. Nem <br>. Nem &nbsp;.
 
 ${VOZ_AMALFI}
 
 Retorne JSON estrito:
 {
-  "description": "...",
-  "descriptionHTML": "<h2>...</h2><p>...</p>",
+  "description": "Parágrafo um.\\n\\nParágrafo dois.\\n\\nParágrafo três.",
   "amazonBulletPoints": ["...", "...", "...", "...", "..."],
   "bulletPoints": ["...", "...", "...", "...", "..."],
   "faq": [
     { "pergunta": "...", "resposta": "..." }
   ]
 }
+`.trim();
+}
+
+// ============================================================
+// 4b. VISUAL SPEC (Gemini Vision lê fotos do produto)
+// ============================================================
+
+export function promptVisualSpec(): string {
+  return `
+Analise as imagens deste produto e descreva visualmente em detalhes técnicos
+EXATOS, pra que outra IA possa gerar imagens novas FIÉIS ao produto real.
+
+Capture:
+- Cor exata (use nomes técnicos: "branco osso", "off-white #F8F4EE", etc)
+- Formato e proporções
+- Materiais visíveis (vidro canelado, metal escovado dourado, ABS branco, etc)
+- Marcas, logos, gravações (transcreva texto se visível)
+- Detalhes funcionais (botões, encaixes, texturas, acabamentos)
+- Dimensões aparentes (relativas)
+- Características distintivas que distinguem do produto genérico
+
+Responda em INGLÊS, parágrafo único, 200-400 palavras, denso e factual.
+Comece com: "Product description for image generation:"
 `.trim();
 }
 

@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/dm-serif-display": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
     "@google/genai": "^1.52.0",
     "@hookform/resolvers": "^5.2.2",
     "@netlify/blobs": "^10.7.4",
@@ -19,10 +22,13 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "clsx": "^2.1.1",
+    "lucide-static": "^1.14.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.75.0",
     "react-router-dom": "^7.15.0",
+    "sharp": "^0.34.5",
+    "text-to-svg": "^3.1.5",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
   },
@@ -34,6 +40,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.5.0",
+    "esbuild": "^0.28.0",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",

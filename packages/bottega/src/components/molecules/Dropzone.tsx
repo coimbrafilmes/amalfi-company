@@ -1,27 +1,36 @@
 import { useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 import { cn } from '../../lib/utils/cn';
+import { resizeImageToBase64 } from '../../lib/utils/resizeImage';
 
 interface DropzoneProps {
-  onFile: (file: File, base64: string) => void;
-  preview?: string;
+  /** Recebe array de data URIs base64 (já redimensionados pra 1024px). */
+  onFiles: (base64s: string[]) => void;
+  previews?: string[];
   className?: string;
-  /** Limite em MB (default: 10) */
-  maxSizeMB?: number;
+  maxFiles?: number;       // default 3
+  maxSizeMB?: number;      // default 12
 }
 
 const ACCEPTED_TYPES = /^image\/(png|jpeg|jpg|webp|heic|heif)$/i;
 const ACCEPTED_EXT = /\.(png|jpe?g|webp|heic|heif)$/i;
 
 /**
- * Dropzone — zona de drop pra foto crua.
- * Princípio: bg Osso, borda dashed Tinta-15, hover Tinta forte.
- * Validação: tipo (PNG/JPG/WEBP/HEIC) + tamanho (default 10 MB).
+ * Dropzone múltiplo — aceita até N fotos de referência do produto.
+ * Resize client-side via canvas (max 1024×1024) antes de devolver,
+ * pra evitar payload >6MB no Netlify Function.
  */
-export function Dropzone({ onFile, preview, className, maxSizeMB = 10 }: DropzoneProps) {
+export function Dropzone({
+  onFiles,
+  previews = [],
+  className,
+  maxFiles = 3,
+  maxSizeMB = 12,
+}: DropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const validate = (file: File): string | null => {
     const isImage = ACCEPTED_TYPES.test(file.type) || ACCEPTED_EXT.test(file.name);
@@ -34,45 +43,65 @@ export function Dropzone({ onFile, preview, className, maxSizeMB = 10 }: Dropzon
     return null;
   };
 
-  const handleFile = (file: File) => {
-    const err = validate(file);
-    if (err) {
-      setError(err);
+  const handleFiles = async (files: FileList | File[]) => {
+    const incoming = Array.from(files);
+    const slotsLeft = maxFiles - previews.length;
+    if (slotsLeft <= 0) {
+      setError(`limite de ${maxFiles} fotos atingido. remova uma pra adicionar outra.`);
       return;
     }
+    const slice = incoming.slice(0, slotsLeft);
     setError(null);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      onFile(file, base64);
-    };
-    reader.onerror = () => {
-      setError('falhou ao ler o arquivo. tente outro.');
-    };
-    reader.readAsDataURL(file);
+    setBusy(true);
+    try {
+      const out: string[] = [];
+      for (const file of slice) {
+        const err = validate(file);
+        if (err) {
+          setError(err);
+          continue;
+        }
+        const resized = await resizeImageToBase64(file);
+        out.push(resized);
+      }
+      if (out.length > 0) {
+        onFiles([...previews, ...out]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'falha ao processar imagem');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeAt = (idx: number) => {
+    onFiles(previews.filter((_, i) => i !== idx));
+    setError(null);
   };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+    void handleFiles(e.dataTransfer.files);
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    if (e.target.files) void handleFiles(e.target.files);
+    if (inputRef.current) inputRef.current.value = '';
   };
+
+  const slotsLeft = maxFiles - previews.length;
 
   return (
     <div className={className}>
       <div
-        onClick={() => inputRef.current?.click()}
+        onClick={() => slotsLeft > 0 && !busy && inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setOver(true); }}
         onDragLeave={() => setOver(false)}
         onDrop={onDrop}
         className={cn(
-          'bg-osso border-thick border-dashed py-10 px-6 text-center cursor-pointer transition-colors duration-fast',
+          'bg-osso border-thick border-dashed py-8 px-6 text-center transition-colors duration-fast',
+          slotsLeft > 0 && !busy ? 'cursor-pointer' : 'cursor-default opacity-60',
           over ? 'border-tinta bg-areia/30' : 'border-tinta-15 hover:border-tinta hover:bg-areia/20',
         )}
       >
@@ -80,19 +109,47 @@ export function Dropzone({ onFile, preview, className, maxSizeMB = 10 }: Dropzon
           ref={inputRef}
           type="file"
           accept="image/png,image/jpeg,image/webp,image/heic,image/heif,.heic,.heif"
+          multiple={maxFiles > 1}
           className="hidden"
           onChange={onChange}
         />
-        {preview ? (
-          <div className="flex flex-col items-center gap-3">
-            <img src={preview} alt="prévia" className="max-h-48 max-w-full object-contain" />
-            <span className="font-editorial italic text-[13px] text-tinta-50">clique pra trocar</span>
+        {previews.length > 0 ? (
+          <div className="space-y-3">
+            <div className="flex justify-center gap-3 flex-wrap">
+              {previews.map((p, idx) => (
+                <div key={idx} className="relative group">
+                  <img
+                    src={p}
+                    alt={`prévia ${idx + 1}`}
+                    className="h-28 w-28 object-cover border border-tinta-15"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeAt(idx);
+                    }}
+                    aria-label={`remover foto ${idx + 1}`}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-tinta text-osso text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-terracota"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <span className="font-editorial italic text-[13px] text-tinta-50 block">
+              {slotsLeft > 0
+                ? `clique pra adicionar mais (${slotsLeft} disponíveis)`
+                : `${maxFiles} de ${maxFiles} · use × pra remover`}
+            </span>
           </div>
         ) : (
           <>
-            <div className="font-display text-2xl mb-1.5 leading-tight text-tinta">Arraste uma foto.</div>
+            <div className="font-display text-2xl mb-1.5 leading-tight text-tinta">
+              {busy ? 'Processando…' : 'Arraste até 3 fotos.'}
+            </div>
             <div className="font-editorial italic text-[14px] text-tinta-50">
-              PNG, JPG, WEBP ou HEIC · até {maxSizeMB} MB · luz natural lateral é a nossa preferida.
+              PNG, JPG, WEBP ou HEIC · até {maxSizeMB} MB cada · referências pra geração fiel.
             </div>
           </>
         )}

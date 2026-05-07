@@ -2,12 +2,13 @@ import { z } from 'zod';
 
 /**
  * Schemas Zod pra validar respostas Gemini antes de aceitar.
- * Bounds explícitos protegem contra alucinação (Gemini retornar 1000 itens).
+ * Bounds explícitos protegem contra alucinação.
+ *
+ * V3: removido briefingsSchema (pipeline gera briefings server-side por SlotKind)
+ *     e descriptionHTML (Amazon não aceita HTML em descriptions).
  */
 
 const shortText = z.string().min(1).max(2_000);
-const mediumText = z.string().min(1).max(8_000);
-const longHtml = z.string().min(1).max(20_000);
 
 export const analiseSchema = z.object({
   persona: z.object({
@@ -47,24 +48,21 @@ export const titulosSchema = z.object({
   dor: z.array(tituloSchema).min(3).max(8),
 });
 
+/**
+ * Descrição plain text Amazon-compatible.
+ * Amazon depreciou HTML em descriptions desde julho/2021.
+ */
+const plainTextNoHtml = z
+  .string()
+  .min(50)
+  .max(3_500)
+  .refine((s) => !/<[a-z][^>]*>/i.test(s), {
+    message: 'description deve ser plain text (Amazon não aceita tags HTML)',
+  });
+
 export const descricaoSchema = z.object({
-  description: mediumText,
-  descriptionHTML: longHtml,
+  description: plainTextNoHtml,
   amazonBulletPoints: z.array(shortText).min(3).max(7),
   bulletPoints: z.array(shortText).min(3).max(7),
   faq: z.array(z.object({ pergunta: shortText, resposta: shortText })).min(2).max(8),
 });
-
-export const briefingSchema = z.object({
-  numero: z.number().int().min(1).max(20),
-  isCover: z.boolean(),
-  estagio: z.enum(['capa', 'gancho', 'dor', 'mecanismo', 'prova', 'objecao', 'decisao', 'lifestyle', 'detalhe']),
-  titulo: shortText,
-  prompt: z.string().min(20).max(4_000),
-  negativePrompt: z.string().max(1_500).optional(),
-  overlayText: z.string().max(80).optional(),
-  dataPoints: z.array(shortText).min(0).max(10),
-  paletaCor: z.enum(['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline']).optional(),
-});
-
-export const briefingsSchema = z.array(briefingSchema).min(1).max(15);
