@@ -7,9 +7,16 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import type { IconKey } from './types';
 
-const ICON_DIR = path.resolve('node_modules/lucide-static/icons');
+// require.resolve resolve absoluto independente de process.cwd() — funciona em
+// dev local e em Lambda Netlify (onde cwd != bundle root).
+const requireFromHere = createRequire(import.meta.url);
+const ICON_DIR = path.join(
+  path.dirname(requireFromHere.resolve('lucide-static/package.json')),
+  'icons',
+);
 
 const ICON_FILE: Record<IconKey, string> = {
   drop: 'droplet.svg',

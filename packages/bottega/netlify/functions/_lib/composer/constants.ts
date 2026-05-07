@@ -20,16 +20,18 @@ export const COLOR = {
   black: '#000000',
 } as const;
 
+// @fontsource fornece .woff (text-to-svg + opentype.js aceita).
+// latin-ext cobre acentos pt-BR (ã, ç, é, etc).
+// Tupla [package, internalPath] pra resolução via require.resolve em runtime —
+// path.resolve(<relativo>) quebra em Lambda Netlify (cwd != bundle root).
 export const FONT_PATH = {
-  // @fontsource fornece .woff (text-to-svg + opentype.js aceita)
-  // Usamos latin-ext pra cobrir acentos pt-BR (ã, ç, é, etc)
-  serif400: 'node_modules/@fontsource/dm-serif-display/files/dm-serif-display-latin-ext-400-normal.woff',
-  italic400: 'node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-ext-400-italic.woff',
-  italic500: 'node_modules/@fontsource/cormorant-garamond/files/cormorant-garamond-latin-ext-500-italic.woff',
-  sans400: 'node_modules/@fontsource/inter/files/inter-latin-ext-400-normal.woff',
-  sans500: 'node_modules/@fontsource/inter/files/inter-latin-ext-500-normal.woff',
-  sans600: 'node_modules/@fontsource/inter/files/inter-latin-ext-600-normal.woff',
-} as const;
+  serif400: ['@fontsource/dm-serif-display', 'files/dm-serif-display-latin-ext-400-normal.woff'],
+  italic400: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-ext-400-italic.woff'],
+  italic500: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-ext-500-italic.woff'],
+  sans400: ['@fontsource/inter', 'files/inter-latin-ext-400-normal.woff'],
+  sans500: ['@fontsource/inter', 'files/inter-latin-ext-500-normal.woff'],
+  sans600: ['@fontsource/inter', 'files/inter-latin-ext-600-normal.woff'],
+} as const satisfies Record<string, readonly [string, string]>;
 
 export type FontKey = keyof typeof FONT_PATH;
 

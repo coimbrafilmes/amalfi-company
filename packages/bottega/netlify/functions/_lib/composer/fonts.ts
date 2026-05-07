@@ -5,13 +5,20 @@
 
 import TextToSVG from 'text-to-svg';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { FONT_PATH, type FontKey } from './constants';
+
+// require.resolve resolve absoluto independente de process.cwd() — funciona em
+// dev local e em Lambda Netlify (onde cwd != bundle root).
+const requireFromHere = createRequire(import.meta.url);
 
 const cache: Partial<Record<FontKey, TextToSVG>> = {};
 
 function loadFont(key: FontKey): TextToSVG {
   if (cache[key]) return cache[key]!;
-  const fontFile = path.resolve(FONT_PATH[key]);
+  const [pkg, rel] = FONT_PATH[key];
+  const pkgRoot = path.dirname(requireFromHere.resolve(`${pkg}/package.json`));
+  const fontFile = path.join(pkgRoot, rel);
   const tts = TextToSVG.loadSync(fontFile);
   cache[key] = tts;
   return tts;
