@@ -67,7 +67,9 @@ export interface DescricaoResult {
   faq: FAQItem[];
 }
 
-// === Slot Kinds (V3) — 13 slots fixos ===
+// === Slot Kinds (V3.1) — 15 slots fixos ===
+// V3.1 adicionou aplus-premium (1464×600 hero amplificado) e aplus-comparison
+// (220×220 thumbnail pra Amazon Comparison Charts).
 export type SlotKind =
   | 'anuncio-capa'
   | 'anuncio-dimensoes'
@@ -81,7 +83,9 @@ export type SlotKind =
   | 'aplus-specs'
   | 'aplus-casos-uso'
   | 'aplus-validacao'
-  | 'aplus-cta';
+  | 'aplus-cta'
+  | 'aplus-premium'
+  | 'aplus-comparison';
 
 export type VarianteImagem = 'anuncio' | 'aplus';
 
@@ -100,23 +104,51 @@ export const SLOT_VARIANT: Record<SlotKind, VarianteImagem> = {
   'aplus-casos-uso': 'aplus',
   'aplus-validacao': 'aplus',
   'aplus-cta': 'aplus',
+  'aplus-premium': 'aplus',
+  'aplus-comparison': 'aplus',
 };
 
 /** Mapping centralizado: slot → dimensões (pixels). */
 export const SLOT_DIMENSIONS: Record<SlotKind, { w: number; h: number }> = {
-  'anuncio-capa': { w: 1024, h: 1024 },
-  'anuncio-dimensoes': { w: 1024, h: 1024 },
-  'anuncio-lifestyle-callouts': { w: 1024, h: 1024 },
-  'anuncio-comparativo': { w: 1024, h: 1024 },
-  'anuncio-aspiracional': { w: 1024, h: 1024 },
-  'anuncio-beneficios': { w: 1024, h: 1024 },
-  'anuncio-prova-final': { w: 1024, h: 1024 },
+  'anuncio-capa': { w: 2000, h: 2000 },
+  'anuncio-dimensoes': { w: 2000, h: 2000 },
+  'anuncio-lifestyle-callouts': { w: 2000, h: 2000 },
+  'anuncio-comparativo': { w: 2000, h: 2000 },
+  'anuncio-aspiracional': { w: 2000, h: 2000 },
+  'anuncio-beneficios': { w: 2000, h: 2000 },
+  'anuncio-prova-final': { w: 2000, h: 2000 },
   'aplus-header': { w: 970, h: 600 },
   'aplus-antes-depois': { w: 970, h: 600 },
   'aplus-specs': { w: 970, h: 600 },
   'aplus-casos-uso': { w: 970, h: 600 },
   'aplus-validacao': { w: 970, h: 600 },
   'aplus-cta': { w: 970, h: 600 },
+  'aplus-premium': { w: 1464, h: 600 },
+  'aplus-comparison': { w: 220, h: 220 },
+};
+
+/**
+ * Mapping centralizado: slot → aspect ratio do Gemini Image.
+ * Gemini suporta apenas '1:1', '4:3', '3:4', '16:9', '9:16'. Sharp depois faz crop center
+ * pra dim alvo do slot. Pra aplus-premium (2.44:1) usamos '16:9' (1.78:1) — mais próximo
+ * do alvo, com crop horizontal mínimo.
+ */
+export const SLOT_ASPECT_RATIO: Record<SlotKind, '1:1' | '4:3' | '16:9'> = {
+  'anuncio-capa': '1:1',
+  'anuncio-dimensoes': '1:1',
+  'anuncio-lifestyle-callouts': '1:1',
+  'anuncio-comparativo': '1:1',
+  'anuncio-aspiracional': '1:1',
+  'anuncio-beneficios': '1:1',
+  'anuncio-prova-final': '1:1',
+  'aplus-header': '4:3',
+  'aplus-antes-depois': '4:3',
+  'aplus-specs': '4:3',
+  'aplus-casos-uso': '4:3',
+  'aplus-validacao': '4:3',
+  'aplus-cta': '4:3',
+  'aplus-premium': '16:9',
+  'aplus-comparison': '1:1',
 };
 
 /** Ordem canônica dos slots (sequência de conversão). */
@@ -134,6 +166,8 @@ export const SLOT_ORDER: SlotKind[] = [
   'aplus-casos-uso',
   'aplus-validacao',
   'aplus-cta',
+  'aplus-premium',
+  'aplus-comparison',
 ];
 
 /** Labels human-friendly pra UI (sub-abas, tooltips). */
@@ -151,6 +185,8 @@ export const SLOT_LABEL: Record<SlotKind, string> = {
   'aplus-casos-uso': 'Casos de uso',
   'aplus-validacao': 'Validação',
   'aplus-cta': 'CTA final',
+  'aplus-premium': 'A+ Premium (1464×600)',
+  'aplus-comparison': 'A+ Comparison (220×220)',
 };
 
 /**
@@ -220,6 +256,8 @@ export interface CriacaoResults {
   keywords: KeywordsResult;
   titulos: TitulosResult;
   descricao: DescricaoResult;
+  /** V3.1+: 7 destaques punchy (paridade Gumpinho — carousel Amazon, social). */
+  destaques?: string[];
   briefings: BriefingImagem[];
   briefingsAPlus: BriefingAPlus[];
   imagens?: ImagemGerada[];

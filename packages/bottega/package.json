@@ -22,6 +22,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "clsx": "^2.1.1",
+    "jszip": "^3.10.1",
     "lucide-static": "^1.14.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

@@ -22,6 +22,15 @@ const VOICE_ANCHOR = `Style: serene, curated, premium-but-not-shouty, Brazilian 
 // a renderizar APENAS o produto exposto, sem qualquer embalagem comercial.
 const NO_PACKAGING_ANCHOR = `CRITICAL — render ONLY the bare product fully unpackaged. NO blister card, NO plastic wrap, NO cardboard backing, NO retail packaging, NO product tag, NO barcode label, NO brand sticker. Show the product as it appears AFTER being removed from its retail box, ready to use.`;
 
+// Reforco contra Gemini "preencher" negative space com tipografia ilegivel/labels falsos.
+// O composer vai adicionar todo texto depois — a CENA deve estar 100% limpa.
+const NO_TEXT_ANCHOR = `STRICT — ABSOLUTELY ZERO text, letters, words, numbers, signs, labels, captions, watermarks, logos, badges with text, price tags, or typography of ANY kind ANYWHERE in the image. The scene must be photographic only.`;
+
+// Critico para slot 3 (lifestyle-callouts): o composer adiciona EXATAMENTE 3 badges circulares.
+// Gemini nao pode gerar circulos decorativos extras (aneis, copos redondos em primeiro plano,
+// floroes circulares) que possam ser confundidos com badges adicionais.
+const NO_DECORATIVE_CIRCLES_ANCHOR = `IMPORTANT — DO NOT include any decorative circular elements, golden rings, round badges, circular plates, framed circles, or round overlays in the scene composition. Keep the background visually flat and free of round geometric accents.`;
+
 function fidelityClause(visualSpec?: string): string {
   if (!visualSpec) return '';
   return `\n\nIMPORTANT — render the EXACT product described:\n${visualSpec}`;
@@ -31,7 +40,7 @@ const PROMPTS: Record<SlotKind, (ctx: PromptCtx) => string> = {
   'anuncio-capa': ({ form, visualSpec }) => `
 Professional product photography on PURE WHITE background (#FFFFFF, no shadows).
 Soft three-point studio lighting, no harsh shadows, neutral evenly-lit white seamless.
-Product (${form.nomeProduto}) centered, occupying ~80% of the 1024×1024 frame.
+Product (${form.nomeProduto}) centered, occupying ~80% of the square frame.
 Camera angle: slight 3/4 view that shows depth without distortion.
 NO people, NO text, NO overlays, NO watermarks, NO props.
 E-commerce catalog style, clean minimal, Amazon-compliant cover image.
@@ -54,11 +63,13 @@ ${VOICE_ANCHOR}`.trim(),
 Lifestyle photography in elegant Brazilian residential context (bathroom, kitchen, or bedroom — pick the most relevant for ${form.nomeProduto}).
 Product in natural use scenario, soft warm directional lighting.
 Surface: marble or wood, blurred sophisticated background.
-LEAVE 200px CLEAR SPACE on top center for headline.
-LEAVE 3 CIRCULAR ZONES at top-left (~160,360), top-right (~864,360), and bottom-center (~512,870) for badges — keep these regions visually clean (out of focus or simple backdrop).
+LEAVE TOP 18% of frame CLEAR (top center) for headline.
+LEAVE 3 CIRCULAR ZONES — top-left (~16% from left, ~36% from top), top-right (~86% from left, ~36% from top), and bottom-center (~50% from left, ~87% from top) — for badges. Keep these regions visually clean (out of focus or simple backdrop).
 Mood: serene, premium quiet luxury.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
+${NO_DECORATIVE_CIRCLES_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-comparativo': ({ form, visualSpec }) => `
@@ -66,7 +77,7 @@ Elegant lifestyle scene with product (${form.nomeProduto}) being used by a perso
 Setting: marble countertop, sophisticated muted bathroom or kitchen.
 Premium directional lighting from above-left.
 LEAVE TOP-LEFT QUADRANT (left 50%, top 60%) clear for serif headline + bullet list.
-LEAVE BOTTOM-RIGHT 200x160px area (around x:770, y:820) clear for a small comparison frame.
+LEAVE BOTTOM-RIGHT corner area (~20% wide × ~16% tall, anchored to bottom-right with small margin) clear for a small comparison frame.
 Mood: confident demonstration of quality.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
@@ -76,20 +87,22 @@ ${VOICE_ANCHOR}`.trim(),
 Aspirational lifestyle photography, dreamy warm golden hour lighting.
 Setting: spa-like Brazilian bathroom or living space — marble or wooden counter, eucalyptus plant, lit candle, white folded towel.
 Product (${form.nomeProduto}) subtle in scene, not dominant.
-LEAVE TOP-LEFT 60% clear for large serif headline overlay.
+LEAVE TOP-LEFT 60% clear for large serif headline overlay (composer adds text — keep this region purely photographic with no decorative typography).
 Mood: serene, transformative, invitation to elevated lifestyle.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-beneficios': ({ form, visualSpec }) => `
 Everyday Brazilian residential lifestyle, well-organized clean bathroom or home counter.
 Product (${form.nomeProduto}) clearly visible and focal, daily-use feeling.
 Neutral natural lighting, mid-day soft window light.
-LEAVE TOP-LEFT 60% clear for serif headline + bullet list.
+LEAVE TOP-LEFT 60% clear for serif headline + bullet list (composer adds text — keep this region purely photographic with no decorative typography).
 Mood: practical sophistication, friendly daily ritual.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-prova-final': ({ form, visualSpec }) => `
@@ -157,6 +170,29 @@ Aspirational final lifestyle scene, premium spa-like Brazilian bathroom.
 Marble + golden accents, eucalyptus plant, large mirror, ${form.nomeProduto} elegantly placed in upper-right area.
 Mood: invitation to elevated lifestyle, warm intimate.
 LEAVE TOP-LEFT 60% clear for elegant serif headline + sub-CTA + 3 mini-tags.
+${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
+${VOICE_ANCHOR}`.trim(),
+
+  'aplus-premium': ({ form, visualSpec }) => `
+Wide cinematic premium hero shot for ${form.nomeProduto} (16:9 ultra-wide landscape, will be cropped to 1464×600).
+Amazon A+ Premium module — 50% wider than standard A+, more cinematic feel.
+Product on RIGHT THIRD of frame, LEFT TWO-THIRDS clear for typography overlay (headline + sub + 3 horizontal tags).
+Setting: marble + wood luxury bathroom or tabletop, blurred elegant background, golden hour ambient.
+Camera: subtle slow-zoom feel, depth of field gentle.
+Mood: editorial product showcase, quiet luxury, invitation.
+${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
+${VOICE_ANCHOR}`.trim(),
+
+  'aplus-comparison': ({ form, visualSpec }) => `
+Tiny product thumbnail of ${form.nomeProduto} for Amazon Comparison Chart (220×220 square).
+PURE WHITE background (#FFFFFF), no shadows, soft even studio lighting.
+Product centered, occupying ~75% of the frame.
+Camera: clean front-facing or slight 3/4 view.
+NO people, NO text, NO overlays, NO watermarks, NO props.
+Same visual style as Amazon catalog cover — clean, minimal, identifiable at very small size.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),

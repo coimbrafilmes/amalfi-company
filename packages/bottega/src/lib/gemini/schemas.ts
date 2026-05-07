@@ -66,3 +66,13 @@ export const descricaoSchema = z.object({
   bulletPoints: z.array(shortText).min(3).max(7),
   faq: z.array(z.object({ pergunta: shortText, resposta: shortText })).min(2).max(8),
 });
+
+/**
+ * 7 Destaques — bullets curtos punchy pra usar como copy de conversão (carousel
+ * Amazon, listing principal, social). Cada um até 80 chars (mobile-first).
+ * Schema exige exatamente 7 itens — paridade com Gumpinho.
+ */
+const destaqueText = z.string().min(8).max(80);
+export const destaquesSchema = z.object({
+  destaques: z.array(destaqueText).length(7),
+});

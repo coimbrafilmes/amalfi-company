@@ -19,29 +19,39 @@ function parseCotas(text: string): Array<{ axis: 'largura' | 'altura' | 'profund
   const cotas: Array<{ axis: 'largura' | 'altura' | 'profundidade'; value: string }> = [];
   const lower = text.toLowerCase();
 
-  // Padrões: "16cm altura", "altura 16cm", "altura: 16 cm"
-  const altura = lower.match(/altura[:\s]*(\d+(?:[.,]\d+)?)\s*cm/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm\s*(?:de\s*)?altura/i)
+  // "cm" opcional — aceita "altura: 16", "altura 16cm", "16cm altura"
+  const altura = lower.match(/altura[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
+    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?altura/i)
     ?? null;
   if (altura) cotas.push({ axis: 'altura', value: `${altura[1].replace(',', '.')} cm` });
 
-  const largura = lower.match(/largura[:\s]*(\d+(?:[.,]\d+)?)\s*cm/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm\s*(?:de\s*)?largura/i)
+  const largura = lower.match(/largura[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
+    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?largura/i)
     ?? null;
   if (largura) cotas.push({ axis: 'largura', value: `${largura[1].replace(',', '.')} cm` });
 
-  const prof = lower.match(/profundidade[:\s]*(\d+(?:[.,]\d+)?)\s*cm/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm\s*(?:de\s*)?profundidade/i)
+  const prof = lower.match(/profundidade[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
+    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?profundidade/i)
+    ?? lower.match(/comprimento[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
     ?? null;
   if (prof) cotas.push({ axis: 'profundidade', value: `${prof[1].replace(',', '.')} cm` });
 
-  // Fallback: detecta "AxBxC" (LxAxP)
+  // Fallback: "AxBxC" com ou sem "cm" no fim
   if (cotas.length === 0) {
-    const dim = text.match(/(\d+)\s*x\s*(\d+)\s*x\s*(\d+)\s*cm/i);
+    const dim = text.match(/(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*cm?/i);
     if (dim) {
-      cotas.push({ axis: 'largura', value: `${dim[1]} cm` });
-      cotas.push({ axis: 'altura', value: `${dim[2]} cm` });
-      cotas.push({ axis: 'profundidade', value: `${dim[3]} cm` });
+      cotas.push({ axis: 'largura', value: `${dim[1].replace(',', '.')} cm` });
+      cotas.push({ axis: 'altura', value: `${dim[2].replace(',', '.')} cm` });
+      cotas.push({ axis: 'profundidade', value: `${dim[3].replace(',', '.')} cm` });
+    }
+  }
+
+  // Fallback 2: "AxB" (2D — assume LxA, profundidade omitida)
+  if (cotas.length === 0) {
+    const dim2 = text.match(/(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*cm?/i);
+    if (dim2) {
+      cotas.push({ axis: 'largura', value: `${dim2[1].replace(',', '.')} cm` });
+      cotas.push({ axis: 'altura', value: `${dim2[2].replace(',', '.')} cm` });
     }
   }
 
@@ -120,7 +130,7 @@ export function extractSlotParams<K extends SlotKind>(
 ): SlotParamsByKind[K] {
   const cotas = parseCotas(form.detalhesTecnicos);
   const capacidade = parseCapacidade(form.detalhesTecnicos);
-  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 20));
+  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 28));
   const dor1 = analise.dores[0]?.titulo ?? 'Bagunça visual';
 
   switch (slot) {
@@ -169,7 +179,7 @@ export function extractSlotParams<K extends SlotKind>(
 
     case 'anuncio-beneficios': {
       const headline = pickHeadline(PATTERNS_BENEFICIOS, form.nomeProduto);
-      const bullets = motivacoesShort.slice(0, 3).map((b) => shorten(b, 32));
+      const bullets = motivacoesShort.slice(0, 3).map((b) => shorten(b, 42));
       while (bullets.length < 3) bullets.push('Sem complicação');
       return { headline, bullets } as SlotParamsByKind[K];
     }
@@ -235,6 +245,24 @@ export function extractSlotParams<K extends SlotKind>(
       return { headline, subCta, miniFeatures } as SlotParamsByKind[K];
     }
 
+    case 'aplus-premium': {
+      // Hero amplificado (1464×600) — mesma intenção que aplus-header mas com 3 badges em vez de 2
+      const headline = analise.persona.label.length <= 30
+        ? analise.persona.label
+        : 'Pequenos gestos costeiros';
+      const sub = 'Curado com calma, levado com cuidado.';
+      const badges = [
+        { icon: 'gem' as IconKey, label: 'Design Sofisticado' },
+        { icon: 'crown' as IconKey, label: 'Acabamento Premium' },
+        { icon: 'shield' as IconKey, label: 'Durabilidade Real' },
+      ];
+      return { headline, sub, badges } as SlotParamsByKind[K];
+    }
+
+    case 'aplus-comparison':
+      // Thumbnail 220×220 — sem overlay, passa-through
+      return {} as SlotParamsByKind[K];
+
     default:
       throw new Error(`extractSlotParams: slot desconhecido ${slot}`);
   }
@@ -244,10 +272,23 @@ export function extractSlotParams<K extends SlotKind>(
 // HELPERS
 // =====================================================
 
+/**
+ * Encurta texto para `max` chars cortando no espaço mais próximo (não quebra palavra).
+ * Não adiciona ellipsis quando a palavra cortada já é o final natural do texto.
+ */
 function shorten(text: string, max: number): string {
   if (!text) return '';
-  if (text.length <= max) return text;
-  return text.slice(0, max - 1).trim() + '…';
+  const trimmed = text.trim();
+  if (trimmed.length <= max) return trimmed;
+
+  // Busca último espaço antes do limite — preserva palavra inteira
+  const slice = trimmed.slice(0, max);
+  const lastSpace = slice.lastIndexOf(' ');
+  // Se o espaço estiver muito no início (< 60% do max), corta direto e adiciona ellipsis
+  if (lastSpace < max * 0.6) {
+    return slice.trimEnd() + '…';
+  }
+  return trimmed.slice(0, lastSpace).trimEnd() + '…';
 }
 
 function detectMaterial(text: string): string {

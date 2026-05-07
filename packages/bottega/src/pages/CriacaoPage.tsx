@@ -54,6 +54,7 @@ export function CriacaoPage() {
           loadingMessage={loadingMessage}
           loadingStep={loadingStep}
           loadingProgress={loadingProgress}
+          productName={form.nomeProduto}
         />
       </section>
 

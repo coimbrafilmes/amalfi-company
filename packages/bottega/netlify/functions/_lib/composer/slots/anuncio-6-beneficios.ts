@@ -1,5 +1,5 @@
 /**
- * Slot 6: BENEFÍCIOS LIFESTYLE PRÁTICOS · 1024×1024
+ * Slot 6: BENEFÍCIOS LIFESTYLE PRÁTICOS · 2000×2000
  * Pergunta: "Que problema concreto resolve?"
  * Overlay: headline duplo + 3 bullets com pontos arredondados.
  */
@@ -24,34 +24,35 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
   const headlineL1 = drawHeadline({
     text: line1,
     font: 'serif',
-    size: 50,
+    size: 100,
     fill: COLOR.tinta,
-    x: 60,
-    y: 80,
+    x: 120,
+    y: 160,
     anchor: 'left',
   });
   const headlineL2 = line2
     ? drawHeadline({
         text: line2,
         font: 'serif',
-        size: 50,
+        size: 100,
         fill: COLOR.tinta,
-        x: 60,
-        y: 145,
+        x: 120,
+        y: 320,
         anchor: 'left',
       })
     : '';
 
-  const bulletStartY = line2 ? 240 : 180;
-  const bulletGap = 42;
+  // line1 ocupa até y~294, line2 até y~454 — bullets começam com folga
+  const bulletStartY = line2 ? 540 : 390;
+  const bulletGap = 84;
   const bulletsSvg = bullets
     .slice(0, 3)
     .map((b, i) =>
       drawBullet({
         text: b,
-        x: 60,
+        x: 120,
         y: bulletStartY + i * bulletGap,
-        fontSize: 18,
+        fontSize: 36,
         fill: COLOR.tinta,
         bulletStyle: 'dot',
         bulletColor: COLOR.ocre,
@@ -59,7 +60,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
     )
     .join('\n');
 
-  const svg = `<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${headlineL1}
     ${headlineL2}
     ${bulletsSvg}

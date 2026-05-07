@@ -1,5 +1,5 @@
 /**
- * Slot 7: PROVA FINAL / SOFISTICAÇÃO · 1024×1024
+ * Slot 7: PROVA FINAL / SOFISTICAÇÃO · 2000×2000
  * Pergunta: "Vale o investimento?"
  * Overlay: 2 tags discretos laterais (esquerda/direita), sem headline grande.
  */
@@ -17,32 +17,32 @@ export async function compose(baseImage: Buffer, params: SlotParamsProvaFinal): 
 
   const leftTag = tag0
     ? drawTag({
-        x: 56,
-        y: 460,
+        x: 112,
+        y: 920,
         iconKey: tag0.icon,
         label: tag0.label,
         bgFill: COLOR.osso,
         textColor: COLOR.tinta,
         iconColor: COLOR.ocre,
-        fontSize: 16,
+        fontSize: 32,
       })
     : '';
 
-  // tag1 fica à direita; ajusta x baseado em estimativa de width (~280px)
+  // tag1 fica à direita; ajusta x baseado em estimativa de width (~560px após escala)
   const rightTag = tag1
     ? drawTag({
-        x: 700,
-        y: 460,
+        x: 1400,
+        y: 920,
         iconKey: tag1.icon,
         label: tag1.label,
         bgFill: COLOR.osso,
         textColor: COLOR.tinta,
         iconColor: COLOR.ocre,
-        fontSize: 16,
+        fontSize: 32,
       })
     : '';
 
-  const svg = `<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${leftTag}
     ${rightTag}
   </svg>`;

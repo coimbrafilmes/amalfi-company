@@ -183,6 +183,48 @@ Retorne JSON estrito:
 }
 
 // ============================================================
+// 4c. DESTAQUES (7 bullets punchy de conversão — paridade Gumpinho)
+// ============================================================
+
+export function promptDestaques(form: CriacaoForm, analiseContext: string): string {
+  return `
+${CONTEXTO_PRODUTO(form)}
+
+CONTEXTO DA ANÁLISE: ${analiseContext}
+
+Crie EXATAMENTE 7 DESTAQUES editoriais pra este produto Amazon BR.
+
+São frases curtas, punchy, mobile-first — pra usar em carousel Amazon, abertura
+de listing e social. Cada destaque deve "vender" um aspecto único do produto
+em uma frase memorável.
+
+REGRAS RÍGIDAS:
+- EXATAMENTE 7 destaques. Nem 6 nem 8.
+- Máximo 80 caracteres por destaque (mobile-first).
+- pt-BR, frases completas, factuais.
+- Cada destaque ataca um ângulo DIFERENTE: forma, função, durabilidade, contexto, sensação, design, propósito.
+- ZERO superlativo vazio ("o melhor"), ZERO marketing barato.
+- ZERO inglês. ZERO emoji. ZERO CAPS LOCK gritado.
+- Use APENAS dados reais dos detalhes técnicos. Zero invenção.
+
+${VOZ_AMALFI}
+
+Retorne JSON estrito:
+{
+  "destaques": [
+    "Destaque 1 — frase curta (até 80 chars)",
+    "Destaque 2 — outro ângulo",
+    "Destaque 3 — ...",
+    "Destaque 4 — ...",
+    "Destaque 5 — ...",
+    "Destaque 6 — ...",
+    "Destaque 7 — ..."
+  ]
+}
+`.trim();
+}
+
+// ============================================================
 // 4b. VISUAL SPEC (Gemini Vision lê fotos do produto)
 // ============================================================
 

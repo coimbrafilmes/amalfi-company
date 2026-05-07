@@ -16,6 +16,7 @@ import {
   promptKeywords,
   promptTitulos,
   promptDescricao,
+  promptDestaques,
   promptVisualSpec,
 } from '../../../src/lib/gemini/prompts';
 import {
@@ -23,11 +24,13 @@ import {
   keywordsSchema,
   titulosSchema,
   descricaoSchema,
+  destaquesSchema,
 } from '../../../src/lib/gemini/schemas';
 import {
   SLOT_ORDER,
   SLOT_VARIANT,
   SLOT_DIMENSIONS,
+  SLOT_ASPECT_RATIO,
   type CriacaoForm,
   type CriacaoResults,
   type ImagemGerada,
@@ -198,13 +201,15 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
 
   const analiseContext = JSON.stringify(analise);
 
-  // ---------- 2. Keywords + Títulos + Descrição (paralelo) ----------
+  // ---------- 2. Keywords + Títulos + Descrição + Destaques (paralelo) ----------
   await opts.onStep('Curando palavras e títulos…');
-  const [keywords, titulos, descricao] = await Promise.all([
+  const [keywords, titulos, descricao, destaquesResult] = await Promise.all([
     geminiText(promptKeywords(form, analiseContext), (r) => keywordsSchema.parse(r), 'keywords'),
     geminiText(promptTitulos(form, analiseContext), (r) => titulosSchema.parse(r), 'titulos'),
     geminiText(promptDescricao(form, analiseContext), (r) => descricaoSchema.parse(r), 'descricao'),
+    geminiText(promptDestaques(form, analiseContext), (r) => destaquesSchema.parse(r), 'destaques'),
   ]);
+  const destaques = destaquesResult.destaques;
 
   // ---------- 3. Imagens dos 13 slots (paralelo Gemini + composer) ----------
   const totalImages = SLOT_ORDER.length;
@@ -213,8 +218,7 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
 
   async function generateImageForSlot(slot: SlotKind): Promise<{ slot: SlotKind; base64: string | null }> {
     const promptText = promptForSlot(slot, form, visualSpec);
-    const variante = SLOT_VARIANT[slot];
-    const aspectRatio: '1:1' | '4:3' = variante === 'aplus' ? '4:3' : '1:1';
+    const aspectRatio = SLOT_ASPECT_RATIO[slot];
 
     try {
       const base64 = await withRetry(async () => {
@@ -268,17 +272,15 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
         };
       }
 
-      // Pra A+: crop 4:3 → 970×600 antes do composer
+      // Sempre normaliza pra dim alvo:
+      //   - A+ (4:3 nativo Gemini): crop centro pra 970×600
+      //   - Anúncio (1:1 nativo ~1024×1024 Gemini): upscale Sharp pra 2000×2000
       let baseBuffer: Buffer;
       try {
-        if (variante === 'aplus') {
-          const cropped = await cropToSize(base64, dim.w, dim.h);
-          baseBuffer = Buffer.from(cropped.base64, 'base64');
-        } else {
-          baseBuffer = Buffer.from(base64, 'base64');
-        }
+        const resized = await cropToSize(base64, dim.w, dim.h);
+        baseBuffer = Buffer.from(resized.base64, 'base64');
       } catch (err) {
-        console.error(`[pipeline] crop falhou pra ${slot}:`, err);
+        console.error(`[pipeline] resize falhou pra ${slot}:`, err);
         baseBuffer = Buffer.from(base64, 'base64');
       }
 
@@ -335,6 +337,7 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
     keywords,
     titulos,
     descricao,
+    destaques,
     briefings,
     briefingsAPlus,
     imagens,
@@ -361,9 +364,8 @@ export async function regenerateOneImage(
 
   const client = new GoogleGenAI({ apiKey });
   const fotos = (form.fotosBase64 ?? []).slice(0, 3);
-  const variante = SLOT_VARIANT[slot];
   const dim = SLOT_DIMENSIONS[slot];
-  const aspectRatio: '1:1' | '4:3' = variante === 'aplus' ? '4:3' : '1:1';
+  const aspectRatio = SLOT_ASPECT_RATIO[slot];
   const promptText = promptForSlot(slot, form, visualSpec);
 
   const base64 = await withRetry(async () => {
@@ -389,11 +391,13 @@ export async function regenerateOneImage(
     throw new Error('sem imagem na resposta');
   }, `regen-${slot}`);
 
+  // Sempre normaliza pra dim alvo (anúncio: upscale 1024→2000; A+: crop 4:3 → 970×600)
   let baseBuffer: Buffer;
-  if (variante === 'aplus') {
-    const cropped = await cropToSize(base64, dim.w, dim.h);
-    baseBuffer = Buffer.from(cropped.base64, 'base64');
-  } else {
+  try {
+    const resized = await cropToSize(base64, dim.w, dim.h);
+    baseBuffer = Buffer.from(resized.base64, 'base64');
+  } catch (err) {
+    console.error(`[regen] resize falhou pra ${slot}:`, err);
     baseBuffer = Buffer.from(base64, 'base64');
   }
 

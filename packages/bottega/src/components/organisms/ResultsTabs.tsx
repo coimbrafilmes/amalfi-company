@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { TabItem } from '../molecules/TabItem';
 import { ResultsBlock } from './ResultsBlock';
@@ -6,6 +7,7 @@ import { TituloListItem } from '../molecules/TituloListItem';
 import { BriefingTile } from '../molecules/BriefingTile';
 import { Button } from '../atoms/Button';
 import type { CriacaoResults, ImagemGerada, BriefingImagem } from '../../types/anuncio';
+import { buildZip, downloadBlob } from '../../lib/export/buildZip';
 
 interface ResultsTabsProps {
   results: CriacaoResults | null;
@@ -13,6 +15,8 @@ interface ResultsTabsProps {
   loadingMessage?: string;
   loadingStep?: string;
   loadingProgress?: { current: number; total: number } | null;
+  /** Nome do produto — usado pro nome do .zip e título do README. */
+  productName?: string;
 }
 
 const PALETAS_PALETA: Array<BriefingImagem['paletaCor']> = ['areia', 'mar', 'ceu', 'terracota', 'ocre', 'osso-outline'];
@@ -32,7 +36,25 @@ function imageInfoFor(imagens: ImagemGerada[] | undefined, n: number, variante: 
 }
 
 /** ResultsTabs — coluna direita Tinta com 5 tabs. */
-export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, loadingProgress }: ResultsTabsProps) {
+export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, loadingProgress, productName }: ResultsTabsProps) {
+  const [zipState, setZipState] = useState<'idle' | 'building' | 'error'>('idle');
+
+  async function handleDownloadZip() {
+    if (!results) return;
+    setZipState('building');
+    try {
+      const { blob, filename } = await buildZip(results, {
+        productName: productName ?? 'Anúncio Amalfi',
+      });
+      downloadBlob(blob, filename);
+      setZipState('idle');
+    } catch (err) {
+      console.error('[buildZip] falhou:', err);
+      setZipState('error');
+      setTimeout(() => setZipState('idle'), 4000);
+    }
+  }
+
   if (isLoading) {
     const progressLabel = loadingProgress
       ? ` · ${loadingProgress.current}/${loadingProgress.total}`
@@ -226,6 +248,25 @@ export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, l
               ))}
             </dl>
           </ResultsBlock>
+
+          {results.destaques && results.destaques.length > 0 && (
+            <ResultsBlock eyebrow="7 Destaques" headline="Frases punchy pra carousel e social">
+              <ol className="list-none p-0 space-y-3 mt-2">
+                {results.destaques.map((d, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="font-editorial italic text-terracota tabular-nums">
+                      {String(i + 1).padStart(2, '0')}.
+                    </span>
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-4 font-editorial italic text-sm opacity-60">
+                Cada um até 80 caracteres — mobile-first. Pra usar em carousel Amazon BR,
+                copy de listing ou social.
+              </p>
+            </ResultsBlock>
+          )}
         </Tabs.Content>
 
         {/* TAB 05 — BRIEFINGS (2 sub-abas: Anúncio + A+) */}
@@ -238,7 +279,7 @@ export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, l
             Da capa ao <em className="font-editorial italic font-regular">detalhe.</em>
           </h2>
           <p className="font-editorial italic text-[22px] leading-snug opacity-85 mb-10">
-            Imagens em duas categorias — anúncio (1024×1024) e Conteúdo A+ (970×600).
+            Imagens em duas categorias — anúncio (2000×2000) e Conteúdo A+ (970×600 standard, 1464×600 premium, 220×220 comparison).
           </p>
 
           <Tabs.Root defaultValue="aba-anuncio">
@@ -247,7 +288,7 @@ export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, l
                 value="aba-anuncio"
                 className="font-ui text-[11px] uppercase tracking-widest px-4 py-2 data-[state=active]:bg-osso data-[state=active]:text-tinta data-[state=inactive]:opacity-60 transition-colors"
               >
-                Anúncio · 1024×1024 · {results.briefings.length}
+                Anúncio · 2000×2000 · {results.briefings.length}
               </Tabs.Trigger>
               <Tabs.Trigger
                 value="aba-aplus"
@@ -333,8 +374,20 @@ export function ResultsTabs({ results, isLoading, loadingMessage, loadingStep, l
         <span className="font-editorial italic text-[14px] opacity-70 hidden md:block">
           "A gente fala como quem oferece café num fim de tarde."
         </span>
-        <div className="flex gap-2">
-          <Button variant="inverse" size="sm">Exportar PDF</Button>
+        <div className="flex gap-2 items-center">
+          {zipState === 'error' && (
+            <span className="font-editorial italic text-[12px] text-terracota">
+              Falhou — tente de novo
+            </span>
+          )}
+          <Button
+            variant="inverse"
+            size="sm"
+            onClick={handleDownloadZip}
+            disabled={zipState === 'building'}
+          >
+            {zipState === 'building' ? 'Empacotando…' : 'Baixar tudo (.zip)'}
+          </Button>
           <Button variant="inverse-ghost" size="sm">Aprovar &amp; arquivar</Button>
         </div>
       </div>

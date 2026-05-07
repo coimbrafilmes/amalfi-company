@@ -1,5 +1,5 @@
 /**
- * Slot 3: LIFESTYLE + CALLOUTS · 1024×1024
+ * Slot 3: LIFESTYLE + CALLOUTS · 2000×2000
  * Pergunta: "Como funciona / como é usar?"
  * Overlay: headline serif topo + 3 badges circulares ao redor do produto.
  */
@@ -15,18 +15,18 @@ export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCall
   const headlineSvg = drawHeadline({
     text: headline,
     font: 'serif',
-    size: 44,
+    size: 88,
     fill: COLOR.tinta,
-    x: 512,
-    y: 70,
+    x: 1000,
+    y: 140,
     anchor: 'center',
   });
 
-  // 3 badges em triângulo (top-left, top-right, bottom-center)
+  // 3 badges em triângulo (top-left, top-right, bottom-center) — coords ×2
   const badgePositions = [
-    { cx: 160, cy: 360 },
-    { cx: 864, cy: 360 },
-    { cx: 512, cy: 870 },
+    { cx: 320, cy: 720 },
+    { cx: 1728, cy: 720 },
+    { cx: 1000, cy: 1740 },
   ];
 
   const badgesSvg = callouts
@@ -36,7 +36,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCall
       return drawCircularBadge({
         cx: pos.cx,
         cy: pos.cy,
-        radius: 80,
+        radius: 160,
         iconKey: c.icon,
         label: c.label,
         bgFill: COLOR.osso,
@@ -47,7 +47,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCall
     })
     .join('\n');
 
-  const svg = `<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
     ${badgesSvg}
   </svg>`;

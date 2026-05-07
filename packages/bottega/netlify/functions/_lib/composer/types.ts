@@ -104,6 +104,18 @@ export interface SlotParamsAplusCta {
   miniFeatures: string[]; // 3 tags pequenas
 }
 
+/** A+ Premium 1464×600: hero amplificado com headline + sub italic + 3 badges horizontais. */
+export interface SlotParamsAplusPremium {
+  headline: string;
+  sub: string;
+  badges: Array<{ icon: IconKey; label: string }>; // 3 (vs 2 no aplus-header)
+}
+
+/** A+ Comparison 220×220: thumbnail limpo (passa-through, sem overlay). */
+export interface SlotParamsAplusComparison {
+  empty?: never;
+}
+
 export interface SlotParamsByKind {
   'anuncio-capa': SlotParamsCapa;
   'anuncio-dimensoes': SlotParamsDimensoes;
@@ -118,6 +130,8 @@ export interface SlotParamsByKind {
   'aplus-casos-uso': SlotParamsAplusCasosUso;
   'aplus-validacao': SlotParamsAplusValidacao;
   'aplus-cta': SlotParamsAplusCta;
+  'aplus-premium': SlotParamsAplusPremium;
+  'aplus-comparison': SlotParamsAplusComparison;
 }
 
 export type SlotParams<K extends SlotKind> = SlotParamsByKind[K];

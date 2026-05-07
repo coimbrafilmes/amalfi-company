@@ -16,6 +16,8 @@ import { compose as composeAplusSpecs } from './slots/aplus-3-specs';
 import { compose as composeAplusCasosUso } from './slots/aplus-4-casos-uso';
 import { compose as composeAplusValidacao } from './slots/aplus-5-validacao';
 import { compose as composeAplusCta } from './slots/aplus-6-cta';
+import { compose as composeAplusPremium } from './slots/aplus-7-premium';
+import { compose as composeAplusComparison } from './slots/aplus-8-comparison';
 import type { SlotKind } from '../../../../src/types/anuncio';
 import type { SlotParamsByKind } from './types';
 
@@ -51,6 +53,10 @@ export async function composeForSlot<K extends SlotKind>(
       return composeAplusValidacao(baseImage, params as SlotParamsByKind['aplus-validacao']);
     case 'aplus-cta':
       return composeAplusCta(baseImage, params as SlotParamsByKind['aplus-cta']);
+    case 'aplus-premium':
+      return composeAplusPremium(baseImage, params as SlotParamsByKind['aplus-premium']);
+    case 'aplus-comparison':
+      return composeAplusComparison(baseImage, params as SlotParamsByKind['aplus-comparison']);
     default:
       throw new Error(`Unknown slot kind: ${slotKind}`);
   }

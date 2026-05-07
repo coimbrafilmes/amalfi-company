@@ -1,5 +1,5 @@
 /**
- * Slot 5: ASPIRACIONAL · 1024×1024
+ * Slot 5: ASPIRACIONAL · 2000×2000
  * Pergunta: "Como minha vida fica melhor?"
  * Overlay: headline grande topo + 3 sub-bullets curtos.
  */
@@ -21,35 +21,35 @@ export async function compose(baseImage: Buffer, params: SlotParamsAspiracional)
   const headlineL1 = drawHeadline({
     text: line1,
     font: 'serif',
-    size: 64,
+    size: 128,
     fill: COLOR.tinta,
-    x: 60,
-    y: 80,
+    x: 120,
+    y: 160,
     anchor: 'left',
   });
   const headlineL2 = line2
     ? drawHeadline({
         text: line2,
         font: 'serif',
-        size: 64,
+        size: 128,
         fill: COLOR.tinta,
-        x: 60,
-        y: 160,
+        x: 120,
+        y: 350,
         anchor: 'left',
       })
     : '';
 
-  // Sub-bullets em rows abaixo do headline
-  const bulletStartY = line2 ? 270 : 200;
-  const bulletGap = 38;
+  // Sub-bullets em rows abaixo do headline (line1 ocupa até y~330, line2 até y~520)
+  const bulletStartY = line2 ? 590 : 430;
+  const bulletGap = 76;
   const bulletsSvg = subBullets
     .slice(0, 3)
     .map((b, i) =>
       drawBullet({
         text: b,
-        x: 60,
+        x: 120,
         y: bulletStartY + i * bulletGap,
-        fontSize: 19,
+        fontSize: 38,
         fill: COLOR.tinta,
         font: 'italic',
         bulletStyle: 'dot',
@@ -58,7 +58,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsAspiracional)
     )
     .join('\n');
 
-  const svg = `<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${headlineL1}
     ${headlineL2}
     ${bulletsSvg}
