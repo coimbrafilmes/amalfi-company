@@ -17,6 +17,11 @@ interface PromptCtx {
 
 const VOICE_ANCHOR = `Style: serene, curated, premium-but-not-shouty, Brazilian residential context. Mood: sophisticated calm.`;
 
+// Critico: as fotos de referencia geralmente mostram o produto AINDA na embalagem
+// blister/cartelinha original (como vem da fabrica). Esse anchor instrui o modelo
+// a renderizar APENAS o produto exposto, sem qualquer embalagem comercial.
+const NO_PACKAGING_ANCHOR = `CRITICAL — render ONLY the bare product fully unpackaged. NO blister card, NO plastic wrap, NO cardboard backing, NO retail packaging, NO product tag, NO barcode label, NO brand sticker. Show the product as it appears AFTER being removed from its retail box, ready to use.`;
+
 function fidelityClause(visualSpec?: string): string {
   if (!visualSpec) return '';
   return `\n\nIMPORTANT — render the EXACT product described:\n${visualSpec}`;
@@ -31,6 +36,7 @@ Camera angle: slight 3/4 view that shows depth without distortion.
 NO people, NO text, NO overlays, NO watermarks, NO props.
 E-commerce catalog style, clean minimal, Amazon-compliant cover image.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-dimensoes': ({ form, visualSpec }) => `
@@ -41,6 +47,7 @@ Background: blurred neutral bathroom or counter, very subtle.
 LEAVE 25% MARGIN around product on top, left, and bottom for measurement annotations to be added later.
 Composition: product fills only the central area; ample negative space surrounding.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-lifestyle-callouts': ({ form, visualSpec }) => `
@@ -51,6 +58,7 @@ LEAVE 200px CLEAR SPACE on top center for headline.
 LEAVE 3 CIRCULAR ZONES at top-left (~160,360), top-right (~864,360), and bottom-center (~512,870) for badges — keep these regions visually clean (out of focus or simple backdrop).
 Mood: serene, premium quiet luxury.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-comparativo': ({ form, visualSpec }) => `
@@ -61,6 +69,7 @@ LEAVE TOP-LEFT QUADRANT (left 50%, top 60%) clear for serif headline + bullet li
 LEAVE BOTTOM-RIGHT 200x160px area (around x:770, y:820) clear for a small comparison frame.
 Mood: confident demonstration of quality.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-aspiracional': ({ form, visualSpec }) => `
@@ -70,6 +79,7 @@ Product (${form.nomeProduto}) subtle in scene, not dominant.
 LEAVE TOP-LEFT 60% clear for large serif headline overlay.
 Mood: serene, transformative, invitation to elevated lifestyle.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-beneficios': ({ form, visualSpec }) => `
@@ -79,6 +89,7 @@ Neutral natural lighting, mid-day soft window light.
 LEAVE TOP-LEFT 60% clear for serif headline + bullet list.
 Mood: practical sophistication, friendly daily ritual.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-prova-final': ({ form, visualSpec }) => `
@@ -88,6 +99,7 @@ Mood: aspirational quiet luxury, central product hero.
 LEAVE LEFT 25% and RIGHT 25% margins clear for small elegant tag overlays.
 Camera close-up showing material quality and finish details.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-header': ({ form, visualSpec }) => `
@@ -96,6 +108,7 @@ Premium environment, golden hour ambient lighting.
 Product on RIGHT THIRD of frame, LEFT TWO-THIRDS clear for typography overlay.
 Setting: marble + wood luxury bathroom, blurred elegant.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-antes-depois': ({ form, visualSpec }) => `
@@ -106,6 +119,7 @@ Comparable camera angle on both sides.
 LEAVE TOP 60px clear on both sides for "Antes" / "Depois" labels.
 LEAVE RIGHT-MIDDLE area (x:510-940, y:230-440) clear for 4 checkmark features.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-specs': ({ form, visualSpec }) => `
@@ -116,6 +130,7 @@ Product in CENTER-LEFT area (x:200-650).
 LEAVE LEFT 100px margin for vertical ruler annotation.
 LEAVE RIGHT 30% (x:700-940) clear for 4 stacked technical callouts.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-casos-uso': ({ form, visualSpec }) => `
@@ -124,6 +139,7 @@ Each scene shows hands using ${form.nomeProduto} or a related accessory in a dif
 Neutral cream/marble background between scenes.
 LEAVE TOP 80px clear for ICON + LABEL above each of the 4 columns.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-validacao': ({ form, visualSpec }) => `
@@ -133,6 +149,7 @@ Product on LEFT-CENTER area (x:150-450).
 LEAVE TOP-CENTER-LEFT clear for circular validation badge (around x:320, y:170).
 LEAVE RIGHT 40% (x:580-940) clear for 3 stacked text pills.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-cta': ({ form, visualSpec }) => `
@@ -141,6 +158,7 @@ Marble + golden accents, eucalyptus plant, large mirror, ${form.nomeProduto} ele
 Mood: invitation to elevated lifestyle, warm intimate.
 LEAVE TOP-LEFT 60% clear for elegant serif headline + sub-CTA + 3 mini-tags.
 ${fidelityClause(visualSpec)}
+${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 };
 

@@ -21,16 +21,18 @@ export const COLOR = {
 } as const;
 
 // @fontsource fornece .woff (text-to-svg + opentype.js aceita).
-// latin-ext cobre acentos pt-BR (ã, ç, é, etc).
-// Tupla [package, internalPath] pra resolução via require.resolve em runtime —
+// Subset 'latin' cobre A-Z, a-z, 0-9, pontuação e acentos pt-BR (ã, ç, é, ê, ô, á).
+// 'latin-ext' eh APENAS extensoes adicionais (europeu central) — sem latin basico,
+// causava .notdef (retangulos) em quase todos os textos.
+// Tupla [package, internalPath] pra resolucao via require.resolve em runtime —
 // path.resolve(<relativo>) quebra em Lambda Netlify (cwd != bundle root).
 export const FONT_PATH = {
-  serif400: ['@fontsource/dm-serif-display', 'files/dm-serif-display-latin-ext-400-normal.woff'],
-  italic400: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-ext-400-italic.woff'],
-  italic500: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-ext-500-italic.woff'],
-  sans400: ['@fontsource/inter', 'files/inter-latin-ext-400-normal.woff'],
-  sans500: ['@fontsource/inter', 'files/inter-latin-ext-500-normal.woff'],
-  sans600: ['@fontsource/inter', 'files/inter-latin-ext-600-normal.woff'],
+  serif400: ['@fontsource/dm-serif-display', 'files/dm-serif-display-latin-400-normal.woff'],
+  italic400: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-400-italic.woff'],
+  italic500: ['@fontsource/cormorant-garamond', 'files/cormorant-garamond-latin-500-italic.woff'],
+  sans400: ['@fontsource/inter', 'files/inter-latin-400-normal.woff'],
+  sans500: ['@fontsource/inter', 'files/inter-latin-500-normal.woff'],
+  sans600: ['@fontsource/inter', 'files/inter-latin-600-normal.woff'],
 } as const satisfies Record<string, readonly [string, string]>;
 
 export type FontKey = keyof typeof FONT_PATH;
