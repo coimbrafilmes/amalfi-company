@@ -20,38 +20,59 @@ export async function compose(baseImage: Buffer, params: SlotParamsAplusAntesDep
     strokeWidth: 3,
   });
 
+  // Labels Antes/Depois — sans BOLD GIGANTE (paridade modulo-2 Gumpinho)
   const labelAntes = drawHeadline({
-    text: 'Antes: Bagunça Visual',
+    text: 'Antes:',
     font: 'sans',
     weight: 600,
-    size: 24,
+    size: 38,
     fill: COLOR.osso,
-    x: 30,
-    y: 30,
-    anchor: 'left',
+    x: 240,
+    y: 40,
+    anchor: 'center',
+  });
+  const labelAntesSub = drawHeadline({
+    text: 'Caos Visual',
+    font: 'sans',
+    weight: 600,
+    size: 38,
+    fill: COLOR.osso,
+    x: 240,
+    y: 88,
+    anchor: 'center',
   });
   const labelDepois = drawHeadline({
-    text: 'Depois: Harmonia & Estilo',
+    text: 'Depois:',
     font: 'sans',
     weight: 600,
-    size: 24,
+    size: 38,
     fill: COLOR.osso,
-    x: 940,
-    y: 30,
-    anchor: 'right',
+    x: 730,
+    y: 40,
+    anchor: 'center',
+  });
+  const labelDepoisSub = drawHeadline({
+    text: 'Elegância Real',
+    font: 'sans',
+    weight: 600,
+    size: 38,
+    fill: COLOR.osso,
+    x: 730,
+    y: 88,
+    anchor: 'center',
   });
 
-  // 4 features no lado direito (depois)
-  const checkStartY = 230;
-  const checkGap = 50;
+  // 4 features no lado direito (depois) — checks maiores
+  const checkStartY = 240;
+  const checkGap = 56;
   const checks = features
     .slice(0, 4)
     .map((f, i) =>
       drawCheckText({
         text: f,
-        x: 510,
+        x: 520,
         y: checkStartY + i * checkGap,
-        fontSize: 18,
+        fontSize: 22,
         textColor: COLOR.osso,
         checkColor: COLOR.validacao,
       }),
@@ -61,7 +82,9 @@ export async function compose(baseImage: Buffer, params: SlotParamsAplusAntesDep
   const svg = `<svg width="970" height="600" xmlns="http://www.w3.org/2000/svg">
     ${divider}
     ${labelAntes}
+    ${labelAntesSub}
     ${labelDepois}
+    ${labelDepoisSub}
     ${checks}
   </svg>`;
 

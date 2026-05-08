@@ -21,10 +21,12 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
     line2 = headline.slice(eIdx + 1).trim();
   }
 
+  // Headline sans-bold (paridade Gumpinho — slots factuais usam sans pesado)
   const headlineL1 = drawHeadline({
     text: line1,
-    font: 'serif',
-    size: 100,
+    font: 'sans',
+    weight: 600,
+    size: 84,
     fill: COLOR.tinta,
     x: 120,
     y: 160,
@@ -33,17 +35,18 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
   const headlineL2 = line2
     ? drawHeadline({
         text: line2,
-        font: 'serif',
-        size: 100,
+        font: 'sans',
+        weight: 600,
+        size: 84,
         fill: COLOR.tinta,
         x: 120,
-        y: 320,
+        y: 290,
         anchor: 'left',
       })
     : '';
 
-  // line1 ocupa até y~294, line2 até y~454 — bullets começam com folga
-  const bulletStartY = line2 ? 540 : 390;
+  // line1 ocupa até y~244, line2 até y~374 — bullets começam com folga
+  const bulletStartY = line2 ? 480 : 320;
   const bulletGap = 84;
   const bulletsSvg = bullets
     .slice(0, 3)
