@@ -303,6 +303,139 @@ export function drawPill(opts: PillOpts): string {
 }
 
 // =====================================================
+// CALLOUT (linha indicadora + ponto âncora + label)
+// Padrão Gumpinho infográfico Amazon — aponta partes específicas do produto
+// com legenda. Ex: "Sensor Touch" → topo do produto, "Antiderrapante" → base.
+// Ver referências: 04_Imagens/medidas.png + 05_ConteudoA+/modulo-3.png
+// =====================================================
+
+export interface CalloutOpts {
+  /** Ponto âncora no produto (onde o ponto/círculo é desenhado). */
+  anchor: { x: number; y: number };
+  /** Onde o final da linha encontra o label (ponto-fim antes do texto). */
+  labelEnd: { x: number; y: number };
+  /** Texto do callout. */
+  label: string;
+  /** Lado do labelEnd onde o texto cai. Default 'left'. */
+  labelSide?: 'left' | 'right';
+  fontSize?: number;
+  fontWeight?: 400 | 500 | 600;
+  stroke?: string;
+  textColor?: string;
+  strokeWidth?: number;
+  anchorRadius?: number;
+}
+
+export function drawCallout(opts: CalloutOpts): string {
+  const fontSize = opts.fontSize ?? 30;
+  const fontKey = opts.fontWeight === 600
+    ? ('sans600' as const)
+    : opts.fontWeight === 400
+      ? ('sans400' as const)
+      : ('sans500' as const);
+  const stroke = opts.stroke ?? COLOR.tinta;
+  const textColor = opts.textColor ?? COLOR.tinta;
+  const strokeWidth = opts.strokeWidth ?? 2;
+  const anchorRadius = opts.anchorRadius ?? 6;
+  const labelSide = opts.labelSide ?? 'left';
+
+  // Linha do anchor → labelEnd
+  const line = `<line x1="${opts.anchor.x}" y1="${opts.anchor.y}" x2="${opts.labelEnd.x}" y2="${opts.labelEnd.y}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" />`;
+
+  // Ponto âncora (círculo pequeno marcando o início)
+  const anchor = `<circle cx="${opts.anchor.x}" cy="${opts.anchor.y}" r="${anchorRadius}" fill="${stroke}" />`;
+
+  // Label posicionado logo após o labelEnd
+  const labelPadding = 12;
+  let labelX: number;
+  let labelAnchor: 'left top' | 'right top';
+  if (labelSide === 'left') {
+    labelX = opts.labelEnd.x - labelPadding;
+    labelAnchor = 'right top';
+  } else {
+    labelX = opts.labelEnd.x + labelPadding;
+    labelAnchor = 'left top';
+  }
+  const labelY = opts.labelEnd.y - fontSize / 2;
+
+  const label = textPath({
+    text: opts.label,
+    fontKey,
+    fontSize,
+    fill: textColor,
+    x: labelX,
+    y: labelY,
+    anchor: labelAnchor,
+  });
+
+  return `<g>${line}${anchor}${label}</g>`;
+}
+
+// =====================================================
+// VERTICAL RULER (régua vertical com tickmarks + label de altura)
+// Padrão Gumpinho slot dimensões — ver medidas.png e modulo-3.png
+// =====================================================
+
+export interface VerticalRulerOpts {
+  /** Topo da régua (ponta superior da seta). */
+  top: { x: number; y: number };
+  /** Base da régua. */
+  bottom: { x: number; y: number };
+  /** Label central (ex: "21cm"). */
+  label: string;
+  /** Largura da régua (espaço pros tickmarks). */
+  width?: number;
+  /** Quantidade de tickmarks ao longo do eixo. */
+  tickCount?: number;
+  fontSize?: number;
+  stroke?: string;
+  textColor?: string;
+}
+
+export function drawVerticalRuler(opts: VerticalRulerOpts): string {
+  const width = opts.width ?? 40;
+  const tickCount = opts.tickCount ?? 21;
+  const fontSize = opts.fontSize ?? 36;
+  const stroke = opts.stroke ?? COLOR.tinta;
+  const textColor = opts.textColor ?? COLOR.tinta;
+  const x = opts.top.x;
+  const y0 = opts.top.y;
+  const y1 = opts.bottom.y;
+  const totalH = y1 - y0;
+
+  // Caixa da régua (retângulo outline)
+  const box = `<rect x="${x}" y="${y0}" width="${width}" height="${totalH}" fill="none" stroke="${stroke}" stroke-width="2" />`;
+
+  // Tickmarks horizontais (linhas curtas dentro da caixa)
+  const ticks: string[] = [];
+  for (let i = 1; i < tickCount; i += 1) {
+    const ty = y0 + (totalH * i) / tickCount;
+    const tw = i % 5 === 0 ? width * 0.6 : width * 0.3;
+    ticks.push(
+      `<line x1="${x}" y1="${ty}" x2="${x + tw}" y2="${ty}" stroke="${stroke}" stroke-width="1" />`,
+    );
+  }
+
+  // Setas nas extremidades (pequenas indicando "altura mensurável")
+  const arrowSize = 12;
+  const topArrow = `<path d="M${x + width / 2 - arrowSize / 2} ${y0 + arrowSize} L${x + width / 2} ${y0} L${x + width / 2 + arrowSize / 2} ${y0 + arrowSize}" stroke="${stroke}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
+  const bottomArrow = `<path d="M${x + width / 2 - arrowSize / 2} ${y1 - arrowSize} L${x + width / 2} ${y1} L${x + width / 2 + arrowSize / 2} ${y1 - arrowSize}" stroke="${stroke}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />`;
+
+  // Label central à direita da régua (ex: "21cm")
+  const labelSvg = textPath({
+    text: opts.label,
+    fontKey: 'sans600',
+    fontSize,
+    fill: textColor,
+    x: x + width + 20,
+    y: y0 + totalH / 2 - fontSize / 2,
+    anchor: 'left top',
+  });
+
+  return `<g>${box}${ticks.join('')}${topArrow}${bottomArrow}${labelSvg}</g>`;
+}
+
+// =====================================================
 // DIMENSION LINE (cota com setas + label)
 // =====================================================
 
