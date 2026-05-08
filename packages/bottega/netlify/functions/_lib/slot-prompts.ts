@@ -77,14 +77,14 @@ ${NO_DECORATIVE_CIRCLES_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-comparativo': ({ form, visualSpec }) => `
-Elegant lifestyle scene with product (${form.nomeProduto}) being used by a person's hand (only hand visible, no face).
-Setting: marble countertop, sophisticated muted bathroom or kitchen.
-Premium directional lighting from above-left.
-LEAVE TOP-LEFT QUADRANT (left 50%, top 60%) clear for serif headline + bullet list.
-LEAVE BOTTOM-RIGHT corner area (~20% wide × ~16% tall, anchored to bottom-right with small margin) clear for a small comparison frame.
-Mood: confident demonstration of quality.
+Hero product photography of ${form.nomeProduto} on the RIGHT 60% of the frame.
+Position the product clearly in the right two-thirds, occupying x:60%-95% horizontal, vertically centered around y:50-70%.
+LEAVE THE ENTIRE LEFT 40% of the frame VISUALLY EMPTY — soft muted off-white or cream background with no decorative elements (it will be covered by a comparison card overlay).
+TOP 12% must also be clear (entire band) for a centered bold headline.
+Setting (right side only): clean elegant wood or marble countertop, very subtle premium ambient lighting, mood of quiet luxury.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-aspiracional': ({ form, visualSpec }) => `

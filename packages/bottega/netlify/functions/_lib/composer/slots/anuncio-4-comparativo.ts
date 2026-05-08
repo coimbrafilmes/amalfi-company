@@ -1,91 +1,147 @@
 /**
  * Slot 4: COMPARATIVO + VALIDAÇÃO · 2000×2000
  * Pergunta: "Por que esse e não o concorrente genérico?"
- * Overlay: eyebrow + headline serif + 3 bullets com seta + mini-comparativo canto inferior direito.
+ *
+ * Layout (paridade Gumpinho — modulo-5.png):
+ *   - Headline sans-bold topo (ocupa toda largura)
+ *   - Lado esquerdo (40%): card "Genérico" com silhueta + 3 X features negativas
+ *   - Lado direito (60%): produto Amalfi (Gemini) + 3-4 ✓ features positivas
+ *
+ * Diferente da versão anterior (mini-canto), agora split é dominante visual.
  */
 
 import sharp from 'sharp';
 import type { SlotParamsComparativo } from '../types';
-import { drawHeadline, drawBullet, drawEyebrow } from '../primitives';
+import { drawHeadline, drawCheckText } from '../primitives';
+import { iconAt } from '../icons';
 import { COLOR } from '../constants';
 
+const FRAME = 2000;
+
 export async function compose(baseImage: Buffer, params: SlotParamsComparativo): Promise<Buffer> {
-  const { eyebrow, headline, bullets, comparisonLabel } = params;
+  const { headline, bullets } = params;
 
-  const eyebrowSvg = drawEyebrow({
-    text: eyebrow,
-    x: 112,
-    y: 112,
-    fill: COLOR.ocre,
-    fontSize: 26,
-  });
-
+  // Headline topo — sans-bold ocupando toda a largura
   const headlineSvg = drawHeadline({
-    text: headline,
-    font: 'serif',
-    size: 112,
+    text: 'O Investimento Certo',
+    font: 'sans',
+    weight: 600,
+    size: 80,
     fill: COLOR.tinta,
-    x: 112,
-    y: 200,
-    anchor: 'left',
+    x: FRAME / 2,
+    y: 100,
+    anchor: 'center',
   });
 
-  // 3 bullets com seta · y começa após headline
-  const bulletStartY = 440;
-  const bulletGap = 100;
-  const bulletsSvg = bullets
-    .slice(0, 3)
-    .map((b, i) =>
-      drawBullet({
-        text: b,
-        x: 112,
-        y: bulletStartY + i * bulletGap,
-        fontSize: 36,
+  // === LADO ESQUERDO (40%) — Genérico ===
+  const leftX = 80;
+  const leftW = 720;
+  const leftY = 280;
+  const leftH = 1480;
+
+  const leftFrame = `<rect x="${leftX}" y="${leftY}" width="${leftW}" height="${leftH}" fill="${COLOR.areia}" rx="12" />`;
+
+  // Label superior centralizada "Comum" (fundo escuro)
+  const leftLabelBg = `<rect x="${leftX + leftW / 2 - 140}" y="${leftY + 30}" width="280" height="64" rx="32" fill="${COLOR.tinta}" />`;
+  const leftLabel = drawHeadline({
+    text: 'Comum',
+    font: 'sans',
+    weight: 600,
+    size: 28,
+    fill: COLOR.osso,
+    x: leftX + leftW / 2,
+    y: leftY + 50,
+    anchor: 'center',
+  });
+
+  // Silhueta abstrata genérica (placeholder retangular cinza)
+  const silSvg = `<g transform="translate(${leftX + leftW / 2 - 140}, ${leftY + 200})">
+    <rect x="40" y="80" width="200" height="280" fill="${COLOR.tinta40}" rx="8" opacity="0.5" />
+    <rect x="100" y="0" width="80" height="100" fill="${COLOR.tinta40}" rx="6" opacity="0.5" />
+  </g>`;
+
+  // 3 X features negativas no lado esquerdo (rodapé do card)
+  const negFeatures = ['Qualidade comum', 'Sem destaque', 'Sem curadoria'];
+  const negStartY = leftY + 760;
+  const negGap = 110;
+  const xMarkColor = COLOR.terracota;
+  const negSvgs = negFeatures
+    .map((feat, i) => {
+      const ny = negStartY + i * negGap;
+      const xMark = `<g transform="translate(${leftX + 70}, ${ny - 22})">
+        <circle r="22" cx="22" cy="22" fill="${xMarkColor}" />
+        <path d="M14 14 L30 30 M30 14 L14 30" stroke="${COLOR.osso}" stroke-width="3.5" stroke-linecap="round" />
+      </g>`;
+      const txt = drawHeadline({
+        text: feat,
+        font: 'sans',
+        weight: 500,
+        size: 32,
         fill: COLOR.tinta,
-        bulletStyle: 'arrow',
-        bulletColor: COLOR.terracota,
+        x: leftX + 130,
+        y: ny - 16,
+        anchor: 'left',
+      });
+      return `<g>${xMark}${txt}</g>`;
+    })
+    .join('\n');
+
+  // === LADO DIREITO (60%) — produto vem do Gemini ===
+  // Coords pra ✓ checks no lado direito (sobre área que Gemini deixa livre)
+  const rightStartX = 880;
+  // 3 ou 4 features positivas — usa bullets do params (3) + 1 fixa premium
+  const posFeatures = bullets.slice(0, 3);
+  while (posFeatures.length < 3) posFeatures.push('Acabamento curado');
+  posFeatures.push('Curadoria Amalfi');
+
+  const posStartY = 760;
+  const posGap = 110;
+  const posSvgs = posFeatures
+    .slice(0, 4)
+    .map((feat, i) =>
+      drawCheckText({
+        text: feat,
+        x: rightStartX,
+        y: posStartY + i * posGap,
+        fontSize: 32,
+        textColor: COLOR.tinta,
+        checkColor: COLOR.validacao,
       }),
     )
     .join('\n');
 
-  // Mini-comparativo canto inferior direito (frame com placeholder + ❌ + label) — coords ×2
-  const compX = 1540;
-  const compY = 1640;
-  const compW = 400;
-  const compH = 320;
-  const xMark = `<g transform="translate(${compX + compW - 72}, ${compY + 24})">
-    <circle r="28" cx="28" cy="28" fill="${COLOR.terracota}" />
-    <path d="M16 16 L40 40 M40 16 L16 40" stroke="${COLOR.osso}" stroke-width="5" stroke-linecap="round" />
-  </g>`;
-  // Placeholder de produto inferior: silhueta abstrata
-  const placeholderSilhouette = `<g transform="translate(${compX + 100}, ${compY + 60})">
-    <rect x="0" y="40" width="120" height="160" fill="${COLOR.tinta40}" rx="8" opacity="0.4" />
-    <rect x="40" y="0" width="40" height="44" fill="${COLOR.tinta40}" rx="4" opacity="0.5" />
-  </g>`;
-  const compLabel = drawHeadline({
-    text: comparisonLabel,
+  // Label "Halter Amalfi" no rodapé direito (ícone selo dourado)
+  const rightLabelBg = `<rect x="${rightStartX}" y="${posStartY - 90}" width="320" height="64" rx="32" fill="${COLOR.ocre}" />`;
+  const rightLabel = drawHeadline({
+    text: 'Curadoria Amalfi',
     font: 'sans',
-    weight: 500,
-    size: 26,
-    fill: COLOR.tinta65,
-    x: compX + compW / 2,
-    y: compY + compH - 44,
+    weight: 600,
+    size: 28,
+    fill: COLOR.tinta,
+    x: rightStartX + 160,
+    y: posStartY - 70,
     anchor: 'center',
   });
 
-  const compFrame = `<g>
-    <rect x="${compX}" y="${compY}" width="${compW}" height="${compH}" fill="${COLOR.osso15}" stroke="${COLOR.tinta40}" stroke-width="2" />
-    ${placeholderSilhouette}
-    ${xMark}
-    ${compLabel}
-  </g>`;
+  // Suprime warning de import não usado quando iconAt não é necessário aqui
+  void iconAt;
 
-  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
-    ${eyebrowSvg}
+  const svg = `<svg width="${FRAME}" height="${FRAME}" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
-    ${bulletsSvg}
-    ${compFrame}
+    ${leftFrame}
+    ${leftLabelBg}
+    ${leftLabel}
+    ${silSvg}
+    ${negSvgs}
+    ${rightLabelBg}
+    ${rightLabel}
+    ${posSvgs}
   </svg>`;
+
+  // Suprime headline (do params) e bullets/comparisonLabel — agora controlados
+  // por padrão fixo Gumpinho-style (headline "O Investimento Certo", labels
+  // "Comum" / "Curadoria Amalfi"). Mantém compatibilidade com type ainda.
+  void headline;
 
   return sharp(baseImage)
     .composite([{ input: Buffer.from(svg) }])
