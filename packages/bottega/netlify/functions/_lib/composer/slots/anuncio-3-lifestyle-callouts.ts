@@ -1,59 +1,88 @@
 /**
  * Slot 3: LIFESTYLE + CALLOUTS · 2000×2000
  * Pergunta: "Como funciona / como é usar?"
- * Overlay: headline serif topo + 3 badges circulares ao redor do produto.
+ * Layout (paridade Gumpinho — ver 04_Imagens/3.png):
+ *   - Headline sans-serif BOLD no topo
+ *   - 3 pills retangulares cápsula no rodapé com ícone + label
+ *
+ * Pills > badges circulares: melhor legibilidade, padrão "infográfico
+ * Amazon", texto não estoura mais, hierarquia visual mais forte.
  */
 
 import sharp from 'sharp';
 import type { SlotParamsLifestyleCallouts } from '../types';
-import { drawHeadline, drawCircularBadge } from '../primitives';
+import { drawHeadline, drawPill, measurePill } from '../primitives';
 import { COLOR } from '../constants';
 
 export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCallouts): Promise<Buffer> {
   const { headline, callouts } = params;
 
+  // Headline topo — sans-serif BOLD pesado (paridade Gumpinho)
   const headlineSvg = drawHeadline({
     text: headline,
-    font: 'serif',
-    size: 88,
+    font: 'sans',
+    weight: 600,
+    size: 76,
     fill: COLOR.tinta,
     x: 1000,
-    y: 140,
+    y: 80,
     anchor: 'center',
   });
 
-  // 3 badges em triângulo invertido (top-left, top-right, bottom-center) — empurrados
-  // pras bordas pra evitar sobreposição com o produto (que Gemini tende a centralizar).
-  // Top y:540 (27%) — abaixo do headline (y:140) com folga, longe do centro vertical.
-  // Lateral x:260/1740 (13%/87%) — quase encostando nas bordas.
-  // Bottom-center cy:1720 (86%) — abaixo do produto.
-  const badgePositions = [
-    { cx: 260, cy: 540 },
-    { cx: 1740, cy: 540 },
-    { cx: 1000, cy: 1720 },
-  ];
+  // 3 pills horizontais no rodapé — bg branco/osso + ícone tinta + label sans bold.
+  // Mede cada pill primeiro pra centralizar a row inteira.
+  const pillFontSize = 32;
+  const pillPaddingX = 28;
+  const pillPaddingY = 16;
+  const pillGap = 24;
 
-  const badgesSvg = callouts
-    .slice(0, 3)
-    .map((c, i) => {
-      const pos = badgePositions[i] ?? badgePositions[0];
-      return drawCircularBadge({
-        cx: pos.cx,
-        cy: pos.cy,
-        radius: 160,
-        iconKey: c.icon,
-        label: c.label,
+  const pillSpecs = callouts.slice(0, 3).map((c) => ({
+    iconKey: c.icon,
+    label: c.label,
+  }));
+
+  const pillSizes = pillSpecs.map((s) =>
+    measurePill({
+      label: s.label,
+      iconKey: s.iconKey,
+      fontSize: pillFontSize,
+      fontWeight: 600,
+      paddingX: pillPaddingX,
+      paddingY: pillPaddingY,
+    }),
+  );
+
+  const totalRowWidth = pillSizes.reduce((sum, p) => sum + p.w, 0) + pillGap * (pillSpecs.length - 1);
+  const rowStartX = (2000 - totalRowWidth) / 2;
+  const rowY = 1820; // próximo do rodapé, mas com folga pra não cortar
+
+  let cursorX = rowStartX;
+  const pillsSvg = pillSpecs
+    .map((s, i) => {
+      const sz = pillSizes[i];
+      const pill = drawPill({
+        x: cursorX,
+        y: rowY,
+        label: s.label,
+        iconKey: s.iconKey,
         bgFill: COLOR.osso,
-        borderStroke: COLOR.ocre,
-        iconColor: COLOR.terracota,
         textColor: COLOR.tinta,
+        iconColor: COLOR.tinta,
+        borderStroke: COLOR.tinta40,
+        borderWidth: 1.5,
+        fontSize: pillFontSize,
+        fontWeight: 600,
+        paddingX: pillPaddingX,
+        paddingY: pillPaddingY,
       });
+      cursorX += sz.w + pillGap;
+      return pill;
     })
     .join('\n');
 
   const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
-    ${badgesSvg}
+    ${pillsSvg}
   </svg>`;
 
   return sharp(baseImage)

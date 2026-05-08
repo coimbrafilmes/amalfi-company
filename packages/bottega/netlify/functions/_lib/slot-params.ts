@@ -211,12 +211,12 @@ export function extractSlotParams<K extends SlotKind>(
       const headline = analise.persona.label.length <= 28
         ? analise.persona.label
         : 'O essencial bem-feito';
-      // Badges circulares têm raio 160px e comportam ~22 chars (2 linhas de ~11 chars).
-      // NÃO usa motivacoesShort (50 chars) — esse limite é pra slots 5/6 que têm
-      // muito mais espaço horizontal.
+      // Pills horizontais comportam ~30 chars cada (paridade Gumpinho 04_Imagens/3.png:
+      // "Design Halter Premium" = 21, "Metal Dourado" = 13, "100% Sem Fios" = 13).
+      // 30 dá folga pra labels Amalfi-style.
       const callouts = analise.motivacoes.slice(0, 3).map((label) => ({
         icon: inferIcon(label),
-        label: shorten(label, 22),
+        label: shorten(label, 30),
       }));
       // garante 3 callouts (preenche se faltar)
       while (callouts.length < 3) callouts.push({ icon: 'circle-dot', label: 'Curado' });

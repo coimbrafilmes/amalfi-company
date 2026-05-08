@@ -214,41 +214,90 @@ export function drawTag(opts: TagOpts): string {
 }
 
 // =====================================================
-// PILL (variante do tag, mais arredondado, sem ícone obrigatório)
+// PILL (cápsula totalmente arredondada — borda rx = altura/2)
+// Aceita ícone opcional à esquerda. Padrão Gumpinho infográfico Amazon.
 // =====================================================
 
-export function drawPill(opts: {
+export interface PillOpts {
   x: number;
   y: number;
   label: string;
+  /** Ícone opcional renderizado à esquerda do texto. */
+  iconKey?: IconKey;
+  iconColor?: string;
   bgFill?: string;
   textColor?: string;
+  /** Border outline opcional (visual mais elegante quando bg=osso). */
+  borderStroke?: string;
+  borderWidth?: number;
   fontSize?: number;
+  fontWeight?: 400 | 500 | 600;
   paddingX?: number;
   paddingY?: number;
-}): string {
+}
+
+/** Calcula dimensões de uma pill SEM renderizar — útil pra layouts que precisam medir antes. */
+export function measurePill(opts: Omit<PillOpts, 'x' | 'y'>): { w: number; h: number } {
+  const fontSize = opts.fontSize ?? 15;
+  const paddingX = opts.paddingX ?? 18;
+  const paddingY = opts.paddingY ?? 9;
+  const fontKey = opts.fontWeight === 600
+    ? ('sans600' as const)
+    : opts.fontWeight === 400
+      ? ('sans400' as const)
+      : ('sans500' as const);
+  const iconSize = opts.iconKey ? fontSize * 1.2 : 0;
+  const iconGap = opts.iconKey ? iconSize + 8 : 0;
+  const metrics = textMetrics({ text: opts.label, fontKey, fontSize });
+  const w = paddingX * 2 + iconGap + metrics.width;
+  const h = paddingY * 2 + fontSize * 1.2;
+  return { w, h };
+}
+
+export function drawPill(opts: PillOpts): string {
   const fontSize = opts.fontSize ?? 15;
   const paddingX = opts.paddingX ?? 18;
   const paddingY = opts.paddingY ?? 9;
   const bg = opts.bgFill ?? COLOR.osso;
   const textColor = opts.textColor ?? COLOR.tinta;
+  const fontKey = opts.fontWeight === 600
+    ? ('sans600' as const)
+    : opts.fontWeight === 400
+      ? ('sans400' as const)
+      : ('sans500' as const);
 
-  const metrics = textMetrics({ text: opts.label, fontKey: 'sans500', fontSize });
-  const w = paddingX * 2 + metrics.width;
+  const iconSize = opts.iconKey ? fontSize * 1.2 : 0;
+  const iconGap = opts.iconKey ? iconSize + 8 : 0;
+
+  const metrics = textMetrics({ text: opts.label, fontKey, fontSize });
+  const w = paddingX * 2 + iconGap + metrics.width;
   const h = paddingY * 2 + fontSize * 1.2;
+
+  const iconSvg = opts.iconKey
+    ? iconAt(opts.iconKey, opts.x + paddingX, opts.y + (h - iconSize) / 2, {
+        stroke: opts.iconColor ?? textColor,
+        size: iconSize,
+        strokeWidth: 2,
+      })
+    : '';
 
   const labelSvg = textPath({
     text: opts.label,
-    fontKey: 'sans500',
+    fontKey,
     fontSize,
     fill: textColor,
-    x: opts.x + paddingX,
+    x: opts.x + paddingX + iconGap,
     y: opts.y + (h - fontSize) / 2,
     anchor: 'left top',
   });
 
+  const strokeAttr = opts.borderStroke
+    ? `stroke="${opts.borderStroke}" stroke-width="${opts.borderWidth ?? 1.5}"`
+    : '';
+
   return `<g>
-    <rect x="${opts.x}" y="${opts.y}" width="${w}" height="${h}" rx="${h / 2}" fill="${bg}" />
+    <rect x="${opts.x}" y="${opts.y}" width="${w}" height="${h}" rx="${h / 2}" fill="${bg}" ${strokeAttr} />
+    ${iconSvg}
     ${labelSvg}
   </g>`;
 }

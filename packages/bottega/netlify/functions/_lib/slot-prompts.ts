@@ -63,8 +63,9 @@ ${VOICE_ANCHOR}`.trim(),
 Lifestyle photography in elegant Brazilian residential context (bathroom, kitchen, or bedroom — pick the most relevant for ${form.nomeProduto}).
 Product in natural use scenario, soft warm directional lighting.
 Surface: marble or wood, blurred sophisticated background.
-LEAVE TOP 18% of frame CLEAR (top center) for headline.
-LEAVE 3 CIRCULAR ZONES — top-left (~16% from left, ~36% from top), top-right (~86% from left, ~36% from top), and bottom-center (~50% from left, ~87% from top) — for badges. Keep these regions visually clean (out of focus or simple backdrop).
+Composition: product clearly visible in the upper-middle/middle area of the frame.
+LEAVE TOP 15% of frame CLEAR (entire top band) for a bold headline overlay.
+LEAVE BOTTOM 18% of frame CLEAR (entire bottom band, plain or smoothly blurred) for 3 horizontal info pills — keep this region visually flat.
 Mood: serene, premium quiet luxury.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}

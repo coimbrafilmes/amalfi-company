@@ -137,6 +137,21 @@ Iter 2 do E2E real (produto: Escultura Abaporu) expôs 2 bugs novos mais sutis:
 
 ---
 
+### 🎨 Bloco I — Paridade visual Gumpinho (all-in, ~10.5h)
+
+Owner forneceu pasta de referência Gumpinho real com 13 imagens (7 anúncio + 6 A+).
+Análise comparativa identificou 7 mudanças pra alcançar paridade ~95%.
+
+- [x] **I1 (HIGH, 2h):** Pills retangulares no slot 3 (substitui badges circulares). Ref: 04_Imagens/3.png + modulo-1.png — `drawPill` estendido com `iconKey` opcional + `measurePill` helper. 3 pills horizontais centralizadas no rodapé y:1820, padding 28×16, fontSize 32, weight 600. Limite shorten 22→30 chars (pills aceitam mais texto que badges circulares). Headline topo agora sans-bold 76pt (era serif 88pt). Prompt slot 3 agora pede TOP 15% + BOTTOM 18% livres (era 3 zonas circulares laterais). Smoke pill_tests passa: ≤ 30 chars validados
+- [ ] **I2 (HIGH, 1h):** `drawCallout` primitive (linha + ponto + label) pra apontar partes do produto. Ref: medidas.png + modulo-3.png
+- [ ] **I3 (HIGH, 2h):** Slot 2 dimensões refatorado — fundo claro neutro + 3 callouts apontadores + régua vertical. Ref: medidas.png
+- [ ] **I4 (HIGH, 1.5h):** Inverter hierarquia tipográfica — sans-serif bold dominante, serif italic só pra emoção. Ref: todas as 13
+- [ ] **I5 (MEDIUM, 2h):** Slot 4 comparativo split grande (não mini-canto). Ref: modulo-5.png
+- [ ] **I6 (MEDIUM, 1h):** `drawSeal` octogonal premium dourado + aplicar em slots premium. Ref: 04_Imagens/3.png + modulo-1.png
+- [ ] **I7 (LOW-MEDIUM, 1h):** aplus-cta com botão dourado destacado + 2 ícones rodapé (Garantia/Envio). Ref: modulo-6.png
+
+---
+
 ## File List (esperado após implementação)
 
 **Novos:**

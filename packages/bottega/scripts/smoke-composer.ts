@@ -261,11 +261,11 @@ async function runTrimTests(): Promise<{ ok: number; fail: number }> {
 }
 
 // ============================================================
-// BADGE LENGTH TESTS — valida slot 3 callouts ≤ 22 chars
+// PILL LENGTH TESTS — valida slot 3 callouts ≤ 30 chars (paridade Gumpinho)
 // ============================================================
 
-function runBadgeLengthTests(): { ok: number; fail: number } {
-  console.log('[badge tests]');
+function runPillLengthTests(): { ok: number; fail: number } {
+  console.log('[pill tests]');
   let ok = 0;
   let fail = 0;
 
@@ -296,15 +296,15 @@ function runBadgeLengthTests(): { ok: number; fail: number } {
   } else {
     let allShort = true;
     for (const c of params.callouts) {
-      if (c.label.length > 22) {
-        console.error(`  ✗ callout "${c.label}" tem ${c.label.length} chars (max 22)`);
+      if (c.label.length > 30) {
+        console.error(`  ✗ pill "${c.label}" tem ${c.label.length} chars (max 30)`);
         allShort = false;
         fail += 1;
         break;
       }
     }
     if (allShort) {
-      console.log(`  ✓ Slot 3 callouts ≤ 22 chars (atual: ${params.callouts.map((c) => c.label.length).join(', ')})`);
+      console.log(`  ✓ Slot 3 pills ≤ 30 chars (atual: ${params.callouts.map((c) => c.label.length).join(', ')})`);
       ok += 1;
     }
   }
@@ -319,10 +319,10 @@ console.log(`[parser tests] ${parserResult.ok} OK · ${parserResult.fail} FAIL\n
 const trimResult = await runTrimTests();
 console.log(`[trim tests] ${trimResult.ok} OK · ${trimResult.fail} FAIL\n`);
 
-const badgeResult = runBadgeLengthTests();
-console.log(`[badge tests] ${badgeResult.ok} OK · ${badgeResult.fail} FAIL\n`);
+const pillResult = runPillLengthTests();
+console.log(`[pill tests] ${pillResult.ok} OK · ${pillResult.fail} FAIL\n`);
 
-const totalFails = parserResult.fail + trimResult.fail + badgeResult.fail;
+const totalFails = parserResult.fail + trimResult.fail + pillResult.fail;
 if (totalFails > 0) {
   console.error('[smoke] testes programáticos falharam — abortando antes de gerar imagens');
   process.exit(1);
