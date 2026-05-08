@@ -15,48 +15,108 @@ import type { IconKey, SlotParamsByKind } from './composer/types';
 // PARSERS de detalhesTecnicos
 // =====================================================
 
-function parseCotas(text: string): Array<{ axis: 'largura' | 'altura' | 'profundidade'; value: string }> {
-  const cotas: Array<{ axis: 'largura' | 'altura' | 'profundidade'; value: string }> = [];
+type Axis = 'largura' | 'altura' | 'profundidade';
+type Cota = { axis: Axis; value: string };
+
+/**
+ * Letras que owners brasileiros usam como sufixo de eixo em descrições.
+ * Ex: "23C x 7L x 12P", "20A × 10L × 5P".
+ * - L = Largura
+ * - A / H = Altura / Height
+ * - C / P = Comprimento / Profundidade (na Amazon BR, "comprimento" e "profundidade"
+ *   são tratados como o mesmo eixo — o lado mais longo do produto fechado)
+ */
+const AXIS_LETTER_MAP: Record<string, Axis> = {
+  l: 'largura',
+  a: 'altura',
+  h: 'altura',
+  c: 'profundidade',
+  p: 'profundidade',
+};
+
+function pushCota(cotas: Cota[], axis: Axis, raw: string): void {
+  if (cotas.find((c) => c.axis === axis)) return; // não duplica
+  cotas.push({ axis, value: `${raw.replace(',', '.')} cm` });
+}
+
+/**
+ * Extrai cotas (largura/altura/profundidade) de texto livre em pt-BR.
+ * Cobre 4 padrões em ordem de prioridade:
+ *   1. Palavras-chave: "altura: 16cm", "16cm de largura"
+ *   2. Letra-sufixo: "23C x 7L", "20A × 10L × 5P" (convenção BR)
+ *   3. AxBxC numérico: "23x7x12 cm"
+ *   4. AxB numérico (2D): "23x7 cm"
+ *
+ * "cm" é opcional em todos os padrões. Aceita "centímetros" e "centimetros".
+ */
+function parseCotas(text: string): Cota[] {
+  const cotas: Cota[] = [];
   const lower = text.toLowerCase();
 
-  // "cm" opcional — aceita "altura: 16", "altura 16cm", "16cm altura"
-  const altura = lower.match(/altura[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?altura/i)
-    ?? null;
-  if (altura) cotas.push({ axis: 'altura', value: `${altura[1].replace(',', '.')} cm` });
+  // PADRÃO 1: palavras-chave explícitas
+  // Aceita: "altura: 16", "altura 16cm", "16cm altura", "16 cm de altura"
+  const KEYWORD_PATTERNS: Array<[Axis, RegExp[]]> = [
+    ['altura', [
+      /altura[:\s]*(\d+(?:[.,]\d+)?)\s*c?m?/i,
+      /(\d+(?:[.,]\d+)?)\s*c?m?\s*(?:de\s*)?altura/i,
+    ]],
+    ['largura', [
+      /largura[:\s]*(\d+(?:[.,]\d+)?)\s*c?m?/i,
+      /(\d+(?:[.,]\d+)?)\s*c?m?\s*(?:de\s*)?largura/i,
+    ]],
+    ['profundidade', [
+      /profundidade[:\s]*(\d+(?:[.,]\d+)?)\s*c?m?/i,
+      /(\d+(?:[.,]\d+)?)\s*c?m?\s*(?:de\s*)?profundidade/i,
+      /comprimento[:\s]*(\d+(?:[.,]\d+)?)\s*c?m?/i,
+      /(\d+(?:[.,]\d+)?)\s*c?m?\s*(?:de\s*)?comprimento/i,
+    ]],
+  ];
 
-  const largura = lower.match(/largura[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?largura/i)
-    ?? null;
-  if (largura) cotas.push({ axis: 'largura', value: `${largura[1].replace(',', '.')} cm` });
-
-  const prof = lower.match(/profundidade[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
-    ?? lower.match(/(\d+(?:[.,]\d+)?)\s*cm?\s*(?:de\s*)?profundidade/i)
-    ?? lower.match(/comprimento[:\s]*(\d+(?:[.,]\d+)?)\s*cm?/i)
-    ?? null;
-  if (prof) cotas.push({ axis: 'profundidade', value: `${prof[1].replace(',', '.')} cm` });
-
-  // Fallback: "AxBxC" com ou sem "cm" no fim
-  if (cotas.length === 0) {
-    const dim = text.match(/(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*cm?/i);
-    if (dim) {
-      cotas.push({ axis: 'largura', value: `${dim[1].replace(',', '.')} cm` });
-      cotas.push({ axis: 'altura', value: `${dim[2].replace(',', '.')} cm` });
-      cotas.push({ axis: 'profundidade', value: `${dim[3].replace(',', '.')} cm` });
+  for (const [axis, patterns] of KEYWORD_PATTERNS) {
+    for (const re of patterns) {
+      const m = lower.match(re);
+      if (m) {
+        pushCota(cotas, axis, m[1]);
+        break;
+      }
     }
   }
 
-  // Fallback 2: "AxB" (2D — assume LxA, profundidade omitida)
+  // PADRÃO 2: letra-sufixo "23C x 7L x 12P"
+  // Captura sequências de "número + letra de eixo (LACPH)" separadas por x/×/espaço.
+  // \b após a letra evita pegar "23cm" (cm tem 2 letras), pega só letras isoladas.
   if (cotas.length === 0) {
-    const dim2 = text.match(/(\d+(?:[.,]\d+)?)\s*x\s*(\d+(?:[.,]\d+)?)\s*cm?/i);
+    const tokenRe = /(\d+(?:[.,]\d+)?)\s*([LACPHlacph])(?=\s|x|×|$|,|;|\.|\))/g;
+    for (const m of text.matchAll(tokenRe)) {
+      const axis = AXIS_LETTER_MAP[m[2].toLowerCase()];
+      if (axis) pushCota(cotas, axis, m[1]);
+    }
+  }
+
+  // PADRÃO 3: "AxBxC" numérico (ordem assumida: largura × altura × profundidade)
+  if (cotas.length === 0) {
+    const dim3 = text.match(/(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*c?m?/i);
+    if (dim3) {
+      pushCota(cotas, 'largura', dim3[1]);
+      pushCota(cotas, 'altura', dim3[2]);
+      pushCota(cotas, 'profundidade', dim3[3]);
+    }
+  }
+
+  // PADRÃO 4: "AxB" numérico (2D — assume largura × altura)
+  if (cotas.length === 0) {
+    const dim2 = text.match(/(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*c?m?/i);
     if (dim2) {
-      cotas.push({ axis: 'largura', value: `${dim2[1].replace(',', '.')} cm` });
-      cotas.push({ axis: 'altura', value: `${dim2[2].replace(',', '.')} cm` });
+      pushCota(cotas, 'largura', dim2[1]);
+      pushCota(cotas, 'altura', dim2[2]);
     }
   }
 
   return cotas;
 }
+
+// Export interno pra smoke test validar regex
+export const __testing = { parseCotas };
 
 function parseCapacidade(text: string): string | null {
   const m = text.match(/(\d+)\s*ml/i) ?? text.match(/(\d+)\s*L\b/i);
@@ -130,7 +190,10 @@ export function extractSlotParams<K extends SlotKind>(
 ): SlotParamsByKind[K] {
   const cotas = parseCotas(form.detalhesTecnicos);
   const capacidade = parseCapacidade(form.detalhesTecnicos);
-  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 28));
+  // Limite 50 chars — cabe motivações típicas Gemini ("Facilitar o preparo de carnes em casa")
+  // sem precisar de ellipsis em 80%+ dos casos. Slots renderizam em fontSize 36-38px num
+  // canvas 2000px de largura, dá folga visual.
+  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 50));
   const dor1 = analise.dores[0]?.titulo ?? 'Bagunça visual';
 
   switch (slot) {
@@ -160,7 +223,7 @@ export function extractSlotParams<K extends SlotKind>(
     case 'anuncio-comparativo': {
       const eyebrow = 'ACABAMENTO E DURABILIDADE';
       const headline = 'Qualidade e Confiança';
-      const bullets = (descricao.bulletPoints ?? motivacoesShort).slice(0, 3).map((b) => shorten(b, 38));
+      const bullets = (descricao.bulletPoints ?? motivacoesShort).slice(0, 3).map((b) => shorten(b, 56));
       while (bullets.length < 3) bullets.push('Detalhe que dura');
       return {
         eyebrow,
@@ -179,7 +242,7 @@ export function extractSlotParams<K extends SlotKind>(
 
     case 'anuncio-beneficios': {
       const headline = pickHeadline(PATTERNS_BENEFICIOS, form.nomeProduto);
-      const bullets = motivacoesShort.slice(0, 3).map((b) => shorten(b, 42));
+      const bullets = motivacoesShort.slice(0, 3); // já vem com 50 chars max
       while (bullets.length < 3) bullets.push('Sem complicação');
       return { headline, bullets } as SlotParamsByKind[K];
     }
@@ -272,9 +335,19 @@ export function extractSlotParams<K extends SlotKind>(
 // HELPERS
 // =====================================================
 
+/** Stopwords pt-BR que ficam feias no fim do texto cortado (ex: "...para a"). */
+const TRAILING_STOPWORDS = new Set([
+  'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas',
+  'de', 'do', 'da', 'dos', 'das',
+  'em', 'no', 'na', 'nos', 'nas',
+  'para', 'pra', 'por', 'com', 'sem',
+  'e', 'ou', 'que', 'se',
+]);
+
 /**
  * Encurta texto para `max` chars cortando no espaço mais próximo (não quebra palavra).
- * Não adiciona ellipsis quando a palavra cortada já é o final natural do texto.
+ * Remove stopwords pendurados no fim ("para a..." → "...").
+ * Adiciona ellipsis só se houve corte real.
  */
 function shorten(text: string, max: number): string {
   if (!text) return '';
@@ -284,11 +357,26 @@ function shorten(text: string, max: number): string {
   // Busca último espaço antes do limite — preserva palavra inteira
   const slice = trimmed.slice(0, max);
   const lastSpace = slice.lastIndexOf(' ');
-  // Se o espaço estiver muito no início (< 60% do max), corta direto e adiciona ellipsis
+
+  // Espaço muito no início (< 60% do max) → corta direto, palavra muito longa
   if (lastSpace < max * 0.6) {
     return slice.trimEnd() + '…';
   }
-  return trimmed.slice(0, lastSpace).trimEnd() + '…';
+
+  let result = trimmed.slice(0, lastSpace).trimEnd();
+
+  // Remove stopwords pendurados no fim ("...para a" → "...para" → ...)
+  // Faz até 2 iterações pra cobrir "para a", "de um", etc.
+  for (let i = 0; i < 2; i += 1) {
+    const lastWord = result.split(' ').pop()?.toLowerCase() ?? '';
+    if (TRAILING_STOPWORDS.has(lastWord) && result.includes(' ')) {
+      result = result.slice(0, result.lastIndexOf(' ')).trimEnd();
+    } else {
+      break;
+    }
+  }
+
+  return result + '…';
 }
 
 function detectMaterial(text: string): string {

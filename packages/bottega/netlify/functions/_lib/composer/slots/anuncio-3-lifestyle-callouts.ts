@@ -22,11 +22,15 @@ export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCall
     anchor: 'center',
   });
 
-  // 3 badges em triângulo (top-left, top-right, bottom-center) — coords ×2
+  // 3 badges em triângulo invertido (top-left, top-right, bottom-center) — empurrados
+  // pras bordas pra evitar sobreposição com o produto (que Gemini tende a centralizar).
+  // Top y:540 (27%) — abaixo do headline (y:140) com folga, longe do centro vertical.
+  // Lateral x:260/1740 (13%/87%) — quase encostando nas bordas.
+  // Bottom-center cy:1720 (86%) — abaixo do produto.
   const badgePositions = [
-    { cx: 320, cy: 720 },
-    { cx: 1728, cy: 720 },
-    { cx: 1000, cy: 1740 },
+    { cx: 260, cy: 540 },
+    { cx: 1740, cy: 540 },
+    { cx: 1000, cy: 1720 },
   ];
 
   const badgesSvg = callouts

@@ -4,8 +4,8 @@
 **Implementador:** Dex (@dev)
 **Branch:** `feat/bottega-v3-composition`
 **Pré-requisitos lidos:** `docs/specs/bottega-v3-blueprint-visual.md` (Marco), `docs/specs/bottega-v3-composition.md` (Aria)
-**Estimativa:** ~12h
-**Status:** Ready for Review (commit `671026c`, pendente push @devops + smoke E2E Sarah)
+**Estimativa:** ~12h + ~2h Bloco G (correções E2E)
+**Status:** InProgress — Bloco G (4 bugs E2E) corrigido localmente, pendente segundo push e re-validação visual
 
 ---
 
@@ -108,6 +108,20 @@ V3 composition layer está 100% implementado e gerando os 13 slots, mas o últim
 - [x] **F3:** Commit `671026c` consolidado (mudanças entrelaçadas no mesmo arquivo entre blocos B/C/D — splittar exigiria `git add -p` interativo; mensagem rica detalha cada bloco). +1004 / -143 linhas, 22 files
 - [ ] **F4:** Push para preview deploy via @devops (handoff necessário — dev não tem permissão de push)
 - [ ] **F5:** Smoke test E2E manual no preview pela Sarah: gerar anúncio com produto real, validar 13 ACs visuais do Marco
+
+---
+
+### 🔧 Bloco G — Fix bugs descobertos no E2E real (~2h) ✅
+
+E2E real do owner expôs 4 bugs visuais que build/lint não pegam. Adicionei smoke test programático pra prevenir regressão.
+
+- [x] **G0 (infra):** Criado `packages/bottega/scripts/smoke-composer.ts` — roda 15 slots com input mock realístico + Sharp local (zero custo Gemini), salva PNGs em `tmp/smoke/` pra inspeção visual. Adicionado script `npm run smoke`. Adicionado `tsx` como dev dep.
+- [x] **G0.5 (parser tests):** Smoke roda 7 testes programáticos de `parseCotas` antes de gerar imagens — bloqueia build se algum input real falha. 7/7 passando incluindo caso real do owner ("23C x 7L centímetros")
+- [x] **G1 (CRITICAL):** `parseCotas` refatorado em 4 padrões prioritários: palavras-chave → letra-sufixo (LACPH BR convention) → AxBxC → AxB. Aceita `cm` opcional, `centímetros`/`centimetros`, decimais com vírgula, `×` e `x`
+- [x] **G2 (HIGH):** `BriefingTile.tsx` reescrito — número/título/tag agora ficam **abaixo** da imagem em legenda dedicada, não mais sobre a imagem (era position:absolute z-10, agora flex column gap-2)
+- [x] **G3 (HIGH):** `shorten()` evoluído: limites motivacoesShort 28→50, comparativo 38→56. Stopwords pendurados (`para a`, `de um`, `em`) são removidos do fim antes do ellipsis
+- [x] **G4 (MEDIUM):** Slot 3 badges recalibrados — y 720→540, x 320/1728→260/1740. Triângulo invertido empurra badges pras bordas, evita zona central onde Gemini coloca produto
+- [x] **G5:** `npm run build` (526ms), `npm run lint` (zero), `npm run smoke` (15/15 + 7/7 parser) todos passam
 
 ---
 

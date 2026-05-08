@@ -14,6 +14,7 @@ interface BriefingTileProps {
 
 /**
  * BriefingTile — célula da grid de briefings.
+ * Imagem fica num quadro limpo (sem overlay textual sobreposto), legenda abaixo.
  * Variants: square (1:1) pra anúncio, landscape (970×600 → ~4:3) pra A+.
  */
 export function BriefingTile({
@@ -26,7 +27,7 @@ export function BriefingTile({
   aspect = 'square',
   className,
 }: BriefingTileProps) {
-  const paletaClass = {
+  const placeholderClass = {
     areia: 'bg-areia text-tinta',
     mar: 'bg-mar text-osso',
     ceu: 'bg-ceu text-tinta',
@@ -38,22 +39,33 @@ export function BriefingTile({
   const aspectClass = aspect === 'landscape' ? 'aspect-[970/600]' : 'aspect-square';
 
   return (
-    <div className={cn(aspectClass, 'p-4 flex flex-col justify-between relative overflow-hidden', paletaClass, className)}>
-      {imageBase64 ? (
-        <img src={imageBase64} alt={titulo} className="absolute inset-0 w-full h-full object-cover" />
-      ) : null}
-      <div className="relative z-10 font-display text-base opacity-70">{String(numero).padStart(2, '0')}</div>
-      <div className="relative z-10">
-        <p className="font-editorial italic text-[17px] leading-snug">{titulo}</p>
+    <div className={cn('flex flex-col gap-2', className)}>
+      {/* Quadro da imagem — sem overlay textual sobreposto */}
+      <div className={cn(aspectClass, 'relative overflow-hidden', !imageBase64 && placeholderClass)}>
+        {imageBase64 ? (
+          <img src={imageBase64} alt={titulo} className="w-full h-full object-cover" />
+        ) : null}
+        {failed && (
+          <span className="absolute top-3 right-3 z-10 bg-terracota text-osso px-2 py-0.5 font-ui text-[9px] font-medium uppercase tracking-widest">
+            falhou
+          </span>
+        )}
       </div>
-      <span className="absolute bottom-4 left-4 z-10 font-ui text-[9px] font-medium uppercase tracking-widest opacity-70">
-        {tag}
-      </span>
-      {failed && (
-        <span className="absolute top-3 right-3 z-10 bg-terracota text-osso px-2 py-0.5 font-ui text-[9px] font-medium uppercase tracking-widest">
-          falhou
+
+      {/* Legenda abaixo da imagem */}
+      <div className="px-1 space-y-1">
+        <div className="flex items-baseline gap-2">
+          <span className="font-display text-base opacity-70 tabular-nums">
+            {String(numero).padStart(2, '0')}
+          </span>
+          <p className="font-editorial italic text-[15px] leading-snug flex-1 opacity-90">
+            {titulo}
+          </p>
+        </div>
+        <span className="block font-ui text-[9px] font-medium uppercase tracking-widest opacity-50">
+          {tag}
         </span>
-      )}
+      </div>
     </div>
   );
 }

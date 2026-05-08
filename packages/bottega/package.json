@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "smoke": "tsx scripts/smoke-composer.ts"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.2.11",
@@ -48,6 +49,7 @@
     "globals": "^17.5.0",
     "postcss": "^8.5.14",
     "tailwindcss": "^3.4.19",
+    "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10"
