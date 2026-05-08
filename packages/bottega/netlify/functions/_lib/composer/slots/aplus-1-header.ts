@@ -5,7 +5,7 @@
 
 import sharp from 'sharp';
 import type { SlotParamsAplusHeader } from '../types';
-import { drawHeadline, drawTag } from '../primitives';
+import { drawHeadline, drawSeal, drawTag } from '../primitives';
 import { COLOR } from '../constants';
 
 export async function compose(baseImage: Buffer, params: SlotParamsAplusHeader): Promise<Buffer> {
@@ -76,11 +76,24 @@ export async function compose(baseImage: Buffer, params: SlotParamsAplusHeader):
       })
     : '';
 
+  // Selo octogonal premium canto superior direito (paridade modulo-1.png)
+  const seal = drawSeal({
+    cx: 890,
+    cy: 80,
+    radius: 60,
+    text: ['Curado', 'Amalfi'],
+    fillColor: COLOR.ocre,
+    borderColor: COLOR.tinta,
+    textColor: COLOR.tinta,
+    fontSize: 11,
+  });
+
   const svg = `<svg width="970" height="600" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
     ${subSvg}
     ${badge1}
     ${badge2}
+    ${seal}
   </svg>`;
 
   return sharp(baseImage)

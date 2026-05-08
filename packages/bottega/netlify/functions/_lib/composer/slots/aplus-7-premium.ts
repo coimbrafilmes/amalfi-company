@@ -7,7 +7,7 @@
 
 import sharp from 'sharp';
 import type { SlotParamsAplusPremium } from '../types';
-import { drawHeadline, drawTag } from '../primitives';
+import { drawHeadline, drawSeal, drawTag } from '../primitives';
 import { COLOR } from '../constants';
 
 export async function compose(baseImage: Buffer, params: SlotParamsAplusPremium): Promise<Buffer> {
@@ -76,10 +76,23 @@ export async function compose(baseImage: Buffer, params: SlotParamsAplusPremium)
   // Marca implícita do gap (não renderizada, só pra clareza do layout):
   void badgeGap;
 
+  // Selo octogonal premium canto superior direito
+  const seal = drawSeal({
+    cx: 1380,
+    cy: 80,
+    radius: 60,
+    text: ['Curado', 'Amalfi'],
+    fillColor: COLOR.ocre,
+    borderColor: COLOR.tinta,
+    textColor: COLOR.tinta,
+    fontSize: 11,
+  });
+
   const svg = `<svg width="1464" height="600" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
     ${subSvg}
     ${badgesSvg}
+    ${seal}
   </svg>`;
 
   return sharp(baseImage)

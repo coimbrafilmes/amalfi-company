@@ -11,7 +11,7 @@
 
 import sharp from 'sharp';
 import type { SlotParamsLifestyleCallouts } from '../types';
-import { drawHeadline, drawPill, measurePill } from '../primitives';
+import { drawHeadline, drawPill, drawSeal, measurePill } from '../primitives';
 import { COLOR } from '../constants';
 
 export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCallouts): Promise<Buffer> {
@@ -80,8 +80,20 @@ export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCall
     })
     .join('\n');
 
+  // Selo octogonal premium no canto superior direito
+  const seal = drawSeal({
+    cx: 1820,
+    cy: 280,
+    radius: 130,
+    text: ['Curado', 'Amalfi'],
+    fillColor: COLOR.ocre,
+    borderColor: COLOR.tinta,
+    textColor: COLOR.tinta,
+  });
+
   const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
     ${headlineSvg}
+    ${seal}
     ${pillsSvg}
   </svg>`;
 

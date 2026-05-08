@@ -303,6 +303,81 @@ export function drawPill(opts: PillOpts): string {
 }
 
 // =====================================================
+// SEAL (medalha octogonal premium dourada — paridade Gumpinho)
+// Ref: 04_Imagens/3.png canto superior direito ("Premium Metal Finish"),
+// modulo-1.png canto superior direito.
+// =====================================================
+
+export interface SealOpts {
+  cx: number;
+  cy: number;
+  radius: number;
+  /** 2-3 linhas curtas (3-4 chars cada idealmente) — vai pra UPPERCASE. */
+  text: string[];
+  fillColor?: string;
+  borderColor?: string;
+  textColor?: string;
+  fontSize?: number;
+}
+
+export function drawSeal(opts: SealOpts): string {
+  const fillColor = opts.fillColor ?? COLOR.ocre;
+  const borderColor = opts.borderColor ?? COLOR.tinta;
+  const textColor = opts.textColor ?? COLOR.tinta;
+  const fontSize = opts.fontSize ?? opts.radius * 0.20;
+
+  // 8 vértices do octógono regular — top começa no eixo Y
+  const r = opts.radius;
+  const a = r * 0.7071; // r/√2 — diagonais
+  const verts: Array<[number, number]> = [
+    [opts.cx, opts.cy - r],         // top
+    [opts.cx + a, opts.cy - a],     // top-right
+    [opts.cx + r, opts.cy],         // right
+    [opts.cx + a, opts.cy + a],     // bottom-right
+    [opts.cx, opts.cy + r],         // bottom
+    [opts.cx - a, opts.cy + a],     // bottom-left
+    [opts.cx - r, opts.cy],         // left
+    [opts.cx - a, opts.cy - a],     // top-left
+  ];
+
+  const outerPoints = verts.map((v) => `${v[0]},${v[1]}`).join(' ');
+  // Polígono interno (efeito de borda dupla decorativa)
+  const innerScale = 0.88;
+  const innerPoints = verts
+    .map(([x, y]) => {
+      const newX = opts.cx + (x - opts.cx) * innerScale;
+      const newY = opts.cy + (y - opts.cy) * innerScale;
+      return `${newX},${newY}`;
+    })
+    .join(' ');
+
+  // Texto centralizado vertical
+  const lineGap = fontSize * 1.15;
+  const totalHeight = (opts.text.length - 1) * lineGap;
+  const textStartY = opts.cy - totalHeight / 2 - fontSize / 2;
+
+  const textSvgs = opts.text
+    .map((line, i) =>
+      textPath({
+        text: line.toUpperCase(),
+        fontKey: 'sans600',
+        fontSize,
+        fill: textColor,
+        x: opts.cx,
+        y: textStartY + i * lineGap,
+        anchor: 'center top',
+      }),
+    )
+    .join('');
+
+  return `<g>
+    <polygon points="${outerPoints}" fill="${fillColor}" stroke="${borderColor}" stroke-width="3" />
+    <polygon points="${innerPoints}" fill="none" stroke="${borderColor}" stroke-width="1.5" opacity="0.6" />
+    ${textSvgs}
+  </g>`;
+}
+
+// =====================================================
 // CALLOUT (linha indicadora + ponto âncora + label)
 // Padrão Gumpinho infográfico Amazon — aponta partes específicas do produto
 // com legenda. Ex: "Sensor Touch" → topo do produto, "Antiderrapante" → base.
