@@ -15,7 +15,7 @@
 # Functions: deixa Netlify usar bundler default (zisi) que mantem hooks runtime.
 # Esbuild como bundler costuma quebrar os hooks que injetam Blobs context.
 [functions]
-  external_node_modules = ["@google/genai", "@netlify/blobs", "sharp", "text-to-svg"]
+  external_node_modules = ["@google/genai", "@netlify/blobs", "sharp", "text-to-svg", "openai"]
   included_files = [
     "node_modules/sharp/**",
     "node_modules/@img/**",

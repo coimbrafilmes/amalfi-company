@@ -179,6 +179,28 @@ E2E pós-Bloco J: bugs técnicos fechados, mas owner ainda diz "horrível, muito
 
 ---
 
+### 🚀 Bloco L — Pivot pra OpenAI gpt-image-1 (modelo do ChatGPT)
+
+Após 5 ciclos (G→H→I→J→K) tentando replicar Gumpinho com Gemini Image, ficou claro que o gap é DE MODELO. Owner mostrou screenshot ChatGPT com qualidade idêntica Gumpinho. Pivot estratégico: trocar Gemini Image → OpenAI gpt-image-1.
+
+**Custo aprovado:** ~$0.63/anúncio (medium quality)
+**Vantagens gpt-image-1:** texto legível embedded, layout descritivo, multi-imagem composição, infográfico design-style nativo.
+
+- [x] **L1:** `openai@^6.37` instalado como dep
+- [x] **L2:** `pipelineOpenAI.ts` criado — fluxo paralelo ao Gemini, usa Gemini Text pra textos (barato) + OpenAI gpt-image-1 pra imagens. Suporta `images.edit` (multi-image input com fotos refs do produto, fidelidade) e `images.generate` (cena pura). Pool de concorrência limitado (4 simultâneos pra respeitar rate limit OpenAI Tier 1)
+- [x] **L3:** `slot-prompts-openai.ts` criado — 15 prompts reescritos no estilo gpt-image-1: pedem TUDO no prompt (texto exato + cores hex + posicionamento por % + layout descritivo). Cada slot é descrito como infográfico Amazon BR top-seller, mood Conde Nast/Architectural Digest/Aman Resort
+- [x] **L4:** `pipeline.ts` ganhou toggle `IMAGE_PROVIDER` env var: `'gemini'` (default) | `'openai'`. Lazy import do pipelineOpenAI só quando provider=openai. `regenerateOneImage` também rotea pelo provider
+- [x] **L5:** `netlify.toml` — `openai` adicionado em `external_node_modules`
+- [x] **L6:** Composer SVG vira **opcional** quando OpenAI: env `APPLY_COMPOSER=false` desliga overlay (gpt-image-1 já gera tudo). Default true (segurança).
+- [x] **L7:** Build + lint + smoke todos passando
+
+Pendente:
+- Owner gerar OPENAI_API_KEY em platform.openai.com + adicionar créditos
+- @devops setar env vars no Netlify: `OPENAI_API_KEY=sk-...`, `IMAGE_PROVIDER=openai`, `OPENAI_IMAGE_QUALITY=medium`
+- Push final + E2E owner
+
+---
+
 ## File List (esperado após implementação)
 
 **Novos:**

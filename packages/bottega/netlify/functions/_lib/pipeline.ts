@@ -142,7 +142,23 @@ interface PipelineOpts {
   onStep: (step: string, progress?: { current: number; total: number }) => Promise<void>;
 }
 
+/**
+ * Provider toggle (Bloco L): permite alternar entre Gemini e OpenAI sem deploy.
+ * Setar IMAGE_PROVIDER=openai no Netlify ativa pipelineOpenAI.ts (gpt-image-1).
+ * Default 'gemini' — comportamento atual.
+ */
+const IMAGE_PROVIDER = (process.env.IMAGE_PROVIDER ?? 'gemini').toLowerCase();
+
 export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts): Promise<CriacaoResults> {
+  if (IMAGE_PROVIDER === 'openai') {
+    // Lazy import — evita carregar OpenAI SDK em deploys que só usam Gemini
+    const { runAnuncioPipelineOpenAI } = await import('./pipelineOpenAI');
+    return runAnuncioPipelineOpenAI(form, opts);
+  }
+  return runAnuncioPipelineGemini(form, opts);
+}
+
+async function runAnuncioPipelineGemini(form: CriacaoForm, opts: PipelineOpts): Promise<CriacaoResults> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY não configurada no servidor');
 
@@ -350,9 +366,23 @@ export async function runAnuncioPipeline(form: CriacaoForm, opts: PipelineOpts):
 
 /**
  * Regenera UMA imagem específica pelo slotKind.
- * Usado pelo regen-image function.
+ * Usado pelo regen-image function. Rotea pelo IMAGE_PROVIDER.
  */
 export async function regenerateOneImage(
+  slot: SlotKind,
+  form: CriacaoForm,
+  analise: import('../../../src/types/anuncio').AnaliseDeMercado,
+  descricao: import('../../../src/types/anuncio').DescricaoResult,
+  visualSpec?: string,
+): Promise<{ base64: string; largura: number; altura: number; modelUsado: string }> {
+  if (IMAGE_PROVIDER === 'openai') {
+    const { regenerateOneImageOpenAI } = await import('./pipelineOpenAI');
+    return regenerateOneImageOpenAI(slot, form, analise, descricao, visualSpec);
+  }
+  return regenerateOneImageGemini(slot, form, analise, descricao, visualSpec);
+}
+
+async function regenerateOneImageGemini(
   slot: SlotKind,
   form: CriacaoForm,
   analise: import('../../../src/types/anuncio').AnaliseDeMercado,
