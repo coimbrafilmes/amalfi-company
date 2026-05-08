@@ -53,7 +53,7 @@ Retorne JSON estritamente neste schema:
   "dores": [
     { "titulo": "frase curta editorial", "descricao": "2-3 frases honestas, sem dramatizar" }
   ],
-  "motivacoes": ["motivação 1", "motivação 2", "motivação 3", "motivação 4"],
+  "motivacoes": ["motivacao 1", "motivacao 2", "motivacao 3", "motivacao 4"],
   "janelaDeDecisao": "ex: '24 a 72 horas após primeira busca'",
   "publicoSecundario": "público adicional (1 frase) ou null"
 }
@@ -63,6 +63,39 @@ REGRAS:
 - 3 a 5 motivações.
 - Tudo em pt-BR fluente. Zero anglicismo desnecessário.
 - Zero superlativos vazios.
+
+⚡ REGRA CRÍTICA — formato das MOTIVAÇÕES (paridade Gumpinho/Amazon BR top sellers):
+
+Cada motivação DEVE ser uma FEATURE-LABEL CURTA E PUNCHY no estilo de pills
+de anúncio Amazon BR. Não escreva frases literárias.
+
+✅ FORMATO CORRETO (12-22 caracteres cada):
+   - "Vidro Resistente"
+   - "Design Clássico"
+   - "Combina com Tudo"
+   - "Acabamento Premium"
+   - "100% Sem Fios"
+   - "Touch Dimerizável"
+   - "Recarga USB"
+   - "Cabo Ergonômico"
+
+❌ FORMATO ERRADO (NÃO faça isso):
+   - "Compor uma mesa que reflita cuidado e bom gosto" (longo, literário)
+   - "Sentir-se bem ao servir convidados" (verbo emocional)
+   - "Agregar valor estético e intelectual ao lar" (poético, vago)
+   - "Expressar identidade e pertencimento" (filosófico)
+
+REGRAS RÍGIDAS DAS MOTIVAÇÕES:
+- Cada motivação: 12 a 22 caracteres MÁX (mobile-first pra carousel/pills)
+- Formato: substantivo + 1 adjetivo curto OU 2-3 substantivos
+- Use Title Case (primeira letra de cada palavra-chave maiúscula)
+- ZERO verbos no gerúndio ("compondo", "expressando", "agregando")
+- ZERO verbos abstratos ("compor", "expressar", "agregar", "transformar")
+- ZERO frases completas com "que" ou "para"
+- USE features TANGÍVEIS do produto, não emoções vagas
+- Se o produto tem "vidro/metal/tecido", inclua MATERIAL como motivação
+- Se o produto tem "320ml/16cm/2kg", inclua MEDIDA como motivação
+- Se o produto tem "USB/wireless/touch", inclua TECNOLOGIA como motivação
 `.trim();
 }
 

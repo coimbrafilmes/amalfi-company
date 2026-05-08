@@ -1,15 +1,17 @@
 /**
  * Slot 2: DIMENSÕES · 2000×2000
- * Pergunta: "Cabe no meu espaço?"
+ * Pergunta: "Cabe no meu espaço? / O que recebo?"
  *
  * Layout (paridade Gumpinho — ver medidas.png + modulo-3.png):
  *   - Headline sans-bold topo: "Especificações Técnicas"
  *   - Produto centralizado em fundo claro studio (Gemini renderiza)
- *   - Callouts apontando partes do produto (drawCallout):
- *       Largura → ponto-âncora no meio do produto, label à esquerda
- *       Profundidade → ponto-âncora na base do produto, label à esquerda abaixo
- *   - Régua vertical direita (drawVerticalRuler) com altura
+ *   - Callouts apontando partes do produto (drawCallout)
+ *   - Régua vertical direita (drawVerticalRuler) com altura ou capacidade
  *   - Footer: nomeProduto · capacidade
+ *
+ * Fallback Bloco J: quando cotas em cm não disponíveis (ex: "Taça 320ml" só
+ * tem capacidade), usa material/cor/capacidade como callouts e capacidade
+ * na régua. Slot nunca fica vazio.
  */
 
 import sharp from 'sharp';
@@ -20,9 +22,8 @@ import { COLOR } from '../constants';
 const FRAME = 2000;
 
 export async function compose(baseImage: Buffer, params: SlotParamsDimensoes): Promise<Buffer> {
-  const { cotas, footerLabel } = params;
+  const { cotas, footerLabel, capacidade, material, cor } = params;
 
-  // Headline topo — sans bold
   const headlineSvg = drawHeadline({
     text: 'Especificações Técnicas',
     font: 'sans',
@@ -34,16 +35,18 @@ export async function compose(baseImage: Buffer, params: SlotParamsDimensoes): P
     anchor: 'center',
   });
 
-  // Mapear cotas por eixo pra layout
+  const elements: string[] = [headlineSvg];
+
+  // Mapear cotas por eixo
   const altura = cotas.find((c) => c.axis === 'altura');
   const largura = cotas.find((c) => c.axis === 'largura');
   const profundidade = cotas.find((c) => c.axis === 'profundidade');
 
-  const elements: string[] = [headlineSvg];
-
-  // Régua vertical à direita com altura (se disponível)
-  // Caso não haja altura, mas haja largura, usa largura como "extensão maior"
-  const rulerLabel = altura?.value ?? largura?.value;
+  // ============================================================
+  // Régua vertical à direita
+  // ============================================================
+  // Prioridade: altura > largura > capacidade (fallback)
+  const rulerLabel = altura?.value ?? largura?.value ?? capacidade;
   if (rulerLabel) {
     elements.push(
       drawVerticalRuler({
@@ -59,13 +62,51 @@ export async function compose(baseImage: Buffer, params: SlotParamsDimensoes): P
     );
   }
 
-  // Callout largura — ponto-âncora no meio horizontal do produto, label esquerda
-  if (largura) {
+  // ============================================================
+  // Callouts à esquerda — apontam partes do produto
+  // ============================================================
+  // Configuração: 1-3 callouts. Coords y verticalmente espaçadas.
+  // Ordem de prioridade quando temos cotas físicas:
+  //   1. Largura
+  //   2. Profundidade
+  //   3. Material (sempre)
+  //
+  // Quando cotas vazias (fallback Bloco J):
+  //   1. Material
+  //   2. Cor (se detectada)
+  //   3. Capacidade (se não foi pra régua)
+  //
+  // Coords y: distribuídas em 3 alturas pra não sobrepor.
+  const calloutSlots: Array<{ y: number }> = [
+    { y: 600 },
+    { y: 1000 },
+    { y: 1400 },
+  ];
+  const calloutLabels: string[] = [];
+
+  if (cotas.length > 0) {
+    // Modo cotas: temos dimensões cm declaradas
+    if (largura) calloutLabels.push(`Largura · ${largura.value}`);
+    if (profundidade) calloutLabels.push(`Profundidade · ${profundidade.value}`);
+    if (material) calloutLabels.push(`Material · ${material}`);
+  } else {
+    // Modo fallback: produto sem cm — usa material/cor/capacidade
+    if (material) calloutLabels.push(`Material · ${material}`);
+    if (cor) calloutLabels.push(`Cor · ${cor}`);
+    // Capacidade só vai pra callout se a régua já estiver renderizando outra coisa.
+    // Se rulerLabel === capacidade, ela já tá lá; senão adiciona aqui.
+    if (capacidade && rulerLabel !== capacidade) {
+      calloutLabels.push(`Capacidade · ${capacidade}`);
+    }
+  }
+
+  calloutLabels.slice(0, 3).forEach((label, i) => {
+    const slot = calloutSlots[i];
     elements.push(
       drawCallout({
-        anchor: { x: 800, y: 900 },
-        labelEnd: { x: 360, y: 900 },
-        label: `Largura · ${largura.value}`,
+        anchor: { x: 800, y: slot.y },
+        labelEnd: { x: 360, y: slot.y },
+        label,
         labelSide: 'left',
         fontSize: 36,
         fontWeight: 500,
@@ -74,30 +115,9 @@ export async function compose(baseImage: Buffer, params: SlotParamsDimensoes): P
         strokeWidth: 2,
       }),
     );
-  }
+  });
 
-  // Callout profundidade — ponto-âncora na base do produto, label esquerda
-  if (profundidade) {
-    elements.push(
-      drawCallout({
-        anchor: { x: 800, y: 1450 },
-        labelEnd: { x: 360, y: 1450 },
-        label: `Profundidade · ${profundidade.value}`,
-        labelSide: 'left',
-        fontSize: 36,
-        fontWeight: 500,
-        stroke: COLOR.tinta,
-        textColor: COLOR.tinta,
-        strokeWidth: 2,
-      }),
-    );
-  }
-
-  // Caso tenha altura E (não tem régua porque já usou ela acima) — adiciona callout de altura também
-  // Quando rulerLabel veio de "altura", já está renderizado na régua. Quando rulerLabel veio de "largura"
-  // (sem altura), nem precisa do callout de altura. Então não adiciona altura aqui.
-
-  // Footer — nome do produto + capacidade
+  // Footer
   const footer = drawHeadline({
     text: footerLabel,
     font: 'sans',

@@ -190,10 +190,10 @@ export function extractSlotParams<K extends SlotKind>(
 ): SlotParamsByKind[K] {
   const cotas = parseCotas(form.detalhesTecnicos);
   const capacidade = parseCapacidade(form.detalhesTecnicos);
-  // Limite 50 chars — cabe motivações típicas Gemini ("Facilitar o preparo de carnes em casa")
-  // sem precisar de ellipsis em 80%+ dos casos. Slots renderizam em fontSize 36-38px num
-  // canvas 2000px de largura, dá folga visual.
-  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 50));
+  // Limite 24 chars — Bloco J: motivações agora vêm DO GEMINI já como feature-labels
+  // curtas (12-22 chars), igual ao Gumpinho ("Vidro Resistente", "Design Clássico").
+  // Limite 24 dá folga pra 22 + 2 de tolerância e bloqueia overflow se Gemini exceder.
+  const motivacoesShort = analise.motivacoes.map((m) => shorten(m, 24));
   const dor1 = analise.dores[0]?.titulo ?? 'Bagunça visual';
 
   switch (slot) {
@@ -201,24 +201,36 @@ export function extractSlotParams<K extends SlotKind>(
       return {} as SlotParamsByKind[K];
 
     case 'anuncio-dimensoes': {
-      const footerLabel = capacidade
+      // Dedup: se a capacidade já aparece no nomeProduto (ex: "Taça 320ml Vidro"),
+      // não duplicar no footer ("Taça 320ml Vidro · 320ml" → "Taça 320ml Vidro")
+      const capacidadeJaNoNome = capacidade
+        && form.nomeProduto.toLowerCase().includes(capacidade.toLowerCase());
+      const footerLabel = (capacidade && !capacidadeJaNoNome)
         ? `${shorten(form.nomeProduto, 30)} · ${capacidade}`
         : shorten(form.nomeProduto, 40);
-      return { cotas, footerLabel } as SlotParamsByKind[K];
+      // Fallbacks pra slot 2 quando cotas vazias (produto sem cm declarado).
+      // Composer usa esses pra renderizar callouts genéricos + régua com capacidade.
+      const material = detectMaterial(form.detalhesTecnicos);
+      const cor = detectCor(form.detalhesTecnicos) ?? undefined;
+      return {
+        cotas,
+        footerLabel,
+        capacidade: capacidade ?? undefined,
+        material,
+        cor,
+      } as SlotParamsByKind[K];
     }
 
     case 'anuncio-lifestyle-callouts': {
       const headline = analise.persona.label.length <= 28
         ? analise.persona.label
         : 'O essencial bem-feito';
-      // Pills horizontais comportam ~30 chars cada (paridade Gumpinho 04_Imagens/3.png:
-      // "Design Halter Premium" = 21, "Metal Dourado" = 13, "100% Sem Fios" = 13).
-      // 30 dá folga pra labels Amalfi-style.
+      // Pills curtas — motivações já vêm do Gemini como feature-labels 12-22 chars
+      // (paridade Gumpinho: "Design Halter Premium", "Metal Dourado", "100% Sem Fios").
       const callouts = analise.motivacoes.slice(0, 3).map((label) => ({
         icon: inferIcon(label),
-        label: shorten(label, 30),
+        label: shorten(label, 24),
       }));
-      // garante 3 callouts (preenche se faltar)
       while (callouts.length < 3) callouts.push({ icon: 'circle-dot', label: 'Curado' });
       return { headline, callouts } as SlotParamsByKind[K];
     }
@@ -244,8 +256,16 @@ export function extractSlotParams<K extends SlotKind>(
     }
 
     case 'anuncio-beneficios': {
-      const headline = pickHeadline(PATTERNS_BENEFICIOS, form.nomeProduto);
-      const bullets = motivacoesShort.slice(0, 3); // já vem com 50 chars max
+      // Headline construído das 2 primeiras motivações reais (feature-labels curtas
+      // vindas do Gemini). Formato "Feature1 e Feature2" mantém compat com o composer
+      // do slot 6 que faz split em " e " pra renderizar 2 linhas.
+      // Fallback pra padrão fixo quando motivações não couberem.
+      const m1 = motivacoesShort[0];
+      const m2 = motivacoesShort[1];
+      const headline = (m1 && m2 && (m1.length + m2.length + 3) <= 50)
+        ? `${m1} e ${m2}`
+        : pickHeadline(PATTERNS_BENEFICIOS, form.nomeProduto);
+      const bullets = motivacoesShort.slice(0, 3);
       while (bullets.length < 3) bullets.push('Sem complicação');
       return { headline, bullets } as SlotParamsByKind[K];
     }
@@ -398,6 +418,21 @@ function detectMaterial(text: string): string {
   if (/metal/.test(lower)) return 'Metal';
   if (/algodão|linho|tecido/.test(lower)) return 'Tecido natural';
   return 'Material nobre';
+}
+
+/** Detecta cor declarada no texto técnico do produto. Retorna null se não achar. */
+function detectCor(text: string): string | null {
+  const lower = text.toLowerCase();
+  if (/dourad|gold/.test(lower)) return 'Dourado';
+  if (/prateado|silver/.test(lower)) return 'Prateado';
+  if (/preto|black/.test(lower)) return 'Preto';
+  if (/branco|white/.test(lower)) return 'Branco';
+  if (/incolor|transparente/.test(lower)) return 'Incolor';
+  if (/bege|nude/.test(lower)) return 'Bege';
+  if (/marrom|brown/.test(lower)) return 'Marrom';
+  if (/cobre|copper/.test(lower)) return 'Cobre';
+  if (/rosé|rose|champagne/.test(lower)) return 'Rosé';
+  return null;
 }
 
 function inferUsos(nomeProduto: string, _dor: string): Array<{ icon: IconKey; label: string }> {

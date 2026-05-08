@@ -24,7 +24,8 @@ const NO_PACKAGING_ANCHOR = `CRITICAL — render ONLY the bare product fully unp
 
 // Reforco contra Gemini "preencher" negative space com tipografia ilegivel/labels falsos.
 // O composer vai adicionar todo texto depois — a CENA deve estar 100% limpa.
-const NO_TEXT_ANCHOR = `STRICT — ABSOLUTELY ZERO text, letters, words, numbers, signs, labels, captions, watermarks, logos, badges with text, price tags, or typography of ANY kind ANYWHERE in the image. The scene must be photographic only.`;
+// V2 (Bloco J): mais agressivo após Gemini alucinar "HEADLINE Serif Headline 600%" no slot 6.
+const NO_TEXT_ANCHOR = `STRICT NO-TEXT POLICY — ABSOLUTELY ZERO text, letters, words, numbers, signs, labels, captions, watermarks, logos, brand mockups, badges with text, price tags, headline samples, layout placeholders, design templates, font specimens, lorem ipsum, sample copy, or typography of ANY kind ANYWHERE in the image. NO pseudo-text, NO illegible-but-text-like marks, NO graphic design overlays. This is a 100% PHOTOGRAPHIC scene — like a real photograph captured with a camera, not a designed mockup or template. If you would normally add a label, headline, or caption — DO NOT. The scene must look like an unedited photograph.`;
 
 // Critico para slot 3 (lifestyle-callouts): o composer adiciona EXATAMENTE 3 badges circulares.
 // Gemini nao pode gerar circulos decorativos extras (aneis, copos redondos em primeiro plano,

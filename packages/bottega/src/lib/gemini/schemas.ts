@@ -10,6 +10,10 @@ import { z } from 'zod';
 
 const shortText = z.string().min(1).max(2_000);
 
+// Motivações são feature-labels curtas tipo Gumpinho/Amazon BR pills (max 30 chars).
+// Limite 30 dá folga pra 22 ideal + 8 de tolerância (Gemini pode levemente exceder).
+const motivacaoLabel = z.string().min(8).max(30);
+
 export const analiseSchema = z.object({
   persona: z.object({
     label: shortText,
@@ -17,7 +21,7 @@ export const analiseSchema = z.object({
     perfilDemografico: shortText,
   }),
   dores: z.array(z.object({ titulo: shortText, descricao: shortText })).min(2).max(5),
-  motivacoes: z.array(shortText).min(3).max(7),
+  motivacoes: z.array(motivacaoLabel).min(3).max(7),
   janelaDeDecisao: shortText,
   publicoSecundario: z.string().max(2_000).nullable().optional(),
 });

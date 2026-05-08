@@ -47,6 +47,14 @@ export interface SlotParamsDimensoes {
   }>;
   /** Label rodapé. Ex: "Dispenser de Sabonete · 240ml" */
   footerLabel: string;
+  /**
+   * Fallbacks usados quando cotas vazias (produto sem dimensão cm declarada,
+   * só capacidade tipo "320ml" ou só "vidro"). Composer usa esses pra montar
+   * callouts genéricos + label da régua.
+   */
+  capacidade?: string;
+  material?: string;
+  cor?: string;
 }
 
 export interface SlotParamsLifestyleCallouts {

@@ -152,6 +152,19 @@ Análise comparativa identificou 7 mudanças pra alcançar paridade ~95%.
 
 ---
 
+### 🩹 Bloco J — Fixes pós-E2E Bloco I (~2-3h)
+
+E2E real do Bloco I (produto Taça Roman) expôs 5 bugs visuais. Owner frustrado:
+"TA HORRIVEL AINDA! QUERO IGUAL AO GUMPINHO".
+
+- [x] **J1 (CRITICAL):** NO_TEXT_ANCHOR V2 super-agressivo — agora explícito contra "headline samples, layout placeholders, design templates, font specimens, lorem ipsum, sample copy". Reforça que cena é "100% PHOTOGRAPHIC, like a real photograph captured with a camera, not a designed mockup"
+- [x] **J4 (HIGH):** promptAnalise reformulado — motivações agora obrigatoriamente feature-labels 12-22 chars estilo Gumpinho ("Vidro Resistente", "Design Clássico"). Schema analiseSchema bloqueia >30 chars no validator. Limite shorten 50→24 em motivacoesShort (defesa em profundidade). Smoke test confirma zero ellipsis com motivações curtas
+- [x] **J2 (HIGH):** SlotParamsDimensoes ganhou capacidade/material/cor opcionais. extractor preenche detectMaterial+detectCor (nova função pra 9 cores). Composer slot 2 lógica adaptativa: se cotas presentes → callouts dimensionais. Se vazias → callouts genéricos (Material/Cor/Capacidade). Régua usa altura > largura > capacidade (fallback). Slot nunca fica vazio agora
+- [x] **J3 (MEDIUM):** Footer dedup — `capacidadeJaNoNome` checa se capacidade já está no nomeProduto antes de concatenar. "Taça 320ml Vidro · 320ml" → "Taça de Água Roman 320ml Vidro"
+- [x] **J5 (MEDIUM):** Slot 6 headline agora usa `motivacoesShort[0] + " e " + motivacoesShort[1]` (ex: "Vidro Resistente e Design Clássico"). Fallback pra pickHeadline se motivações combinadas excederem 50 chars
+
+---
+
 ## File List (esperado após implementação)
 
 **Novos:**

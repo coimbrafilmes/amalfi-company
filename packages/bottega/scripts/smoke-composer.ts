@@ -261,7 +261,7 @@ async function runTrimTests(): Promise<{ ok: number; fail: number }> {
 }
 
 // ============================================================
-// PILL LENGTH TESTS — valida slot 3 callouts ≤ 30 chars (paridade Gumpinho)
+// PILL LENGTH TESTS — valida slot 3 callouts ≤ 24 chars (Bloco J — feature-labels Gumpinho)
 // ============================================================
 
 function runPillLengthTests(): { ok: number; fail: number } {
@@ -269,15 +269,16 @@ function runPillLengthTests(): { ok: number; fail: number } {
   let ok = 0;
   let fail = 0;
 
-  // Mock com motivações LONGAS (37-43 chars) — tipo o caso real "Escultura Abaporu"
+  // Mock com motivações LONGAS (defesa em profundidade) — schema agora bloqueia,
+  // mas o shorten ainda precisa cortar caso passe.
   const longMotivacoes: AnaliseDeMercado = {
     persona: { label: 'Cultura na casa', descricao: 'x', perfilDemografico: 'x' },
     dores: [{ titulo: 'd1', descricao: 'x' }, { titulo: 'd2', descricao: 'x' }],
     motivacoes: [
-      'Conectar a casa à cultura brasileira',                  // 37 chars
-      'Expressar identidade e pertencimento',                  // 36 chars
-      'Agregar valor estético e intelectual ao lar',           // 43 chars
-      'Obra clássica reinterpretada',                          // 28 chars
+      'Conectar a casa à cultura brasileira', // 37 chars (cenário pré-Bloco J)
+      'Expressar identidade e pertencimento', // 36 chars
+      'Agregar valor estético e intelectual ao lar', // 43 chars
+      'Obra clássica reinterpretada', // 28 chars
     ],
     janelaDeDecisao: '24h',
     publicoSecundario: null,
@@ -296,17 +297,101 @@ function runPillLengthTests(): { ok: number; fail: number } {
   } else {
     let allShort = true;
     for (const c of params.callouts) {
-      if (c.label.length > 30) {
-        console.error(`  ✗ pill "${c.label}" tem ${c.label.length} chars (max 30)`);
+      if (c.label.length > 24) {
+        console.error(`  ✗ pill "${c.label}" tem ${c.label.length} chars (max 24)`);
         allShort = false;
         fail += 1;
         break;
       }
     }
     if (allShort) {
-      console.log(`  ✓ Slot 3 pills ≤ 30 chars (atual: ${params.callouts.map((c) => c.label.length).join(', ')})`);
+      console.log(`  ✓ Slot 3 pills ≤ 24 chars (atual: ${params.callouts.map((c) => c.label.length).join(', ')})`);
       ok += 1;
     }
+  }
+
+  // Caso ideal Bloco J: motivações já vindo curtas do Gemini (12-22 chars)
+  const idealMotivacoes: AnaliseDeMercado = {
+    persona: { label: 'Cultura na casa', descricao: 'x', perfilDemografico: 'x' },
+    dores: [{ titulo: 'd1', descricao: 'x' }, { titulo: 'd2', descricao: 'x' }],
+    motivacoes: [
+      'Vidro Resistente',     // 16 chars (Gumpinho-style)
+      'Design Clássico',      // 15 chars
+      'Combina com Tudo',     // 16 chars
+      'Acabamento Premium',   // 18 chars
+    ],
+    janelaDeDecisao: '24h',
+    publicoSecundario: null,
+  };
+  const idealParams = extractSlotParams(
+    'anuncio-lifestyle-callouts',
+    mockForm,
+    idealMotivacoes,
+    mockDescricao,
+  ) as SlotParamsLifestyleCallouts;
+  // Sem ellipsis quando origem é curta (tudo cabe em 24)
+  const noEllipsis = idealParams.callouts.every((c) => !c.label.includes('…'));
+  if (noEllipsis) {
+    console.log(`  ✓ Pills com motivações Gumpinho-style: zero ellipsis`);
+    ok += 1;
+  } else {
+    console.error(`  ✗ Pills com motivações curtas ainda têm ellipsis: ${idealParams.callouts.map((c) => c.label).join(', ')}`);
+    fail += 1;
+  }
+
+  return { ok, fail };
+}
+
+// ============================================================
+// SLOT 2 FALLBACK TEST — valida que slot 2 sem cm declarado ainda renderiza
+// ============================================================
+
+function runSlot2FallbackTests(): { ok: number; fail: number } {
+  console.log('[slot2 fallback tests]');
+  let ok = 0;
+  let fail = 0;
+
+  // Caso 1: produto sem cm, só com capacidade + material
+  const formSemCm: CriacaoForm = {
+    nomeProduto: 'Taça de Água Roman 320ml Vidro',
+    detalhesTecnicos: 'Fácil de limpar. Material vidro temperado. Cor incolor. Capacidade 320ml. Versátil para água, sucos ou drinks em eventos.',
+    numeroImagens: 7,
+    estiloImagem: 'lifestyle',
+  };
+
+  const params = extractSlotParams(
+    'anuncio-dimensoes',
+    formSemCm,
+    mockAnalise,
+    mockDescricao,
+  ) as { cotas: unknown[]; footerLabel: string; capacidade?: string; material?: string; cor?: string };
+
+  // Cotas devem estar vazias (sem cm declarado)
+  if (params.cotas.length !== 0) {
+    console.error(`  ✗ cotas deveria ser [], veio com ${params.cotas.length} items`);
+    fail += 1;
+  } else {
+    console.log(`  ✓ Sem cm declarado: cotas vazia (correto)`);
+    ok += 1;
+  }
+
+  // Mas params devem ter capacidade + material + cor (fallback)
+  const hasFallback = params.capacidade && params.material && params.cor;
+  if (hasFallback) {
+    console.log(`  ✓ Fallback presente: capacidade="${params.capacidade}", material="${params.material}", cor="${params.cor}"`);
+    ok += 1;
+  } else {
+    console.error(`  ✗ Fallback ausente: capacidade=${params.capacidade}, material=${params.material}, cor=${params.cor}`);
+    fail += 1;
+  }
+
+  // Footer dedup: "320ml Vidro · 320ml" não deve duplicar
+  if (!params.footerLabel.match(/320ml.*320ml/i)) {
+    console.log(`  ✓ Footer dedup OK: "${params.footerLabel}"`);
+    ok += 1;
+  } else {
+    console.error(`  ✗ Footer duplicou capacidade: "${params.footerLabel}"`);
+    fail += 1;
   }
 
   return { ok, fail };
@@ -322,7 +407,10 @@ console.log(`[trim tests] ${trimResult.ok} OK · ${trimResult.fail} FAIL\n`);
 const pillResult = runPillLengthTests();
 console.log(`[pill tests] ${pillResult.ok} OK · ${pillResult.fail} FAIL\n`);
 
-const totalFails = parserResult.fail + trimResult.fail + pillResult.fail;
+const slot2Result = runSlot2FallbackTests();
+console.log(`[slot2 fallback tests] ${slot2Result.ok} OK · ${slot2Result.fail} FAIL\n`);
+
+const totalFails = parserResult.fail + trimResult.fail + pillResult.fail + slot2Result.fail;
 if (totalFails > 0) {
   console.error('[smoke] testes programáticos falharam — abortando antes de gerar imagens');
   process.exit(1);
