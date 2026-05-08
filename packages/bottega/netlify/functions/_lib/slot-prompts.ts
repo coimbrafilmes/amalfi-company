@@ -49,14 +49,17 @@ ${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-dimensoes': ({ form, visualSpec }) => `
-Product photography on light marble or cream surface.
-Product (${form.nomeProduto}) clearly visible, centered, no people.
-Soft natural diffused lighting from upper-left.
-Background: blurred neutral bathroom or counter, very subtle.
-LEAVE 25% MARGIN around product on top, left, and bottom for measurement annotations to be added later.
-Composition: product fills only the central area; ample negative space surrounding.
+Catalog-style product spec sheet of ${form.nomeProduto}.
+NEUTRAL LIGHT studio backdrop — soft off-white to light cream gradient (#F8F4EE to #EFE8DD).
+NO surface, NO marble, NO countertop, NO lifestyle scene — like an isolated catalog photo.
+Product centered occupying ~45-55% of frame width and ~50-60% of frame height (smaller than cover).
+Soft diffused omnidirectional studio lighting, very subtle ground shadow only.
+LEAVE WIDE MARGINS on left, right, top, and bottom — the entire LEFT 22% and RIGHT 22% must be visually empty for measurement annotations and a vertical ruler.
+Top 10% and bottom 12% also clear for headline + footer label.
+Mood: technical reference, clean, almost editorial spec-sheet.
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-lifestyle-callouts': ({ form, visualSpec }) => `

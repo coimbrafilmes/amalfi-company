@@ -1,83 +1,117 @@
 /**
  * Slot 2: DIMENSÕES · 2000×2000
  * Pergunta: "Cabe no meu espaço?"
- * Overlay: cotas (setas + medidas) + footer label.
  *
- * Layout (coords escaladas ×2 do baseline 1024 — Amazon BR exige 2000+ pra zoom mobile):
- * - Largura: cota horizontal acima do produto (y ~ 180, x range central 480-1560)
- * - Altura: cota vertical à esquerda (x ~ 180, y range 400-1640)
- * - Profundidade (se houver): cota diagonal pequena no canto inferior direito
- * - Footer: label centralizada em y ~ 1860
+ * Layout (paridade Gumpinho — ver medidas.png + modulo-3.png):
+ *   - Headline sans-bold topo: "Especificações Técnicas"
+ *   - Produto centralizado em fundo claro studio (Gemini renderiza)
+ *   - Callouts apontando partes do produto (drawCallout):
+ *       Largura → ponto-âncora no meio do produto, label à esquerda
+ *       Profundidade → ponto-âncora na base do produto, label à esquerda abaixo
+ *   - Régua vertical direita (drawVerticalRuler) com altura
+ *   - Footer: nomeProduto · capacidade
  */
 
 import sharp from 'sharp';
 import type { SlotParamsDimensoes } from '../types';
-import { drawDimensionLine, drawHeadline } from '../primitives';
+import { drawCallout, drawHeadline, drawVerticalRuler } from '../primitives';
 import { COLOR } from '../constants';
+
+const FRAME = 2000;
 
 export async function compose(baseImage: Buffer, params: SlotParamsDimensoes): Promise<Buffer> {
   const { cotas, footerLabel } = params;
 
-  const cotaSvgs: string[] = [];
+  // Headline topo — sans bold
+  const headlineSvg = drawHeadline({
+    text: 'Especificações Técnicas',
+    font: 'sans',
+    weight: 600,
+    size: 56,
+    fill: COLOR.tinta,
+    x: FRAME / 2,
+    y: 90,
+    anchor: 'center',
+  });
 
-  for (const cota of cotas) {
-    if (cota.axis === 'largura') {
-      cotaSvgs.push(
-        drawDimensionLine({
-          from: { x: 480, y: 180 },
-          to: { x: 1560, y: 180 },
-          label: cota.value,
-          stroke: COLOR.tinta,
-          textColor: COLOR.tinta,
-          fontSize: 52,
-          textPosition: 'above',
-          dashed: true,
-        }),
-      );
-    } else if (cota.axis === 'altura') {
-      cotaSvgs.push(
-        drawDimensionLine({
-          from: { x: 180, y: 400 },
-          to: { x: 180, y: 1640 },
-          label: cota.value,
-          stroke: COLOR.tinta,
-          textColor: COLOR.tinta,
-          fontSize: 52,
-          textPosition: 'left',
-          dashed: true,
-        }),
-      );
-    } else if (cota.axis === 'profundidade') {
-      // Diagonal pequena canto inferior direito
-      cotaSvgs.push(
-        drawDimensionLine({
-          from: { x: 1440, y: 1740 },
-          to: { x: 1840, y: 1840 },
-          label: cota.value,
-          stroke: COLOR.tinta65,
-          textColor: COLOR.tinta65,
-          fontSize: 44,
-          textPosition: 'below',
-          dashed: true,
-        }),
-      );
-    }
+  // Mapear cotas por eixo pra layout
+  const altura = cotas.find((c) => c.axis === 'altura');
+  const largura = cotas.find((c) => c.axis === 'largura');
+  const profundidade = cotas.find((c) => c.axis === 'profundidade');
+
+  const elements: string[] = [headlineSvg];
+
+  // Régua vertical à direita com altura (se disponível)
+  // Caso não haja altura, mas haja largura, usa largura como "extensão maior"
+  const rulerLabel = altura?.value ?? largura?.value;
+  if (rulerLabel) {
+    elements.push(
+      drawVerticalRuler({
+        top: { x: 1720, y: 380 },
+        bottom: { x: 1720, y: 1620 },
+        label: rulerLabel,
+        width: 50,
+        tickCount: 24,
+        fontSize: 44,
+        stroke: COLOR.tinta,
+        textColor: COLOR.tinta,
+      }),
+    );
   }
 
+  // Callout largura — ponto-âncora no meio horizontal do produto, label esquerda
+  if (largura) {
+    elements.push(
+      drawCallout({
+        anchor: { x: 800, y: 900 },
+        labelEnd: { x: 360, y: 900 },
+        label: `Largura · ${largura.value}`,
+        labelSide: 'left',
+        fontSize: 36,
+        fontWeight: 500,
+        stroke: COLOR.tinta,
+        textColor: COLOR.tinta,
+        strokeWidth: 2,
+      }),
+    );
+  }
+
+  // Callout profundidade — ponto-âncora na base do produto, label esquerda
+  if (profundidade) {
+    elements.push(
+      drawCallout({
+        anchor: { x: 800, y: 1450 },
+        labelEnd: { x: 360, y: 1450 },
+        label: `Profundidade · ${profundidade.value}`,
+        labelSide: 'left',
+        fontSize: 36,
+        fontWeight: 500,
+        stroke: COLOR.tinta,
+        textColor: COLOR.tinta,
+        strokeWidth: 2,
+      }),
+    );
+  }
+
+  // Caso tenha altura E (não tem régua porque já usou ela acima) — adiciona callout de altura também
+  // Quando rulerLabel veio de "altura", já está renderizado na régua. Quando rulerLabel veio de "largura"
+  // (sem altura), nem precisa do callout de altura. Então não adiciona altura aqui.
+
+  // Footer — nome do produto + capacidade
   const footer = drawHeadline({
     text: footerLabel,
     font: 'sans',
     weight: 500,
-    size: 44,
+    size: 38,
     fill: COLOR.tinta,
-    x: 1000,
-    y: 1860,
+    x: FRAME / 2,
+    y: 1880,
     anchor: 'center',
   });
+  elements.push(footer);
 
-  const svg = `<svg width="2000" height="2000" xmlns="http://www.w3.org/2000/svg">
-    ${cotaSvgs.join('\n')}
-    ${footer}
+  const svg = `<svg width="${FRAME}" height="${FRAME}" xmlns="http://www.w3.org/2000/svg">
+    ${elements.join('\n')}
   </svg>`;
 
   return sharp(baseImage)
