@@ -32,6 +32,19 @@ const NO_TEXT_ANCHOR = `STRICT NO-TEXT POLICY — ABSOLUTELY ZERO text, letters,
 // floroes circulares) que possam ser confundidos com badges adicionais.
 const NO_DECORATIVE_CIRCLES_ANCHOR = `IMPORTANT — DO NOT include any decorative circular elements, golden rings, round badges, circular plates, framed circles, or round overlays in the scene composition. Keep the background visually flat and free of round geometric accents.`;
 
+// CINEMATIC LUXURY VIBE — paridade Gumpinho. Cenas geradas pelo Gemini estavam
+// "mornas" (cozinha mediana, taça pequena no canto). Esse anchor força drama
+// de magazine editorial / luxury hotel commercial. Aplicado em slots
+// lifestyle/aspirational (3, 5, 6, 7, A+ hero, A+ cta).
+const LUXURY_VIBE_ANCHOR = `CINEMATIC LUXURY VIBE — render the scene like a high-end editorial spread (Conde Nast Traveler, Architectural Digest, Saint Laurent residential, Veuve Clicquot ad, Eichholtz showroom). MANDATORY visual treatment:
+- WARM GOLDEN HOUR ambient lighting (soft sunset glow, never flat midday)
+- VERY SHALLOW depth of field — background heavily blurred, dreamy bokeh
+- Product feels like a HERO — central, confident, lit dramatically with rim light
+- Composition is CINEMATIC — like a still from a luxury commercial, not stock photo
+- Materials in scene are PREMIUM — marble, wood, brass, velvet, linen — never plastic or cheap surfaces
+- Color palette is RICH and MOODY — deep tones with warm highlights, never flat or washed-out
+- The image must feel ASPIRATIONAL — viewer wants to BE in this scene, not just buy the product`;
+
 function fidelityClause(visualSpec?: string): string {
   if (!visualSpec) return '';
   return `\n\nIMPORTANT — render the EXACT product described:\n${visualSpec}`;
@@ -64,13 +77,12 @@ ${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-lifestyle-callouts': ({ form, visualSpec }) => `
-Lifestyle photography in elegant Brazilian residential context (bathroom, kitchen, or bedroom — pick the most relevant for ${form.nomeProduto}).
-Product in natural use scenario, soft warm directional lighting.
-Surface: marble or wood, blurred sophisticated background.
-Composition: product clearly visible in the upper-middle/middle area of the frame.
+Editorial luxury lifestyle scene featuring ${form.nomeProduto} in elegant Brazilian residential context (boutique hotel suite, magazine-spread interior, design studio living room — pick the most natural fit for the product category).
+Product is the HERO — clearly visible upper-middle of frame, lit with cinematic rim light, confident presence.
+Surface: dark marble, walnut wood, brass accents, or rich linen — never plastic or cheap.
 LEAVE TOP 15% of frame CLEAR (entire top band) for a bold headline overlay.
-LEAVE BOTTOM 18% of frame CLEAR (entire bottom band, plain or smoothly blurred) for 3 horizontal info pills — keep this region visually flat.
-Mood: serene, premium quiet luxury.
+LEAVE BOTTOM 18% of frame CLEAR (entire bottom band, smoothly blurred) for 3 horizontal info pills — keep this region visually flat.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
 ${NO_TEXT_ANCHOR}
@@ -89,44 +101,46 @@ ${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-aspiracional': ({ form, visualSpec }) => `
-Aspirational lifestyle photography, dreamy warm golden hour lighting.
-Setting: spa-like Brazilian bathroom or living space — marble or wooden counter, eucalyptus plant, lit candle, white folded towel.
-Product (${form.nomeProduto}) subtle in scene, not dominant.
+Cinematic aspirational scene featuring ${form.nomeProduto} in a luxury setting (boutique hotel spa, Mediterranean villa interior, magazine-spread bathroom, designer's home).
+Setting elements: white marble, eucalyptus plant, lit beeswax candles, folded linen towels, brass accents — Veuve Clicquot ad / Aman Resort vibe.
+Product placement: integrated into the scene, NOT subtle and faded — visible enough to read material/finish, but the SCENE is the star.
 LEAVE TOP-LEFT 60% clear for large serif headline overlay (composer adds text — keep this region purely photographic with no decorative typography).
-Mood: serene, transformative, invitation to elevated lifestyle.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
 ${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-beneficios': ({ form, visualSpec }) => `
-Everyday Brazilian residential lifestyle, well-organized clean bathroom or home counter.
-Product (${form.nomeProduto}) clearly visible and focal, daily-use feeling.
-Neutral natural lighting, mid-day soft window light.
+Cinematic everyday-luxe lifestyle of ${form.nomeProduto} — feels like a moment captured for an editorial magazine, not a stock photo.
+Setting: well-curated Brazilian residence, premium materials (marble, walnut, brass), warm afternoon light streaming in.
+Product is clearly visible and confidently placed — the kind of product placement you'd see in a Saint Laurent home spread.
 LEAVE TOP-LEFT 60% clear for serif headline + bullet list (composer adds text — keep this region purely photographic with no decorative typography).
-Mood: practical sophistication, friendly daily ritual.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
 ${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'anuncio-prova-final': ({ form, visualSpec }) => `
-Hero product photography of ${form.nomeProduto}, premium ambient lighting, golden hour glow.
-Surface: marble, blurred elegant bathroom background with bathtub silhouette.
-Mood: aspirational quiet luxury, central product hero.
+Hero close-up product portrait of ${form.nomeProduto} — magazine cover-style, dramatic and confident.
+Material details visible: brushed metal, etched glass, polished surface — whatever applies, render it precisely.
+Setting: rich blurred background (marble bathroom, walnut counter, dark velvet) — pure mood, no distracting elements.
 LEAVE LEFT 25% and RIGHT 25% margins clear for small elegant tag overlays.
-Camera close-up showing material quality and finish details.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-header': ({ form, visualSpec }) => `
-Wide horizontal cinematic product hero shot for ${form.nomeProduto} (970×600 landscape).
-Premium environment, golden hour ambient lighting.
+Wide cinematic editorial hero shot for ${form.nomeProduto} (970×600 landscape).
 Product on RIGHT THIRD of frame, LEFT TWO-THIRDS clear for typography overlay.
-Setting: marble + wood luxury bathroom, blurred elegant.
+Setting: feels like the opening spread of a Conde Nast Traveler feature — luxury hotel suite, marble + walnut + brass, warm twilight light.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-antes-depois': ({ form, visualSpec }) => `
@@ -171,12 +185,14 @@ ${NO_PACKAGING_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-cta': ({ form, visualSpec }) => `
-Aspirational final lifestyle scene, premium spa-like Brazilian bathroom.
-Marble + golden accents, eucalyptus plant, large mirror, ${form.nomeProduto} elegantly placed in upper-right area.
-Mood: invitation to elevated lifestyle, warm intimate.
+Cinematic final lifestyle scene featuring ${form.nomeProduto} — like the closing frame of a luxury hotel commercial or the back cover of an Aman resort brochure.
+Setting: rich, intimate, warm — boutique hotel suite at golden hour, candle-lit dinner scene, or designer's residential sanctuary. Marble + brass + eucalyptus + lit candles.
+${form.nomeProduto} placed in upper-right area with cinematic presence.
 LEAVE TOP-LEFT 60% clear for elegant serif headline + sub-CTA + 3 mini-tags.
+${LUXURY_VIBE_ANCHOR}
 ${fidelityClause(visualSpec)}
 ${NO_PACKAGING_ANCHOR}
+${NO_TEXT_ANCHOR}
 ${VOICE_ANCHOR}`.trim(),
 
   'aplus-premium': ({ form, visualSpec }) => `

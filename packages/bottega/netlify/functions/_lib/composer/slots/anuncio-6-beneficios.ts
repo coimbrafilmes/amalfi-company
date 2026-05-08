@@ -45,9 +45,9 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
       })
     : '';
 
-  // line1 ocupa até y~244, line2 até y~374 — bullets começam com folga
-  const bulletStartY = line2 ? 480 : 320;
-  const bulletGap = 84;
+  // line1 ocupa até y~244, line2 até y~374 — bullets fontSize aumentado pra hierarquia
+  const bulletStartY = line2 ? 510 : 350;
+  const bulletGap = 96;
   const bulletsSvg = bullets
     .slice(0, 3)
     .map((b, i) =>
@@ -55,7 +55,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsBeneficios): 
         text: b,
         x: 120,
         y: bulletStartY + i * bulletGap,
-        fontSize: 36,
+        fontSize: 44,
         fill: COLOR.tinta,
         bulletStyle: 'dot',
         bulletColor: COLOR.ocre,

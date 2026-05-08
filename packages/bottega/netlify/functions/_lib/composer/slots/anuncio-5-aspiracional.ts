@@ -39,9 +39,9 @@ export async function compose(baseImage: Buffer, params: SlotParamsAspiracional)
       })
     : '';
 
-  // Sub-bullets em rows abaixo do headline (line1 ocupa até y~330, line2 até y~520)
-  const bulletStartY = line2 ? 590 : 430;
-  const bulletGap = 76;
+  // Sub-bullets — fontSize aumentado pra balancear hierarquia com headline 128pt
+  const bulletStartY = line2 ? 620 : 460;
+  const bulletGap = 90;
   const bulletsSvg = subBullets
     .slice(0, 3)
     .map((b, i) =>
@@ -49,7 +49,7 @@ export async function compose(baseImage: Buffer, params: SlotParamsAspiracional)
         text: b,
         x: 120,
         y: bulletStartY + i * bulletGap,
-        fontSize: 38,
+        fontSize: 48,
         fill: COLOR.tinta,
         font: 'italic',
         bulletStyle: 'dot',

@@ -17,15 +17,15 @@ import { COLOR } from '../constants';
 export async function compose(baseImage: Buffer, params: SlotParamsLifestyleCallouts): Promise<Buffer> {
   const { headline, callouts } = params;
 
-  // Headline topo — sans-serif BOLD pesado (paridade Gumpinho)
+  // Headline topo — sans-serif BOLD pesado dominante (paridade Gumpinho — banda topo cheia)
   const headlineSvg = drawHeadline({
     text: headline,
     font: 'sans',
     weight: 600,
-    size: 76,
+    size: 96,
     fill: COLOR.tinta,
     x: 1000,
-    y: 80,
+    y: 100,
     anchor: 'center',
   });
 

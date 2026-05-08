@@ -165,6 +165,20 @@ E2E real do Bloco I (produto Taça Roman) expôs 5 bugs visuais. Owner frustrado
 
 ---
 
+### 🎬 Bloco K — Refinar conteúdo Gemini (cinematic luxury vibe) ~2h
+
+E2E pós-Bloco J: bugs técnicos fechados, mas owner ainda diz "horrível, muito atrás" do Gumpinho. Diagnóstico Gage: gap está em CONTEÚDO Gemini (motivações descritivas + cenas mornas + hierarquia visual fraca).
+
+- [x] **K1:** promptAnalise reformulado — motivações agora obrigatoriamente BENEFÍCIOS DISFARÇADOS DE FEATURE, não só descrição. Adicionados ✅/❌ extensivos: "Brilho Cristalino" (vende beleza, soa material) vs "Vidro Transparente" (só descreve). Catálogo de exemplos por categoria (taça/luminária/dispenser/escultura) — Gemini tem agora referências concretas
+- [x] **K2:** Novo `LUXURY_VIBE_ANCHOR` — direcional cinematográfico: golden hour, shallow DOF, hero product, magazine editorial Conde Nast/Architectural Digest, Veuve Clicquot ad/Aman Resort vibe. Aplicado em 6 slots: anuncio-3, anuncio-5, anuncio-6, anuncio-7 + aplus-1 + aplus-cta. Reescritos prompts pra remover linguagem "morna" ("bathroom, kitchen") substituída por "boutique hotel suite, magazine-spread interior"
+- [x] **K3:** Hierarquia visual recalibrada:
+  - Slot 3 headline: 76pt → **96pt** (banda topo dominante)
+  - Slot 5 sub-bullets: 38pt → **48pt** (balanceia headline 128pt)
+  - Slot 6 bullets: 36pt → **44pt**, gap 84→96
+  - Y-coords ajustados pra acompanhar tamanhos novos
+
+---
+
 ## File List (esperado após implementação)
 
 **Novos:**

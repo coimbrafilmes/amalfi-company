@@ -66,36 +66,79 @@ REGRAS:
 
 ⚡ REGRA CRÍTICA — formato das MOTIVAÇÕES (paridade Gumpinho/Amazon BR top sellers):
 
-Cada motivação DEVE ser uma FEATURE-LABEL CURTA E PUNCHY no estilo de pills
-de anúncio Amazon BR. Não escreva frases literárias.
+Cada motivação DEVE ser um BENEFÍCIO DISFARÇADO DE FEATURE — combina:
+- O QUE o produto entrega (material/tecnologia/funcionalidade) +
+- QUAL SENSAÇÃO/STATUS/DIFERENCIAL isso traz pra Amazon shopper.
 
-✅ FORMATO CORRETO (12-22 caracteres cada):
-   - "Vidro Resistente"
-   - "Design Clássico"
-   - "Combina com Tudo"
-   - "Acabamento Premium"
-   - "100% Sem Fios"
-   - "Touch Dimerizável"
-   - "Recarga USB"
-   - "Cabo Ergonômico"
+A motivação precisa fazer o consumidor pensar "EU QUERO ISSO", não "isso é
+um produto descritivo". Gumpinho-style: vende emoção disfarçada de feature.
 
-❌ FORMATO ERRADO (NÃO faça isso):
-   - "Compor uma mesa que reflita cuidado e bom gosto" (longo, literário)
+✅ FORMATO CORRETO — BENEFÍCIO PUNCHY (12-22 caracteres cada):
+
+Premium/sofisticação:
+   - "Design Halter Premium"   (vende status, soa feature)
+   - "Brilho Cristalino"        (vende beleza, soa material)
+   - "Acabamento Dourado"       (vende luxo, soa visual)
+   - "Toque Sensorial"          (vende experiência, soa funcional)
+
+Sensação/uso:
+   - "Mesa Posta Diária"        (vende ritual, soa contexto)
+   - "Drinks Premium"           (vende status, soa contexto)
+   - "Luz Aconchegante"         (vende mood, soa funcional)
+   - "Conforto Premium"         (vende sensação, soa qualidade)
+   - "Café da Manhã Especial"   (vende ritual, soa contexto)
+
+Tecnologia/diferencial:
+   - "100% Sem Fios"            (vende liberdade, soa feature)
+   - "Touch Dimerizável"        (vende controle, soa tech)
+   - "Recarga USB Rápida"       (vende praticidade, soa tech)
+   - "Bateria 8h"               (vende autonomia, soa spec)
+
+❌ FORMATO ERRADO — só descreve, não vende:
+   - "Vidro Transparente"       (descreve material, sem promessa)
+   - "Conjunto 6 Peças"         (descreve quantidade, sem benefício)
+   - "Uso Diário"               (descreve frequência, sem aspiração)
+   - "Material Resistente"      (vago, sem diferencial)
+   - "Acabamento Bonito"        (subjetivo vazio)
+
+❌ FORMATO ERRADO — frases literárias:
+   - "Compor uma mesa que reflita cuidado e bom gosto" (longo, poético)
    - "Sentir-se bem ao servir convidados" (verbo emocional)
-   - "Agregar valor estético e intelectual ao lar" (poético, vago)
-   - "Expressar identidade e pertencimento" (filosófico)
+   - "Agregar valor estético e intelectual ao lar" (filosófico)
 
 REGRAS RÍGIDAS DAS MOTIVAÇÕES:
 - Cada motivação: 12 a 22 caracteres MÁX (mobile-first pra carousel/pills)
-- Formato: substantivo + 1 adjetivo curto OU 2-3 substantivos
+- Cada motivação combina FEATURE TANGÍVEL + BENEFÍCIO IMPLÍCITO
 - Use Title Case (primeira letra de cada palavra-chave maiúscula)
-- ZERO verbos no gerúndio ("compondo", "expressando", "agregando")
+- ZERO verbos no gerúndio ("compondo", "expressando")
 - ZERO verbos abstratos ("compor", "expressar", "agregar", "transformar")
-- ZERO frases completas com "que" ou "para"
-- USE features TANGÍVEIS do produto, não emoções vagas
-- Se o produto tem "vidro/metal/tecido", inclua MATERIAL como motivação
-- Se o produto tem "320ml/16cm/2kg", inclua MEDIDA como motivação
-- Se o produto tem "USB/wireless/touch", inclua TECNOLOGIA como motivação
+- ZERO frases com "que" ou "para"
+- ZERO descrições sem promessa ("Vidro Transparente" só, "Conjunto 6 Peças" só)
+- Se for descrever material/quantidade/uso, AGREGUE a um adjetivo de
+  benefício: "Vidro Cristalino" não "Vidro Transparente"; "Set Editorial"
+  não "Conjunto 6 Peças"; "Mesa Posta Diária" não "Uso Diário".
+
+EXEMPLOS POR CATEGORIA DE PRODUTO (referência):
+
+Taça/copo de vidro:
+   - "Brilho Cristalino", "Mesa Posta Diária", "Drinks Premium",
+     "Set Editorial", "Toque Aconchegante"
+
+Luminária/abajur:
+   - "Luz Aconchegante", "100% Sem Fios", "Touch Dimerizável",
+     "Hotel Boutique", "Atmosfera Spa"
+
+Dispenser/decoração banho:
+   - "Acabamento Dourado", "Pump Suave", "Banho Spa", "Mármore Hotel",
+     "Ritual Sensorial"
+
+Tomada/elétrico:
+   - "Sem Fios Visíveis", "Instalação Rápida", "Acabamento Premium",
+     "Liberdade Visual"
+
+Escultura/peça decorativa:
+   - "Arte Brasileira", "Peça Editorial", "Toque Curatorial",
+     "Profundidade Cultural"
 `.trim();
 }
 
