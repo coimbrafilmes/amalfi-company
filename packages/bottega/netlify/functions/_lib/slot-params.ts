@@ -211,9 +211,12 @@ export function extractSlotParams<K extends SlotKind>(
       const headline = analise.persona.label.length <= 28
         ? analise.persona.label
         : 'O essencial bem-feito';
-      const callouts = motivacoesShort.slice(0, 3).map((label) => ({
+      // Badges circulares têm raio 160px e comportam ~22 chars (2 linhas de ~11 chars).
+      // NÃO usa motivacoesShort (50 chars) — esse limite é pra slots 5/6 que têm
+      // muito mais espaço horizontal.
+      const callouts = analise.motivacoes.slice(0, 3).map((label) => ({
         icon: inferIcon(label),
-        label,
+        label: shorten(label, 22),
       }));
       // garante 3 callouts (preenche se faltar)
       while (callouts.length < 3) callouts.push({ icon: 'circle-dot', label: 'Curado' });
@@ -347,19 +350,23 @@ const TRAILING_STOPWORDS = new Set([
 /**
  * Encurta texto para `max` chars cortando no espaço mais próximo (não quebra palavra).
  * Remove stopwords pendurados no fim ("para a..." → "...").
- * Adiciona ellipsis só se houve corte real.
+ * Adiciona ellipsis só se houve corte real. **Output total é sempre ≤ max** —
+ * o ellipsis (1 char) é reservado dentro do orçamento.
  */
 function shorten(text: string, max: number): string {
   if (!text) return '';
   const trimmed = text.trim();
   if (trimmed.length <= max) return trimmed;
 
+  // Reserva 1 char pro ellipsis no orçamento (output final ≤ max chars)
+  const budget = max - 1;
+
   // Busca último espaço antes do limite — preserva palavra inteira
-  const slice = trimmed.slice(0, max);
+  const slice = trimmed.slice(0, budget);
   const lastSpace = slice.lastIndexOf(' ');
 
-  // Espaço muito no início (< 60% do max) → corta direto, palavra muito longa
-  if (lastSpace < max * 0.6) {
+  // Espaço muito no início (< 60% do budget) → corta direto, palavra muito longa
+  if (lastSpace < budget * 0.6) {
     return slice.trimEnd() + '…';
   }
 

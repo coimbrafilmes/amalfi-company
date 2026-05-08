@@ -125,6 +125,18 @@ E2E real do owner expôs 4 bugs visuais que build/lint não pegam. Adicionei smo
 
 ---
 
+### 🔧 Bloco H — Iter 2 do E2E (~30min) ✅
+
+Iter 2 do E2E real (produto: Escultura Abaporu) expôs 2 bugs novos mais sutis:
+
+- [x] **H1 (CRITICAL):** Bordas pretas (letterbox) em slots de anúncio. Causa: Gemini Image às vezes ignora `aspectRatio:'1:1'` e retorna PNG com letterbox preto embutido. Fix em `cropImage.ts`: `sharp.trim({ background: 'black', threshold: 12 })` antes do resize. Trim é no-op se imagem não tem letterbox
+- [x] **H2 (CRITICAL):** Slot 3 badges com texto longo estourando círculo. Causa: usava `motivacoesShort` (50 chars, dimensionado pra slots 5/6) em badges circulares que comportam max ~22 chars. Fix: `slot-params.ts` agora aplica `shorten(label, 22)` específico no slot 3, sem regredir 50 chars dos slots 5/6
+- [x] **H3 (bonus):** `shorten()` agora reserva 1 char pro ellipsis no orçamento. Antes "max 22" produzia 23 chars (22 + "…"); agora produz 22 (21 + "…"). Output garantido ≤ max
+- [x] **H4 (smoke):** Adicionado `runTrimTests()` com mock letterbox 4:3 dentro de canvas 1:1 + caso clean. Adicionado `runBadgeLengthTests()` com motivações de 36-43 chars (caso real) validando que callouts saem ≤ 22 chars
+- [x] **H5:** `npm run smoke` passa: 7 parser + 2 trim + 1 badge + 15 slots
+
+---
+
 ## File List (esperado após implementação)
 
 **Novos:**

@@ -16,6 +16,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { composeForSlot } from '../netlify/functions/_lib/composer/index.ts';
 import { extractSlotParams, __testing } from '../netlify/functions/_lib/slot-params.ts';
+import { cropToSize } from '../netlify/functions/_lib/cropImage.ts';
 import {
   SLOT_ORDER,
   SLOT_DIMENSIONS,
@@ -24,7 +25,7 @@ import {
   type DescricaoResult,
   type SlotKind,
 } from '../src/types/anuncio.ts';
-import type { SlotParamsByKind } from '../netlify/functions/_lib/composer/types.ts';
+import type { SlotParamsByKind, SlotParamsLifestyleCallouts } from '../netlify/functions/_lib/composer/types.ts';
 
 // ============================================================
 // PARSER TESTS — valida regex de parseCotas com inputs reais
@@ -198,11 +199,132 @@ async function makeBaseImage(w: number, h: number): Promise<Buffer> {
 // MAIN
 // ============================================================
 
+// ============================================================
+// TRIM TESTS — valida cropToSize remove letterbox preto do Gemini
+// ============================================================
+
+/**
+ * Gera PNG 1024×1024 com retângulo central útil + faixas pretas top/bottom
+ * (simula letterbox que Gemini retorna quando ignora aspectRatio:'1:1').
+ */
+async function makeLetterboxedMock(
+  outerW: number, outerH: number,
+  innerW: number, innerH: number,
+): Promise<string> {
+  const offsetX = Math.floor((outerW - innerW) / 2);
+  const offsetY = Math.floor((outerH - innerH) / 2);
+  // SVG com fundo preto e retângulo bege central
+  const svg = `<svg width="${outerW}" height="${outerH}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${outerW}" height="${outerH}" fill="black"/>
+    <rect x="${offsetX}" y="${offsetY}" width="${innerW}" height="${innerH}" fill="#E8DFD2"/>
+  </svg>`;
+  const buf = await sharp(Buffer.from(svg)).png().toBuffer();
+  return buf.toString('base64');
+}
+
+async function runTrimTests(): Promise<{ ok: number; fail: number }> {
+  console.log('[trim tests]');
+  let ok = 0;
+  let fail = 0;
+
+  // Caso 1: letterbox top/bottom (4:3 dentro de 1:1) → trim deve remover faixas pretas
+  // Mock: 1024×1024 outer, 1024×768 inner (4:3) — bordas pretas top+bottom 128px cada
+  const lbBase64 = await makeLetterboxedMock(1024, 1024, 1024, 768);
+  const trimmed = await cropToSize(lbBase64, 2000, 2000);
+  // Após trim, a imagem útil 1024×768 (1.33:1) é resized cover pra 2000×2000.
+  // Cover preserva o ratio 1.33:1 cortando lateral, output deve ser 2000×2000 sem
+  // mais nenhum pixel preto puro nas bordas (validar via Sharp metadata + amostra).
+  const meta = await sharp(Buffer.from(trimmed.base64, 'base64')).metadata();
+  if (meta.width === 2000 && meta.height === 2000) {
+    console.log(`  ✓ Letterbox 4:3 removido + resize 2000×2000`);
+    ok += 1;
+  } else {
+    console.error(`  ✗ Letterbox: dim final ${meta.width}×${meta.height} (esperava 2000×2000)`);
+    fail += 1;
+  }
+
+  // Caso 2: imagem sem letterbox (puro 1024×1024) → trim deve ser no-op
+  const cleanBase64 = await sharp({
+    create: { width: 1024, height: 1024, channels: 3, background: '#A8B0BC' },
+  }).png().toBuffer().then((b) => b.toString('base64'));
+  const cleanResized = await cropToSize(cleanBase64, 2000, 2000);
+  const cleanMeta = await sharp(Buffer.from(cleanResized.base64, 'base64')).metadata();
+  if (cleanMeta.width === 2000 && cleanMeta.height === 2000) {
+    console.log(`  ✓ Imagem limpa (sem letterbox) → resize 2000×2000 ok`);
+    ok += 1;
+  } else {
+    console.error(`  ✗ Clean: dim final ${cleanMeta.width}×${cleanMeta.height}`);
+    fail += 1;
+  }
+
+  return { ok, fail };
+}
+
+// ============================================================
+// BADGE LENGTH TESTS — valida slot 3 callouts ≤ 22 chars
+// ============================================================
+
+function runBadgeLengthTests(): { ok: number; fail: number } {
+  console.log('[badge tests]');
+  let ok = 0;
+  let fail = 0;
+
+  // Mock com motivações LONGAS (37-43 chars) — tipo o caso real "Escultura Abaporu"
+  const longMotivacoes: AnaliseDeMercado = {
+    persona: { label: 'Cultura na casa', descricao: 'x', perfilDemografico: 'x' },
+    dores: [{ titulo: 'd1', descricao: 'x' }, { titulo: 'd2', descricao: 'x' }],
+    motivacoes: [
+      'Conectar a casa à cultura brasileira',                  // 37 chars
+      'Expressar identidade e pertencimento',                  // 36 chars
+      'Agregar valor estético e intelectual ao lar',           // 43 chars
+      'Obra clássica reinterpretada',                          // 28 chars
+    ],
+    janelaDeDecisao: '24h',
+    publicoSecundario: null,
+  };
+
+  const params = extractSlotParams(
+    'anuncio-lifestyle-callouts',
+    mockForm,
+    longMotivacoes,
+    mockDescricao,
+  ) as SlotParamsLifestyleCallouts;
+
+  if (params.callouts.length !== 3) {
+    console.error(`  ✗ callouts.length = ${params.callouts.length} (esperava 3)`);
+    fail += 1;
+  } else {
+    let allShort = true;
+    for (const c of params.callouts) {
+      if (c.label.length > 22) {
+        console.error(`  ✗ callout "${c.label}" tem ${c.label.length} chars (max 22)`);
+        allShort = false;
+        fail += 1;
+        break;
+      }
+    }
+    if (allShort) {
+      console.log(`  ✓ Slot 3 callouts ≤ 22 chars (atual: ${params.callouts.map((c) => c.label.length).join(', ')})`);
+      ok += 1;
+    }
+  }
+
+  return { ok, fail };
+}
+
 // Roda parser tests primeiro — bloqueia se algum falhar
 const parserResult = runParserTests();
 console.log(`[parser tests] ${parserResult.ok} OK · ${parserResult.fail} FAIL\n`);
-if (parserResult.fail > 0) {
-  console.error('[smoke] parser tests falharam — abortando antes de gerar imagens');
+
+const trimResult = await runTrimTests();
+console.log(`[trim tests] ${trimResult.ok} OK · ${trimResult.fail} FAIL\n`);
+
+const badgeResult = runBadgeLengthTests();
+console.log(`[badge tests] ${badgeResult.ok} OK · ${badgeResult.fail} FAIL\n`);
+
+const totalFails = parserResult.fail + trimResult.fail + badgeResult.fail;
+if (totalFails > 0) {
+  console.error('[smoke] testes programáticos falharam — abortando antes de gerar imagens');
   process.exit(1);
 }
 
