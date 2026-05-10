@@ -8,7 +8,7 @@ export function GlobalFooter() {
       <div>
         <Lockup variant="footer" />
         <p className="font-ui text-xs leading-loose mt-6 opacity-65 max-w-[280px]">
-          Atelier digital de criação de anúncios. Pequenos gestos que cabem na vida boa.
+          Atelier digital de criação de anúncios. Seu anúncio em alguns cliques.
         </p>
       </div>
       <div className="font-ui text-xs leading-loose opacity-65">

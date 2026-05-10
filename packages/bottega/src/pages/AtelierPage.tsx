@@ -76,10 +76,10 @@ export function AtelierPage() {
 
       <HeroEditorial
         eyebrow={VOLUME_LABEL}
-        headline={{ topo: 'A vida boa', italic: 'cabe em pequenos gestos.' }}
+        headline={{ topo: 'AMALFI CREATOR,', italic: 'seu anúncio em alguns cliques.' }}
         lede={
           isEmpty
-            ? 'Aqui é onde a Amalfi & Co. começa cada anúncio. O atelier ainda está em branco — comece pelo essencial.'
+            ? 'Aqui é onde a Amalfi Co. começa cada anúncio. O atelier ainda está em branco — comece pelo essencial.'
             : `Hoje você tem ${anuncios.length} ${anuncios.length === 1 ? 'anúncio' : 'anúncios'} em curadoria. Comece pelo próximo.`
         }
         actions={
