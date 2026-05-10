@@ -22,6 +22,10 @@
  *      - Quando não tem refs → images.generate (cena pura)
  *   4. Sharp resize pra dim alvo (gpt-image-1 retorna 1024×1024 ou 1536×1024)
  *   5. Composer SVG opcional (controle via APPLY_COMPOSER env)
+ *      - true (default): aplica overlays SVG por cima do output OpenAI
+ *      - false: deixa output puro do gpt-image-1 (texto JÁ embedded no pixel)
+ *      Quando os prompts pedem texto no próprio modelo, usar false evita
+ *      sobreposição/duplicação visual entre layout-OpenAI e overlay-SVG.
  *   6. Retorna CriacaoResults com 15 imagens compostas
  */
 
