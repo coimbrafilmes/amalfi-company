@@ -84,6 +84,17 @@ function readApplyComposer(): boolean {
   return process.env.APPLY_COMPOSER !== 'false';
 }
 
+// Module-level boot log — aparece sempre que o Lambda faz cold start.
+// Background functions suprimem logs internos da execução, mas esse boot
+// log é avaliado durante o load do módulo e fica visível no log do Netlify.
+console.log(
+  `[pipelineOpenAI] MODULE LOADED · ` +
+  `process.env.APPLY_COMPOSER=${JSON.stringify(process.env.APPLY_COMPOSER)} · ` +
+  `readApplyComposer()=${readApplyComposer()} · ` +
+  `process.env.IMAGE_PROVIDER=${JSON.stringify(process.env.IMAGE_PROVIDER)} · ` +
+  `node=${process.version}`,
+);
+
 const MAX_ATTEMPTS = 5;
 const BACKOFF_MS = [2_000, 5_000, 10_000, 20_000];
 
@@ -399,17 +410,29 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
     // V4 (Filosofia C): composer SVG é responsável por TODO texto. gpt-image-1
     // entrega cena pura sem texto. APPLY_COMPOSER=true é o padrão correto pra V4.
     // Quando false (debug), deixa imagem crua do modelo (sem branding/headlines).
+    //
+    // DEBUG (V4.1): encodar status do composer no campo modelUsado pra visualizar
+    // direto no devtools do frontend (background functions suprimem logs internos).
     let finalBuffer: Buffer = baseBuffer;
+    let composerStatus: string;
+    const envRawApplyComposer = JSON.stringify(process.env.APPLY_COMPOSER);
+
     if (APPLY_COMPOSER) {
       try {
         const params = extractSlotParams(slot, form, analise, descricao);
         finalBuffer = await composeForSlot(slot, baseBuffer, params);
-        console.log(`[pipelineOpenAI] composer aplicado em ${slot} (${baseBuffer.length}b → ${finalBuffer.length}b)`);
+        const before = baseBuffer.length;
+        const after = finalBuffer.length;
+        composerStatus = `OK-${before}b-${after}b`;
+        console.log(`[pipelineOpenAI] composer aplicado em ${slot} (${before}b → ${after}b)`);
       } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        composerStatus = `ERR-${msg.slice(0, 80).replace(/\s+/g, '-')}`;
         console.error(`[pipelineOpenAI] composer falhou pra ${slot}:`, err);
       }
     } else {
-      console.log(`[pipelineOpenAI] composer SKIPPED pra ${slot} (APPLY_COMPOSER=false)`);
+      composerStatus = `SKIP-env=${envRawApplyComposer}`;
+      console.log(`[pipelineOpenAI] composer SKIPPED pra ${slot} (APPLY_COMPOSER raw=${envRawApplyComposer})`);
     }
 
     completed += 1;
@@ -422,7 +445,7 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
       base64: `data:image/png;base64,${finalBuffer.toString('base64')}`,
       largura: dim.w,
       altura: dim.h,
-      modelUsado: APPLY_COMPOSER ? `${IMAGE_MODEL}+composer` : IMAGE_MODEL,
+      modelUsado: `${IMAGE_MODEL}|composer:${composerStatus}|envRaw:${envRawApplyComposer}`,
     };
   });
 
