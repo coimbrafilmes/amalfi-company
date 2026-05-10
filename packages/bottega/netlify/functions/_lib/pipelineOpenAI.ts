@@ -62,11 +62,24 @@ import { selectSlots, estiloForSlot, type SlotSelection } from './slot-pools';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
 const IMAGE_MODEL = 'gpt-image-1';
-const IMAGE_QUALITY = (process.env.OPENAI_IMAGE_QUALITY ?? 'medium') as 'low' | 'medium' | 'high';
-/** Concorrência limitada — Tier 1 OpenAI tem ~5 RPS; usar 4 dá folga */
-const IMAGE_CONCURRENCY = parseInt(process.env.OPENAI_IMAGE_CONCURRENCY ?? '4', 10);
-/** Composer SVG vira opcional quando gpt-image-1 já gera tudo. Default true (segurança). */
-const APPLY_COMPOSER = process.env.APPLY_COMPOSER !== 'false';
+
+/**
+ * Env vars lidas em RUNTIME (não no import do módulo). Importante: Netlify
+ * Functions com warm container retêm constantes do escopo de módulo do
+ * primeiro cold start. Se a env var muda no painel, o módulo já carregado
+ * mantém o valor antigo. Lendo por chamada, garantimos que toda invocação
+ * Lambda usa o valor atual da env — sem precisar de rebuild.
+ */
+function readImageQuality(): 'low' | 'medium' | 'high' {
+  return (process.env.OPENAI_IMAGE_QUALITY ?? 'medium') as 'low' | 'medium' | 'high';
+}
+function readImageConcurrency(): number {
+  return parseInt(process.env.OPENAI_IMAGE_CONCURRENCY ?? '4', 10);
+}
+/** Composer SVG é o coração da Filosofia C V4. Default true. */
+function readApplyComposer(): boolean {
+  return process.env.APPLY_COMPOSER !== 'false';
+}
 
 const MAX_ATTEMPTS = 5;
 const BACKOFF_MS = [2_000, 5_000, 10_000, 20_000];
@@ -185,6 +198,15 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
 
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey) throw new Error('GEMINI_API_KEY não configurada no servidor — pipeline ainda usa Gemini Text');
+
+  // Env vars lidas a CADA invocação (não cacheadas em escopo de módulo).
+  const IMAGE_QUALITY = readImageQuality();
+  const IMAGE_CONCURRENCY = readImageConcurrency();
+  const APPLY_COMPOSER = readApplyComposer();
+  console.log(
+    `[pipelineOpenAI] V4 boot · APPLY_COMPOSER=${APPLY_COMPOSER} · IMAGE_QUALITY=${IMAGE_QUALITY} · ` +
+    `IMAGE_CONCURRENCY=${IMAGE_CONCURRENCY}`,
+  );
 
   const openai = new OpenAI({ apiKey: openaiKey });
   const gemini = new GoogleGenAI({ apiKey: geminiKey });
@@ -448,6 +470,10 @@ export async function regenerateOneImageOpenAI(
   const openaiKey = process.env.OPENAI_API_KEY;
   if (!openaiKey) throw new Error('OPENAI_API_KEY não configurada');
   const openai = new OpenAI({ apiKey: openaiKey });
+
+  // Env vars lidas em runtime (mesmo motivo do pipeline principal).
+  const IMAGE_QUALITY = readImageQuality();
+  const APPLY_COMPOSER = readApplyComposer();
 
   const fotos = (form.fotosBase64 ?? []).slice(0, 3);
   const dim = SLOT_DIMENSIONS[slot];
