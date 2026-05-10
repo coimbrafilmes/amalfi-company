@@ -35,7 +35,29 @@ const PALETTE = `Brand palette: deep navy #1F2A3A (headlines), warm cream #F8F4E
 
 const NO_BRAND = `Do NOT include logos of Amazon, Mercado Livre, Shopee, or any third-party brand. Do not write "Amazon" or any e-commerce platform name anywhere.`;
 
-const TEXT_FIDELITY = `CRITICAL — TEXT FIDELITY: every text element marked between «quotes» MUST be rendered EXACTLY as written, character by character including all Portuguese accents (ç ã á é ê í ó ô ú). Do NOT translate. Do NOT paraphrase. Do NOT add extra words. If unsure of a character, copy it exactly. NO English text, NO other languages — Portuguese only as quoted.`;
+const TEXT_FIDELITY = `CRITICAL — TEXT FIDELITY (this is the single most important rule, read it twice):
+
+Every text element marked between «french quotes» MUST be rendered EXACTLY as written, character by character — including ALL Portuguese accents and special characters: ç Ç ã Ã á Á é É ê Ê í Í ó Ó ô Ô õ Õ ú Ú.
+
+DO NOT translate to English. DO NOT paraphrase. DO NOT add extra words. DO NOT remove accents. DO NOT abbreviate or truncate text. If text doesn't fit in the layout area, REDUCE the font size — never cut off characters mid-word.
+
+Common typos to AVOID (these were errors in past generations — do NOT repeat them):
+- Write «BRILHO» (correct) — NOT «Brilno», NOT «Britho»
+- Write «CRISTALINO» — NOT «Cristalmo», NOT «Cristalmo»
+- Write «TÉCNICAS» (with é) — NOT «TECNICAS» (without accent)
+- Write «ESPECIFICAÇÕES» (with ç and ões) — NOT «ESPECIFICACOES»
+- Write «curadoria» — NOT «curadoría» (no tilde on i)
+- Write «Roman» — NOT «Rorhan», NOT «3ophil»
+- Write «dia a dia» — NOT «lia a dia»
+- Write «capacidade» — NOT «capsoidade»
+- Write «refrescantes» — NOT «reffeccantes»
+
+Spanish-Portuguese confusion to avoid:
+- Use Portuguese «e» (not Spanish «y»)
+- Use Portuguese «com» (not «con»)
+- Use Portuguese «para» (not «pra» unless in casual contexts)
+
+Render Portuguese only — NO English, NO Spanish, NO other languages anywhere.`;
 
 const QUALITY = `Premium magazine-quality output. Sharp focus on product photography, crisp typography. Style: Brazilian Amazon BR top-seller infographic ad (think Gumpinho / Multilaser premium / Tramontina campaign).`;
 
@@ -182,8 +204,7 @@ SQUARE 1:1 Amazon BR lifestyle infographic for «${form.nomeProduto}», cinemati
 
 LAYOUT:
 - TOP BAND (15%, white #FFFFFF or cream #F8F4EE): bold sans-serif headline navy #1F2A3A centered, max 2 lines: «${p.headline}»
-- CENTER (65%): cinematic editorial photo of the product in luxury Brazilian residential setting (marble counter, warm golden hour, walnut, brass, eucalyptus blur). Product is the visual hero.
-- TOP RIGHT CORNER: small octagonal gold #D4A876 seal badge with 2-line uppercase serif text inside it: line 1 «CURADO», line 2 «AMALFI»
+- CENTER (65%): cinematic editorial photo of the product on a brunch-style breakfast table (marble counter, fresh fruits in a brass bowl, sunlight from a side window, eucalyptus stem). Product is the visual hero, photographed at table-level. NO badges, NO seals, NO text inside this center area.
 - BOTTOM BAND (20%, white #FFFFFF or cream #F8F4EE): 3 horizontal pill-shaped buttons evenly spaced, each pill has white background with thin navy border, small line-icon on left + bold sans-serif uppercase label in navy. Pills left-to-right:
   Pill 1: icon + «${p.callouts[0]?.label ?? ''}»
   Pill 2: icon + «${p.callouts[1]?.label ?? ''}»
@@ -198,8 +219,7 @@ SQUARE 1:1 Amazon BR feature infographic for «${form.nomeProduto}».
 
 LAYOUT:
 - TOP BAND (15%, cream #F8F4EE): bold sans-serif headline navy centered: «${p.headline}»
-- CENTER (65%): product on minimalist neutral residential surface, soft warm light
-- TOP RIGHT: gold #D4A876 octagonal badge with «CURADO» / «AMALFI» (2 lines uppercase)
+- CENTER (65%): product on a minimalist linen runner with eucalyptus, soft warm side window light, shallow depth of field. NO badges, NO text inside.
 - BOTTOM BAND (20%, cream): 3 horizontal pills (white bg, navy border, icon+label):
   «${p.callouts[0]?.label ?? ''}»
   «${p.callouts[1]?.label ?? ''}»
@@ -214,8 +234,7 @@ SQUARE 1:1 Amazon BR lifestyle+feature infographic for «${form.nomeProduto}».
 
 LAYOUT:
 - TOP BAND (15%, cream #F8F4EE): bold sans-serif headline navy centered: «${p.headline}»
-- CENTER (65%): editorial product photo in warm residential context (marble, linen, brass, soft warm light, shallow depth)
-- TOP RIGHT octagonal gold #D4A876 seal: «CURADO» / «AMALFI» (2 lines uppercase)
+- CENTER (65%): cocktail-hour editorial scene — product on a polished walnut bar surface with fresh citrus slices, ice, sprig of mint, warm amber bar light from side. NO badges, NO text inside.
 - BOTTOM BAND (20%, cream): 3 horizontal pills white bg navy border, icon+label:
   «${p.callouts[0]?.label ?? ''}»
   «${p.callouts[1]?.label ?? ''}»
@@ -240,7 +259,7 @@ LAYOUT — vertical split 50/50:
   - Center: abstract grey silhouette outline of generic product (no real product)
   - Below silhouette: 3 lines, each starts with red ✗ icon + sans-serif navy text: ${bulletsLeft}
 - RIGHT 50%: hero shot of «${form.nomeProduto}» on premium marble/walnut, warm cinematic light, shallow depth
-  - Top-center over photo: gold #D4A876 pill capsule with bold uppercase sans label: «CURADORIA AMALFI»
+  - Top-center over photo: gold #D4A876 pill capsule with bold uppercase sans label: «PREMIUM»
   - Below pill, over photo: 3 lines, each starts with green ✓ check icon + sans-serif navy text: ${bulletsRight}
 
 ${productClause(form)}${tail()}`.trim();
@@ -255,7 +274,7 @@ SQUARE 1:1 Amazon BR comparison infographic for «${form.nomeProduto}».
 LAYOUT — split 50/50:
 - TOP (8%): bold sans uppercase navy centered: «O INVESTIMENTO CERTO»
 - LEFT (sand #E8DFD2): navy pill «COMUM» on top + grey silhouette + ✗ list: ${bulletsLeft}
-- RIGHT (cream #F8F4EE): clean shot of product + gold pill «CURADORIA AMALFI» + ✓ list: ${bulletsRight}
+- RIGHT (cream #F8F4EE): clean shot of product + gold pill «PREMIUM» + ✓ list: ${bulletsRight}
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -269,7 +288,7 @@ SQUARE 1:1 Amazon BR comparison infographic for «${form.nomeProduto}».
 LAYOUT — split 50/50:
 - TOP BAND (8%, cream): bold sans-serif UPPERCASE navy centered: «O INVESTIMENTO CERTO»
 - LEFT 50% (sand cream #E8DFD2): navy pill «COMUM» top, grey silhouette of generic product, 3 ✗ lines: ${bulletsLeft}
-- RIGHT 50%: hero «${form.nomeProduto}» on warm marble/walnut, gold pill «CURADORIA AMALFI» top, 3 ✓ lines: ${bulletsRight}
+- RIGHT 50%: hero «${form.nomeProduto}» on warm marble/walnut, gold pill «PREMIUM» top, 3 ✓ lines: ${bulletsRight}
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -286,7 +305,7 @@ LAYOUT:
 - TOP-LEFT (28% width × 50% height): bold serif italic headline navy #1F2A3A in 2-3 lines: «${p.headline}»
   Below headline, smaller sans-serif navy 3 bullets each prefixed with • dot:
   ${bullets}
-- RIGHT 70%: cinematic aspirational scene featuring the product in luxury Brazilian residential moment (Mediterranean villa terrace, boutique hotel spa, designer's home interior). Marble surfaces, lit beeswax candles, brass holders, folded linen, eucalyptus, warm golden hour, very shallow depth of field. Product as cinematic hero with rim light.
+- RIGHT 70%: cinematic aspirational scene — formal dinner party setting with the product as centerpiece (Mediterranean villa dining table, lit beeswax candles in brass holders, antique silverware, folded linen napkins, sprig of rosemary, deep evening light, very shallow depth of field). Product as cinematic hero with rim light. NO text inside this area.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -312,7 +331,7 @@ SQUARE 1:1 Amazon BR aspirational ad for «${form.nomeProduto}».
 LAYOUT:
 - TOP-LEFT 28%: bold serif italic navy #1F2A3A headline 2-3 lines: «${p.headline}»
   Below: sans-serif navy bullets with • prefix: ${bullets}
-- RIGHT 70%: cinematic luxury residential scene (marble, candles, brass, linen, golden hour). Product hero with rim light.
+- RIGHT 70%: cinematic poolside terrace scene at sunset — product on a teakwood side table with travertine stone backdrop, fresh herbs, soft amber sky reflection, very shallow depth. Product as hero with rim light. NO text overlay here.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -329,7 +348,7 @@ LAYOUT — horizontal split 50/50:
 - TOP 50%: bold sans-serif UPPERCASE headline navy #1F2A3A in 2 lines centered: «${p.headline.toUpperCase()}»
   Below in same area: 3 bullets, each prefixed with bold navy • dot, sans-serif navy:
   ${bullets}
-- BOTTOM 50%: hero shot of «${form.nomeProduto}» on warm residential surface (marble or walnut), warm rim light, shallow depth of field
+- BOTTOM 50%: hero shot of «${form.nomeProduto}» on a kitchen counter (white marble) with morning sunlight from a window, fresh oranges in a brass bowl behind, slight steam rising. Product as hero with shallow depth. NO text overlay in this area.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -355,7 +374,7 @@ SQUARE 1:1 Amazon BR benefits for «${form.nomeProduto}».
 LAYOUT — split 50/50:
 - TOP 50%: bold sans-serif UPPERCASE navy #1F2A3A 2 lines centered: «${p.headline.toUpperCase()}»
   + sans navy bullets with • dot: ${bullets}
-- BOTTOM 50%: hero product on premium surface, warm rim light, shallow depth
+- BOTTOM 50%: hero product on a slate-grey kitchen island with a white linen runner, fresh basil and a cutting board with citrus slices, golden afternoon light, shallow depth. NO text overlay here.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -369,9 +388,8 @@ const PROMPT_ANUNCIO_PROVA_FINAL: PromptByStyle = {
 SQUARE 1:1 Amazon BR magazine-cover hero for «${form.nomeProduto}».
 
 LAYOUT:
-- TOP RIGHT CORNER: gold #D4A876 octagonal badge with 2-line UPPERCASE serif: line 1 «CURADO», line 2 «AMALFI»
 - TOP LEFT (12% height): 2 small horizontal pill capsules side-by-side, white background navy border, sans-serif navy uppercase labels: ${tags}
-- CENTER (75%): dramatic editorial close-up of the product as fashion-magazine cover. Slight low-angle, very shallow depth of field, premium materials around (marble, brass, velvet) blurred. Cinematic warm rim light.
+- CENTER (75%): dramatic editorial close-up of the product as fashion-magazine cover. Slight low-angle, very shallow depth of field, premium materials around (marble, brass, velvet) blurred. Cinematic warm rim light. NO badges, NO seals, NO text overlay.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -382,9 +400,8 @@ ${productClause(form)}${tail()}`.trim();
 SQUARE 1:1 Amazon BR hero for «${form.nomeProduto}».
 
 LAYOUT:
-- TOP RIGHT: gold octagonal badge «CURADO» / «AMALFI»
 - TOP LEFT: 2 small white pills navy border, sans navy uppercase: ${tags}
-- CENTER: clean premium close-up of product on cream gradient with warm rim light
+- CENTER: clean premium close-up of product on cream gradient with warm rim light. NO badges, NO seals.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -395,9 +412,8 @@ ${productClause(form)}${tail()}`.trim();
 SQUARE 1:1 Amazon BR magazine-cover hero for «${form.nomeProduto}».
 
 LAYOUT:
-- TOP RIGHT: gold #D4A876 octagonal badge «CURADO» / «AMALFI» (2 lines uppercase)
 - TOP LEFT: 2 small white-background pills navy border, sans-serif navy uppercase labels: ${tags}
-- CENTER 75%: dramatic editorial close-up, slight low-angle, shallow depth, premium materials blurred (marble, brass), warm rim light
+- CENTER 75%: dramatic editorial close-up, slight low-angle, shallow depth, premium materials blurred (marble, brass), warm rim light. NO badges, NO seals, NO text overlay.
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -591,7 +607,6 @@ LAYOUT:
 - LEFT 50%: hero shot of product on premium surface, warm rim light, shallow depth
 - RIGHT 50% (cream #F8F4EE bg): bold sans UPPERCASE navy centered headline: «POR QUE CONFIAR»
   Below: 3 lines stacked, each with green ✓ check icon + sans navy text: ${items}
-  Top-right corner of right side: gold #D4A876 octagonal badge «CURADO» / «AMALFI»
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -604,7 +619,6 @@ WIDE LANDSCAPE 3:2 validation for «${form.nomeProduto}».
 LAYOUT:
 - LEFT 50%: clean product shot
 - RIGHT 50% (cream): «POR QUE CONFIAR» bold sans UPPERCASE navy + 3 ✓ lines: ${items}
-  + gold octagonal seal «CURADO/AMALFI» top-right
 
 ${productClause(form)}${tail()}`.trim();
   },
@@ -618,7 +632,6 @@ LAYOUT:
 - LEFT 50%: hero product shot, warm rim light, shallow depth
 - RIGHT 50% (cream #F8F4EE): bold sans UPPERCASE navy centered: «POR QUE CONFIAR»
   + 3 ✓ navy lines: ${items}
-  + gold #D4A876 octagonal seal «CURADO» / «AMALFI» top-right corner
 
 ${productClause(form)}${tail()}`.trim();
   },
