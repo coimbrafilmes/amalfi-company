@@ -74,7 +74,10 @@ function readImageQuality(): 'low' | 'medium' | 'high' {
   return (process.env.OPENAI_IMAGE_QUALITY ?? 'medium') as 'low' | 'medium' | 'high';
 }
 function readImageConcurrency(): number {
-  return parseInt(process.env.OPENAI_IMAGE_CONCURRENCY ?? '4', 10);
+  // Tier 1 do gpt-image-1 limita a 5 input-images/min. Concorrência 2 mantém
+  // throughput aceitável (~30s por imagem) sem estourar quando há retries.
+  // Override com OPENAI_IMAGE_CONCURRENCY se for Tier 2+.
+  return parseInt(process.env.OPENAI_IMAGE_CONCURRENCY ?? '2', 10);
 }
 /** Composer SVG é o coração da Filosofia C V4. Default true. */
 function readApplyComposer(): boolean {
@@ -401,9 +404,12 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
       try {
         const params = extractSlotParams(slot, form, analise, descricao);
         finalBuffer = await composeForSlot(slot, baseBuffer, params);
+        console.log(`[pipelineOpenAI] composer aplicado em ${slot} (${baseBuffer.length}b → ${finalBuffer.length}b)`);
       } catch (err) {
         console.error(`[pipelineOpenAI] composer falhou pra ${slot}:`, err);
       }
+    } else {
+      console.log(`[pipelineOpenAI] composer SKIPPED pra ${slot} (APPLY_COMPOSER=false)`);
     }
 
     completed += 1;
