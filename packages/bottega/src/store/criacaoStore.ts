@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { CriacaoForm, CriacaoResults } from '../types/anuncio';
+import { FORM_DEFAULTS } from '../types/anuncio';
 import { gerarMockTudo, LOADING_MESSAGES } from '../lib/mocks';
 import { USE_MOCK } from '../lib/utils/env';
 
@@ -8,8 +9,10 @@ const formInicial = (): CriacaoForm => ({
   fotosBase64: undefined,
   detalhesTecnicos: '',
   tituloAtual: '',
-  numeroImagens: 7,
-  estiloImagem: 'lifestyle',
+  numeroAnuncio: FORM_DEFAULTS.numeroAnuncio,
+  numeroAplus: FORM_DEFAULTS.numeroAplus,
+  estiloAnuncio: FORM_DEFAULTS.estiloAnuncio,
+  estiloAplus: FORM_DEFAULTS.estiloAplus,
 });
 
 interface CriacaoState {

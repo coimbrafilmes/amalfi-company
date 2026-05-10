@@ -58,7 +58,7 @@ export function AtelierPage() {
   const cards = anuncios.slice(0, 6).map((a) => ({
     id: a.id,
     paletaCapa: 'mar' as const,
-    capaLegenda: 'Anúncio Bottega',
+    capaLegenda: 'Anúncio Amalfi Creator',
     eyebrow: 'Curadoria · Casa',
     titulo: a.form.nomeProduto.split(' ').slice(0, 2).join(' '),
     tituloItalic: a.form.nomeProduto.split(' ').slice(2).join(' ') || 'criado.',

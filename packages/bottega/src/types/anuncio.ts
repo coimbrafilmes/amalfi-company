@@ -13,9 +13,38 @@ export interface CriacaoForm {
   fotosBase64?: string[];
   detalhesTecnicos: string;
   tituloAtual?: string;
-  numeroImagens: number;       // mantido por backward-compat (V3 fixa em 7+6)
-  estiloImagem: EstiloImagem;
+
+  // V4: quantidades configuráveis por categoria (padrão Gumpinho)
+  /** Quantidade de imagens de Anúncio (2000×2000). Range 6-10. */
+  numeroAnuncio: number;
+  /** Quantidade de imagens de Conteúdo A+ (970×600). Range 3-6. */
+  numeroAplus: number;
+  /** Estilo visual das imagens de Anúncio. */
+  estiloAnuncio: EstiloImagem;
+  /** Estilo visual das imagens de A+. */
+  estiloAplus: EstiloImagem;
+
+  // === Backward-compat V3 ===
+  // Mantidos pra compatibilidade com anúncios antigos no localStorage. Quando
+  // V3 setava numeroImagens=N e estiloImagem=X, V4 deriva numeroAnuncio/Aplus
+  // e estiloAnuncio/Aplus de maneira sensata.
+  /** @deprecated V4 usa numeroAnuncio + numeroAplus. Mantido pra migration. */
+  numeroImagens?: number;
+  /** @deprecated V4 usa estiloAnuncio + estiloAplus. Mantido pra migration. */
+  estiloImagem?: EstiloImagem;
 }
+
+/** Defaults V4 do formulário (Gumpinho-style). */
+export const FORM_DEFAULTS = {
+  numeroAnuncio: 7,
+  numeroAplus: 5,
+  estiloAnuncio: 'misto' as EstiloImagem,
+  estiloAplus: 'misto' as EstiloImagem,
+  numeroAnuncioMin: 6,
+  numeroAnuncioMax: 10,
+  numeroAplusMin: 3,
+  numeroAplusMax: 6,
+} as const;
 
 /** Análise de mercado (etapa 1) */
 export interface AnaliseDeMercado {

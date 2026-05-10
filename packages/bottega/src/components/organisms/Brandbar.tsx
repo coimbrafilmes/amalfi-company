@@ -16,7 +16,7 @@ export function Brandbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-osso border-b border-tinta-08 px-12 py-4 flex items-center justify-between">
-      <Link to="/atelier" aria-label="Bottega home">
+      <Link to="/atelier" aria-label="AMALFI CREATOR home">
         <Lockup variant="brandbar" />
       </Link>
       <nav className="flex items-center gap-9">

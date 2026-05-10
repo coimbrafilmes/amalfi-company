@@ -7,18 +7,18 @@ interface LockupProps {
 }
 
 /**
- * Lockup — Bottega by Amalfi & Co.
- * Princípio brandbook: DM Serif "Amalfi" + Cormorant italic "& Co.".
+ * Lockup — AMALFI CREATOR by Amalfi Co.
+ * Princípio brandbook: DM Serif "AMALFI CREATOR" (caixa-alta) + Cormorant italic "by Amalfi Co.".
  */
 export function Lockup({ variant = 'brandbar', showBy = true, className }: LockupProps) {
   if (variant === 'footer') {
     return (
       <div className={cn('flex flex-col gap-1', className)}>
-        <div className="font-display text-display-m leading-none text-tinta">
-          Bottega <em className="font-editorial italic font-regular text-display-s">by</em>
+        <div className="font-display text-display-m leading-none text-tinta tracking-tight">
+          AMALFI <em className="font-editorial italic font-regular text-display-s">CREATOR</em>
         </div>
-        <div className="font-display text-2xl text-tinta">
-          Amalfi <em className="font-editorial italic font-regular text-xl">&amp; Co.</em>
+        <div className="font-editorial italic text-xl text-tinta-65">
+          by Amalfi Co.
         </div>
       </div>
     );
@@ -26,10 +26,10 @@ export function Lockup({ variant = 'brandbar', showBy = true, className }: Locku
 
   if (variant === 'inline') {
     return (
-      <span className={cn('font-display text-tinta', className)}>
-        Bottega
+      <span className={cn('font-display text-tinta tracking-tight', className)}>
+        AMALFI CREATOR
         {showBy && <em className="font-editorial italic font-regular text-tinta-65 mx-1.5 text-[0.75em]">by</em>}
-        Amalfi <em className="font-editorial italic font-regular text-[0.85em]">&amp; Co.</em>
+        <em className="font-editorial italic font-regular text-[0.85em]">Amalfi Co.</em>
       </span>
     );
   }
@@ -37,10 +37,9 @@ export function Lockup({ variant = 'brandbar', showBy = true, className }: Locku
   // brandbar default
   return (
     <div className={cn('flex items-baseline gap-2', className)}>
-      <span className="font-display text-[28px] leading-none text-tinta tracking-tight">Bottega</span>
+      <span className="font-display text-[26px] leading-none text-tinta tracking-tight">AMALFI CREATOR</span>
       {showBy && <span className="font-editorial italic text-base text-tinta-65">by</span>}
-      <span className="font-display text-[22px] text-tinta">Amalfi</span>
-      <span className="font-editorial italic text-lg text-tinta -ml-1">&amp; Co.</span>
+      <span className="font-editorial italic text-lg text-tinta">Amalfi Co.</span>
     </div>
   );
 }

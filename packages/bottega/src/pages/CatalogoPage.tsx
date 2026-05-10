@@ -39,7 +39,7 @@ export function CatalogoPage() {
             <CardAnuncio
               key={a.id}
               paletaCapa="mar"
-              capaLegenda="Anúncio Bottega"
+              capaLegenda="Anúncio Amalfi Creator"
               eyebrow="Curadoria · Casa"
               titulo={a.form.nomeProduto.split(' ').slice(0, 2).join(' ')}
               tituloItalic={a.form.nomeProduto.split(' ').slice(2).join(' ') || 'criado.'}

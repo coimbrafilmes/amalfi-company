@@ -158,7 +158,7 @@ function formatReadme(results: CriacaoResults, productName: string): string {
 
   return `# ${productName}
 
-> Anúncio Amazon BR gerado pelo Bottega · Amalfi Editorial
+> Anúncio Amazon BR gerado pelo AMALFI CREATOR · Amalfi Co.
 > Gerado em ${new Date(results.geradoEm).toLocaleString('pt-BR')} · modo \`${results.modoGeracao}\`
 
 ---

@@ -47,7 +47,6 @@ import {
   destaquesSchema,
 } from '../../../src/lib/gemini/schemas';
 import {
-  SLOT_ORDER,
   SLOT_VARIANT,
   SLOT_DIMENSIONS,
   type CriacaoForm,
@@ -59,6 +58,7 @@ import { cropToSize } from './cropImage';
 import { promptForSlotOpenAI } from './slot-prompts-openai';
 import { extractSlotParams } from './slot-params';
 import { composeForSlot } from './composer';
+import { selectSlots, estiloForSlot, type SlotSelection } from './slot-pools';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? 'gemini-2.5-flash';
 const IMAGE_MODEL = 'gpt-image-1';
@@ -253,8 +253,16 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
   const destaques = destaquesResult.destaques;
 
   // ---------- 3. Imagens dos slots via OpenAI gpt-image-1 ----------
-  const totalImages = SLOT_ORDER.length;
+  // V4: seleção dinâmica de slots baseada em form (numeroAnuncio, numeroAplus,
+  // estiloAnuncio, estiloAplus). Slots viram lista runtime ao invés de SLOT_ORDER fixo.
+  const selection: SlotSelection = selectSlots(form);
+  const slotsToRender = selection.slots;
+  const totalImages = slotsToRender.length;
   let completed = 0;
+  console.log(
+    `[pipelineOpenAI] V4 slot selection: ${selection.anuncioSlots.length} anúncio (${selection.estiloAnuncio}) ` +
+    `+ ${selection.aplusSlots.length} A+ (${selection.estiloAplus}) = ${totalImages} total`,
+  );
   await opts.onStep(`Renderizando imagens (gpt-image-1 · ${IMAGE_QUALITY})…`, { current: 0, total: totalImages });
 
   /**
@@ -262,10 +270,12 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
    * Quando tem fotos do produto → usa images.edit (multi-image input pra fidelidade).
    * Quando não tem refs → usa images.generate (cena pura).
    */
-  async function generateImageForSlot(slot: SlotKind): Promise<string | null> {
+  async function generateImageForSlot(slot: SlotKind, slotIndex: number): Promise<string | null> {
     const params = extractSlotParams(slot, form, analise, descricao);
-    const promptText = promptForSlotOpenAI(slot, form, params, visualSpec);
+    const estilo = estiloForSlot(slot, selection);
+    const promptText = promptForSlotOpenAI(slot, form, params, estilo, visualSpec);
     const size = openaiSizeForSlot(slot);
+    void slotIndex; // mantido pra debugging (variante futura entre slots repetidos)
 
     try {
       return await withRetry(async () => {
@@ -325,17 +335,23 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
     return results;
   }
 
-  const imagens: ImagemGerada[] = await runWithPool(SLOT_ORDER, IMAGE_CONCURRENCY, async (slot): Promise<ImagemGerada> => {
-    const base64 = await generateImageForSlot(slot);
+  // V4: lista de slots vem de selectSlots(form), não SLOT_ORDER fixo.
+  // Cada item carrega (slot, indexNoArray) pra suportar slots repetidos
+  // quando numeroAnuncio > 7 ou numeroAplus > 8.
+  const slotsWithIdx = slotsToRender.map((slot, idx) => ({ slot, idx }));
+
+  const imagens: ImagemGerada[] = await runWithPool(slotsWithIdx, IMAGE_CONCURRENCY, async ({ slot, idx }): Promise<ImagemGerada> => {
+    const base64 = await generateImageForSlot(slot, idx);
     const variante = SLOT_VARIANT[slot];
     const dim = SLOT_DIMENSIONS[slot];
+    const briefingNumero = idx + 1;
 
     if (!base64) {
       completed += 1;
       await opts.onStep(`Renderizando imagens (gpt-image-1)…`, { current: completed, total: totalImages });
       return {
         slotKind: slot,
-        briefingNumero: SLOT_ORDER.indexOf(slot) + 1,
+        briefingNumero,
         variante,
         base64: '',
         largura: dim.w,
@@ -355,8 +371,9 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
       baseBuffer = Buffer.from(base64, 'base64');
     }
 
-    // Composer SVG opcional. Quando APPLY_COMPOSER=false, deixa só a imagem do gpt-image-1
-    // (já gera texto+layout no próprio modelo). Padrão: aplica composer (segurança).
+    // V4 (Filosofia C): composer SVG é responsável por TODO texto. gpt-image-1
+    // entrega cena pura sem texto. APPLY_COMPOSER=true é o padrão correto pra V4.
+    // Quando false (debug), deixa imagem crua do modelo (sem branding/headlines).
     let finalBuffer: Buffer = baseBuffer;
     if (APPLY_COMPOSER) {
       try {
@@ -372,7 +389,7 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
 
     return {
       slotKind: slot,
-      briefingNumero: SLOT_ORDER.indexOf(slot) + 1,
+      briefingNumero,
       variante,
       base64: `data:image/png;base64,${finalBuffer.toString('base64')}`,
       largura: dim.w,
@@ -381,28 +398,25 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
     };
   });
 
-  // Briefings sintéticos pra UI continuar funcionando (legacy compat)
-  const briefings = SLOT_ORDER
-    .filter((s) => SLOT_VARIANT[s] === 'anuncio')
-    .map((slot, idx) => ({
-      numero: idx + 1,
-      isCover: slot === 'anuncio-capa',
-      estagio: slot,
-      titulo: slot.replace('anuncio-', '').replace(/-/g, ' '),
-      prompt: '(handled by pipelineOpenAI)',
-      dataPoints: [],
-    }));
+  // Briefings sintéticos pra UI continuar funcionando — agora baseados na
+  // selection dinâmica do V4, não no SLOT_ORDER fixo.
+  const briefings = selection.anuncioSlots.map((slot, idx) => ({
+    numero: idx + 1,
+    isCover: slot === 'anuncio-capa',
+    estagio: slot,
+    titulo: slot.replace('anuncio-', '').replace(/-/g, ' '),
+    prompt: '(handled by pipelineOpenAI)',
+    dataPoints: [],
+  }));
 
-  const briefingsAPlus = SLOT_ORDER
-    .filter((s) => SLOT_VARIANT[s] === 'aplus')
-    .map((slot, idx) => ({
-      numero: idx + 1,
-      estagio: slot,
-      titulo: slot.replace('aplus-', '').replace(/-/g, ' '),
-      prompt: '(handled by pipelineOpenAI)',
-    }));
+  const briefingsAPlus = selection.aplusSlots.map((slot, idx) => ({
+    numero: idx + 1,
+    estagio: slot,
+    titulo: slot.replace('aplus-', '').replace(/-/g, ' '),
+    prompt: '(handled by pipelineOpenAI)',
+  }));
 
-  console.log(`[pipelineOpenAI] V3 concluído em ${Date.now() - inicio}ms · provider=openai · quality=${IMAGE_QUALITY}`);
+  console.log(`[pipelineOpenAI] V4 concluído em ${Date.now() - inicio}ms · provider=openai · quality=${IMAGE_QUALITY}`);
 
   return {
     analise,
@@ -416,7 +430,7 @@ export async function runAnuncioPipelineOpenAI(form: CriacaoForm, opts: Pipeline
     visualSpec,
     geradoEm: new Date().toISOString(),
     modoGeracao: 'real',
-    schemaVersion: 3,
+    schemaVersion: 4,
   };
 }
 
@@ -439,7 +453,12 @@ export async function regenerateOneImageOpenAI(
   const dim = SLOT_DIMENSIONS[slot];
   const size = openaiSizeForSlot(slot);
   const params = extractSlotParams(slot, form, analise, descricao);
-  const promptText = promptForSlotOpenAI(slot, form, params, visualSpec);
+  // Pra regenerate, usa estilo do form (anuncio ou aplus dependendo do slot)
+  const variante = SLOT_VARIANT[slot];
+  const estilo = variante === 'anuncio'
+    ? (form.estiloAnuncio ?? form.estiloImagem ?? 'misto')
+    : (form.estiloAplus ?? form.estiloImagem ?? 'misto');
+  const promptText = promptForSlotOpenAI(slot, form, params, estilo, visualSpec);
 
   const base64 = await withRetry(async () => {
     if (fotos.length > 0) {

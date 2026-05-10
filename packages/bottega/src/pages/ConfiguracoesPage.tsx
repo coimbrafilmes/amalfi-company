@@ -37,7 +37,7 @@ export function ConfiguracoesPage() {
           Configurações <em className="font-editorial italic font-regular">simples.</em>
         </h1>
         <Editorial size="l" className="opacity-75 mb-section-lg max-w-prose">
-          Tudo o que controla a Bottega — em dois cliques.
+          Tudo o que controla o AMALFI CREATOR — em dois cliques.
         </Editorial>
 
         <section className="bg-areia px-10 py-10 mb-8 max-w-3xl">
@@ -47,8 +47,8 @@ export function ConfiguracoesPage() {
           </h2>
           <p className="font-ui font-light leading-loose mb-5">
             {USE_MOCK
-              ? 'A Bottega está usando dados de exemplo (mock). Nenhuma chamada à API Gemini ou Imagen é feita. Para ativar geração real, edite VITE_USE_MOCK=false em .env e reinicie o servidor.'
-              : 'A Bottega está conectada ao Gemini real via Netlify Functions (key segura, server-side). Cada criação consome créditos. Imagens via Imagen 4 custam ~$0.04 por foto.'}
+              ? 'O AMALFI CREATOR está usando dados de exemplo (mock). Nenhuma chamada à API Gemini ou OpenAI é feita. Para ativar geração real, edite VITE_USE_MOCK=false em .env e reinicie o servidor.'
+              : 'O AMALFI CREATOR está conectado às APIs reais via Netlify Functions (keys seguras, server-side). Cada criação consome créditos. Imagens via gpt-image-1 custam ~$0.042 por foto em medium quality.'}
           </p>
           <div className="font-ui text-sm space-y-2 opacity-80">
             <div>
